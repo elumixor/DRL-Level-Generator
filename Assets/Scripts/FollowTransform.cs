@@ -17,7 +17,7 @@ public class FollowTransform : MonoBehaviour {
     public float followStrength;
     public Vector3 offset;
 
-    private void Update() {
+    void Update() {
         var p = transform.position;
         var pp = toFollow.position + offset;
 

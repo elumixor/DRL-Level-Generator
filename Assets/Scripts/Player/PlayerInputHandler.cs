@@ -7,13 +7,13 @@ namespace Player {
     /// </summary>
     [RequireComponent(typeof(PlayerBehaviouralController))]
     public class PlayerInputHandler : MonoBehaviour {
-        private void Update() {
+        void Update() {
             if (Input.GetMouseButtonDown(0)) {
-                Switch();
+                OnTap();
             }
         }
 
-        private void Switch() {
+        public void OnTap() {
             var playerBehaviouralController = GetComponent<PlayerBehaviouralController>();
             
             playerBehaviouralController.Switch();

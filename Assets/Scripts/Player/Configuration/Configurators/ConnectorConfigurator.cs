@@ -5,16 +5,16 @@ using UnityEngine;
 namespace Player.Configuration.Configurators {
     [RequireComponent(typeof(LineRenderer))]
     public class ConnectorConfigurator : MonoBehaviour {
-        [SerializeField, Range(2, 100)] private int smoothness;
+        [SerializeField, Range(2, 100)] int smoothness;
 
-        private float length;
+        float length;
 
         public void ApplyConfiguration(StructuralConfiguration structuralConfiguration) {
             transform.localScale = new Vector3(1, structuralConfiguration.connectorLength, -1);
         }
 
         [Button]
-        private void UpdateLineRenderer() {
+        void UpdateLineRenderer() {
             var positions = new Vector3[smoothness];
 
             for (var i = 0; i < smoothness; i++)

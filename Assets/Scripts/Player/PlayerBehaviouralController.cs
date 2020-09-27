@@ -8,36 +8,38 @@ namespace Player {
     /// </summary>
     [RequireComponent(typeof(PlayerConfigurator))]
     public class PlayerBehaviouralController : MonoBehaviour {
-        [SerializeField] private Transform rotatingPart;
+        public event Action OnCollided = delegate { };
 
-        private float angle;
+        [SerializeField] Transform rotatingPart;
 
-        [SerializeField] private float maxAngle;
-        [SerializeField] private float swingSpeed;
-        [SerializeField] private float upwardSpeed;
+        float angle;
 
-        [SerializeField] private float upwardSpeedBoostStrength;
-        [SerializeField] private float upwardSpeedBoostTime;
+        [SerializeField] float maxAngle;
+        [SerializeField] float swingSpeed;
+        [SerializeField] float upwardSpeed;
 
-        [SerializeField] private float swingBoostStrength;
-        [SerializeField] private float swingBoostTime;
+        [SerializeField] float upwardSpeedBoostStrength;
+        [SerializeField] float upwardSpeedBoostTime;
 
+        [SerializeField] float swingBoostStrength;
+        [SerializeField] float swingBoostTime;
 
-        private float t;
-        private float direction = 1;
-        private float boost;
-        private float swingBoost;
+        float t;
+        float direction = 1;
+        float boost;
+        float swingBoost;
 
-        private IEnumerator currentUpwardSpeedBoostCoroutine;
-        private IEnumerator currentSwingBoostCoroutine;
+        IEnumerator currentUpwardSpeedBoostCoroutine;
+        IEnumerator currentSwingBoostCoroutine;
 
-        private void Update() {
+        void Update() {
             t += Time.deltaTime * (swingSpeed + swingBoost) * direction;
             var a = Mathf.Sin(t) * maxAngle;
 
             rotatingPart.localEulerAngles = Vector3.forward * a;
             transform.localPosition += (upwardSpeed + boost) * Time.deltaTime * Vector3.up;
         }
+
 
         public void Switch() {
             direction *= -1;
@@ -77,9 +79,31 @@ namespace Player {
 
             currentUpwardSpeedBoostCoroutine = UpwardSpeedBoostCoroutine();
             currentSwingBoostCoroutine = SwingBoostCoroutine();
-            
+
             StartCoroutine(currentUpwardSpeedBoostCoroutine);
             StartCoroutine(currentSwingBoostCoroutine);
+        }
+
+        void OnTriggerEnter2D(Collider2D other) {
+            if (other.CompareTag("Enemy")) OnCollided();
+        }
+
+        public void ResetState() {
+            transform.position = Vector3.zero;
+
+            if (currentSwingBoostCoroutine != null) {
+                StopCoroutine(currentSwingBoostCoroutine);
+                currentSwingBoostCoroutine = null;
+            }
+
+            if (currentUpwardSpeedBoostCoroutine != null) {
+                StopCoroutine(currentUpwardSpeedBoostCoroutine);
+                currentSwingBoostCoroutine = null;
+            }
+
+            t = 0;
+
+            direction = 1;
         }
     }
 }

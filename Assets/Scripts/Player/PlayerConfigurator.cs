@@ -10,12 +10,12 @@ namespace Player {
     /// </summary>
     [ExecuteInEditMode]
     public class PlayerConfigurator : MonoBehaviour {
-        [SerializeField] private StructuralConfiguration structuralConfiguration;
-        [SerializeField] private BehaviouralConfiguration behaviouralConfiguration;
+        [SerializeField] StructuralConfiguration structuralConfiguration;
+        [SerializeField] BehaviouralConfiguration behaviouralConfiguration;
         
-        [SerializeField, Foldout("Components")] private BobConfigurator bobConfigurator;
-        [SerializeField, Foldout("Components")] private ConnectorConfigurator connectorConfigurator;
-        [SerializeField] private bool watchForChanges = true;
+        [SerializeField, Foldout("Components")] BobConfigurator bobConfigurator;
+        [SerializeField, Foldout("Components")] ConnectorConfigurator connectorConfigurator;
+        [SerializeField] bool watchForChanges = true;
 
         // Expose configurations
         public BehaviouralConfiguration BehaviouralConfiguration => behaviouralConfiguration;
@@ -25,16 +25,16 @@ namespace Player {
         /// Applies the structural and behavioural configuration to the player
         /// </summary>
         [Button]
-        private void ApplyConfiguration() {
+        void ApplyConfiguration() {
             ApplyStructuralConfiguration();
         }
 
-        private void ApplyStructuralConfiguration() {
+        void ApplyStructuralConfiguration() {
             connectorConfigurator.ApplyConfiguration(structuralConfiguration);
             bobConfigurator.ApplyConfiguration(structuralConfiguration);
         }
 
-        private void Update() {
+        void Update() {
             if (watchForChanges) ApplyConfiguration();
         }
     }

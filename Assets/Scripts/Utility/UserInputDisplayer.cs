@@ -5,9 +5,9 @@ using UnityEngine;
 namespace Utility {
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class UserInputDisplayer : MonoBehaviour {
-        [SerializeField] private float fadeTime;
+        [SerializeField] float fadeTime;
 
-        private string Text {
+        string Text {
             set {
                 var tmpro = GetComponent<TextMeshProUGUI>();
                 tmpro.text = value;
@@ -28,14 +28,14 @@ namespace Utility {
             }
         }
 
-        private IEnumerator currentCoroutine;
+        IEnumerator currentCoroutine;
 
 
         void Update() {
             HandleInput();
         }
 
-        private void HandleInput() {
+        void HandleInput() {
             if (Input.GetMouseButtonDown(0)) {
                 Text = "Click";
                 return;
