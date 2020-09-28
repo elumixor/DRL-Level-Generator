@@ -4,22 +4,31 @@ using Common;
 namespace Utilities {
     public class MemoryBuffer<TAction, TObservation> : IByteConvertible
         where TAction : IByteConvertible where TObservation : IByteConvertible {
-        List<TObservation> observations = new List<TObservation>();
-        List<TAction> actions = new List<TAction>();
-        List<float> rewards = new List<float>();
+        CyclingQueue<TObservation> observations;
+        CyclingQueue<TAction> actions;
+        CyclingQueue<float> rewards;
+
+        public MemoryBuffer(int size) {
+            observations = new CyclingQueue<TObservation>(size);
+            actions = new CyclingQueue<TAction>(size);
+            rewards = new CyclingQueue<float>(size);
+        }
+        
+        public int Length => observations.Length;
 
         public void Clear() {
-            observations = new List<TObservation>();
-            actions = new List<TAction>();
-            rewards = new List<float>();
+            observations.Clear();
+            actions.Clear();
+            rewards.Clear();
         }
 
         public void Push(TObservation state, TAction action, float reward) {
-            observations.Add(state);
-            actions.Add(action);
-            rewards.Add(reward);
+            observations.Enqueue(state);
+            actions.Enqueue(action);
+            rewards.Enqueue(reward);
         }
 
-        public byte[] ToBytes() => ByteConverter.ConcatBytes(observations.ToBytes(), actions.ToBytes(), rewards.ToBytes());
+        public byte[] ToBytes() =>
+            ByteConverter.ConcatBytes(Length.ToBytes(), observations.ToBytes(), actions.ToBytes(), rewards.ToBytes());
     }
 }

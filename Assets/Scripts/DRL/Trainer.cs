@@ -80,7 +80,7 @@
 
             if (episode >= episodesPerEpoch) {
                 epoch++;
-                agent.UpdateAgent();
+                agent.OnEpochFinished();
             }
             if (epoch < epochs) StartNewEpisode();
             else OnTrainingFinished();

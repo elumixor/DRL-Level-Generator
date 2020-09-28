@@ -6,6 +6,7 @@ namespace Common {
     public static class ByteConverter {
         public static byte[] ToBytes(this float value) => BitConverter.GetBytes(value);
         public static byte[] ToBytes(this bool value) => BitConverter.GetBytes(value);
+        public static byte[] ToBytes(this int value) => BitConverter.GetBytes(value);
 
         public static byte[] ToBytes(this IEnumerable<byte[]> enumerable) => ConcatBytes(enumerable.ToArray());
 

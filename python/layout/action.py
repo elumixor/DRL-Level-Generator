@@ -1,0 +1,8 @@
+import struct
+
+# action is just a single number
+action_size = 1
+
+
+def action2bytes(action):
+    return struct.pack('i', 1 if action.item() > 0 else 0)

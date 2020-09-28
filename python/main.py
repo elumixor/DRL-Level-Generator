@@ -1,15 +1,18 @@
-import struct
-
+from layout import bytes2state, action2bytes, bytes2training_data
 from server import start_server, on_message, send_message
+from DRL import agent
 
 
-def handle_message(bytes):
-    header = bytes[0:1].decode()
-    data = struct.unpack('f', bytes[1:])[0]
+def handle_message(message):
+    header = message[0:1].decode()
+    data = message[1:]
 
-    response = 0 if data > 1 else 1
-
-    send_message(struct.pack('i', response))
+    if header == 'i':
+        action = agent.infer(bytes2state(message))
+        send_message(action2bytes(action))
+    else:
+        agent.train(bytes2training_data(message))  # updates the model
+        send_message(b'')
 
 
 on_message += handle_message

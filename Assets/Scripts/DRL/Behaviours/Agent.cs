@@ -7,6 +7,6 @@ namespace DRL.Behaviours {
         public abstract TAction GetAction(TObservation observation);
         public virtual void SaveStep(TObservation previousObservation, TAction action, float reward) {}
         public virtual void OnEpisodeFinished() {}
-        public virtual void UpdateAgent() {}
+        public virtual void OnEpochFinished() {}
     }
 }
