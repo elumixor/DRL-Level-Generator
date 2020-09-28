@@ -32,12 +32,17 @@ namespace Player {
         IEnumerator currentUpwardSpeedBoostCoroutine;
         IEnumerator currentSwingBoostCoroutine;
 
-        void Update() {
-            t += Time.deltaTime * (swingSpeed + swingBoost) * direction;
-            var a = Mathf.Sin(t) * maxAngle;
+        public Vector2 Position => transform.localPosition;
+        public float Angle { get; private set; }
+        public float AnglularSpeed => (swingSpeed + swingBoost) * direction;
+        public float UpwardSpeed => upwardSpeed + boost;
 
-            rotatingPart.localEulerAngles = Vector3.forward * a;
-            transform.localPosition += (upwardSpeed + boost) * Time.deltaTime * Vector3.up;
+        void Update() {
+            t += Time.deltaTime * AngularSpeed;
+            Angle = Mathf.Sin(t) * maxAngle;
+
+            rotatingPart.localEulerAngles = Vector3.forward * Angle;
+            transform.localPosition += UpwwardSpeed * Time.deltaTime * Vector3.up;
         }
 
 

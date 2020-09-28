@@ -2,33 +2,33 @@
 using Common;
 
 namespace Utilities {
-    public class MemoryBuffer<TAction, TObservation> : IByteConvertible
-        where TAction : IByteConvertible where TObservation : IByteConvertible {
-        CyclingQueue<TObservation> observations;
+    public class MemoryBuffer<TAction, TState> : IByteConvertible
+        where TAction : IByteConvertible where TState : IByteConvertible {
+        CyclingQueue<TState> states;
         CyclingQueue<TAction> actions;
         CyclingQueue<float> rewards;
 
         public MemoryBuffer(int size) {
-            observations = new CyclingQueue<TObservation>(size);
+            states = new CyclingQueue<TState>(size);
             actions = new CyclingQueue<TAction>(size);
             rewards = new CyclingQueue<float>(size);
         }
         
-        public int Length => observations.Length;
+        public int Length => states.Length;
 
         public void Clear() {
-            observations.Clear();
+            states.Clear();
             actions.Clear();
             rewards.Clear();
         }
 
-        public void Push(TObservation state, TAction action, float reward) {
-            observations.Enqueue(state);
-            actions.Enqueue(action);
-            rewards.Enqueue(reward);
+        public void Push(TState state, TAction action, float reward) {
+            states.Push(state);
+            actions.Push(action);
+            rewards.Push(reward);
         }
 
         public byte[] ToBytes() =>
-            ByteConverter.ConcatBytes(Length.ToBytes(), observations.ToBytes(), actions.ToBytes(), rewards.ToBytes());
+            ByteConverter.ConcatBytes(Length.ToBytes(), states.ToBytes(), actions.ToBytes(), rewards.ToBytes());
     }
 }
