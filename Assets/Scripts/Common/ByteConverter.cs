@@ -5,6 +5,7 @@ using System.Linq;
 namespace Common {
     public static class ByteConverter {
         public static byte[] ToBytes(this float value) => BitConverter.GetBytes(value);
+        public static byte[] ToBytes(this bool value) => BitConverter.GetBytes(value);
 
         public static byte[] ToBytes(this IEnumerable<byte[]> enumerable) => ConcatBytes(enumerable.ToArray());
 
@@ -26,5 +27,11 @@ namespace Common {
 
             return res;
         }
+
+
+        // bytes -> data
+        public static float ToFloat(this byte[] bytes, int startIndex = 0) => BitConverter.ToSingle(bytes, startIndex);
+        public static bool ToBool(this byte[] bytes, int startIndex = 0) => BitConverter.ToBoolean(bytes, startIndex);
+        public static int ToInt(this byte[] bytes, int startIndex = 0) => BitConverter.ToInt32(bytes, startIndex);
     }
 }

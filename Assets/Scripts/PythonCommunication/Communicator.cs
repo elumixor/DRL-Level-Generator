@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using AsyncIO;
+using Common;
 using NetMQ;
 using NetMQ.Sockets;
-using TMPro;
+using UnityEditor;
 using UnityEngine;
 
 namespace PythonCommunication {
-    public class Communicator : MonoBehaviour {
+    public class Communicator {
         static Thread listenerThread;
-
         static bool running = true;
-        static string address = "tcp://localhost:5556";
-
+        const string ADDRESS = "tcp://localhost:5555";
         static bool shouldSendByteData;
         static byte[] byteData;
-
         static bool isConnected;
 
-        public static Communicator Instance { get; private set; }
         public static event Action<byte[]> OnMessageReceived = delegate { };
 
         public static void SendMessage(byte[] data) {
@@ -26,13 +24,24 @@ namespace PythonCommunication {
             byteData = data;
         }
 
+        public static byte[] Compute(byte[] data) {
+            client.SendFrame(data);
+            var receiveFrameBytes = client.ReceiveFrameBytes();
+            return receiveFrameBytes;
+        }
+
+        static RequestSocket client;
+
         public static void OpenConnection() {
             if (isConnected) return;
+            ForceDotNet.Force();
 
             isConnected = true;
 
-            listenerThread = new Thread(Instance.Listen);
-            listenerThread.Start();
+            client = new RequestSocket();
+            client.Connect(ADDRESS);
+            // listenerThread = new Thread(Listen);
+            // listenerThread.Start();
         }
 
         public static void CloseConnection() {
@@ -40,30 +49,31 @@ namespace PythonCommunication {
 
             isConnected = false;
 
-            running = false;
+            client.Dispose();
+            NetMQConfig.Cleanup();
             listenerThread.Join();
         }
 
-        void Listen() {
-            ForceDotNet.Force(); // this line is needed to prevent unity freeze after one use, not sure why yet
+        static void Listen() {
+            // // this line is needed to prevent unity freeze after one use, not sure why yet
+            //
+            // var 
+            //
+            // using (var client = new RequestSocket()) {
+            //     client.Connect(ADDRESS);
+            //
+            //     while (running) {
+            //         if (shouldSendByteData) {
+            //             client.SendFrame(byteData);
+            //             shouldSendByteData = false;
+            //
+            //             if (client.TryReceiveFrameBytes(out var byteMessage))
+            //                 OnMessageReceived(byteMessage);
+            //         }
+            //     }
+            // }
 
-            using (var client = new RequestSocket()) {
-                client.Connect(address);
-
-                while (running) {
-                    if (shouldSendByteData)
-                        client.SendFrame(byteData);
-
-                    if (client.TryReceiveFrameBytes(out var byteMessage))
-                        OnMessageReceived(byteMessage);
-                }
-            }
-
-            NetMQConfig.Cleanup(); // this line is needed to prevent unity freeze after one use, not sure why yet
+            // this line is needed to prevent unity freeze after one use, not sure why yet
         }
-
-        void Awake() => Instance = this;
-
-        void OnDestroy() => CloseConnection();
     }
 }
