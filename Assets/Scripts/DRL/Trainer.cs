@@ -3,12 +3,16 @@
     /// Connects training environment and an agent to control the general training.
     /// Designed asynchronously around Unity's update. Listens to <see cref="IEnvironment{TAction,TObservation}.Stepped"/> event to control training. 
     /// </summary>
-    public class Trainer<TAction, TObservation> {
-        readonly IEnvironment<TAction, TObservation> environment;
-        readonly IAgent<TAction, TObservation> agent;
+    public class Trainer<TAction, TState> {
+        readonly IEnvironment<TAction, TState> environment;
+        readonly IAgent<TAction, TState> agent;
         readonly int epochs;
         readonly int episodesPerEpoch;
         readonly int maximumEpisodeLength;
+
+        TState previousState;
+        TAction previousAction;
+        float previousReward;
 
         // Track current training data
         int epoch;
@@ -29,7 +33,8 @@
         /// <param name="epochs">Number of epochs to train. Each epoch consists of several episodes</param>
         /// <param name="episodesPerEpoch">Number of episodes within an epoch</param>
         /// <param name="maximumEpisodeLength">Maximum number of steps in an episode. Used to cutoff the long (possibly infinite) episodes</param>
-        public Trainer(IEnvironment<TAction, TObservation> environment, IAgent<TAction, TObservation> agent, int epochs = 100, int episodesPerEpoch = 1, int maximumEpisodeLength = -1) {
+        public Trainer(IEnvironment<TAction, TState> environment, IAgent<TAction, TState> agent, int epochs = 100, int episodesPerEpoch = 1,
+            int maximumEpisodeLength = -1) {
             this.environment = environment;
             this.agent = agent;
             this.epochs = epochs;
@@ -51,12 +56,17 @@
             StartNewEpisode();
         }
 
-        void OnEnvironmentStepped(TObservation observation) {
-            var action = agent.GetAction(observation);
+        void OnEnvironmentStepped(TState state) {
+            if (step != 0)
+                agent.SaveTransition(new Transition<TAction, TState>(previousState, previousAction, previousReward, state));
+
+            var action = agent.GetAction(state);
 
             var (reward, isDone) = environment.Step(action);
 
-            agent.SaveStep(observation, action, reward);
+            previousAction = action;
+            previousState = state;
+            previousReward = reward;
 
             step++;
             episodeReward += reward;
@@ -82,6 +92,7 @@
                 epoch++;
                 agent.OnEpochFinished();
             }
+
             if (epoch < epochs) StartNewEpisode();
             else OnTrainingFinished();
         }

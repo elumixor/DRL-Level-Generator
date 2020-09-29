@@ -1,1 +1,1 @@
-from DRL.agent import agent
+from DRL.agent import Agent

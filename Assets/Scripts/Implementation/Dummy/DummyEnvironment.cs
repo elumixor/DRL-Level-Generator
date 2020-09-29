@@ -22,7 +22,7 @@ namespace Implementation.Dummy {
             return (1f, false);
         }
 
-        protected override DummyObservation CurrentObservation {
+        protected override DummyObservation CurrentState {
             get {
                 var enemies = FindObjectsOfType<Enemy>();
                 var playerPosition = GameObject.FindWithTag("Player").transform.position;

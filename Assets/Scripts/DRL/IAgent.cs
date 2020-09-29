@@ -3,7 +3,7 @@
         void Initialize(IEnvironment<TAction, TObservation> environment);
         void OnEpisodeStarted();
         TAction GetAction(TObservation observation);
-        void SaveStep(TObservation previousObservation, TAction action, float reward);
+        void SaveTransition(Transition<TAction, TObservation> transition);
         void OnEpisodeFinished();
         void OnEpochFinished();
     }

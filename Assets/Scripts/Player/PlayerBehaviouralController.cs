@@ -8,7 +8,7 @@ namespace Player {
     /// </summary>
     [RequireComponent(typeof(PlayerConfigurator))]
     public class PlayerBehaviouralController : MonoBehaviour {
-        public event Action OnCollided = delegate { };
+        public event Action Collided = delegate { };
 
         [SerializeField] Transform rotatingPart;
 
@@ -88,7 +88,7 @@ namespace Player {
         }
 
         void OnTriggerEnter2D(Collider2D other) {
-            if (other.CompareTag("Enemy")) OnCollided();
+            if (other.CompareTag("Enemy")) Collided();
         }
 
         public void ResetState() {

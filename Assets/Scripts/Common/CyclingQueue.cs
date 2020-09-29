@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Common {
@@ -11,7 +12,9 @@ namespace Common {
         int pointer;
 
         public bool IsFull => pointer >= size;
+
         public int Length => Math.Min(pointer, size);
+
         public CyclingQueue(int size) {
             this.size = size;
             items = new T[size];

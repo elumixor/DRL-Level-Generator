@@ -1,5 +1,5 @@
 ﻿namespace DRL {
-    public interface IEnvironment<TAction, TObservation> {
+    public interface IEnvironment<in TAction, out TState> {
         /// <summary>
         /// Called at the beginning of the episode to reset everything to new episode
         /// </summary>
@@ -15,7 +15,7 @@
         /// <summary>
         /// Emit this event when the training step should be executed, i.e. in your Update() function after the observation is received
         /// </summary>
-        event System.Action<TObservation> Stepped;
+        event System.Action<TState> Stepped;
         
         /// <summary>
         /// Is set in the trainer. Used to notify the environment that the environment is up and running.

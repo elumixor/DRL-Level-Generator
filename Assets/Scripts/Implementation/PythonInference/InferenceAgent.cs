@@ -1,36 +1,29 @@
 ﻿using System.Linq;
 using Common;
+using DRL;
 using DRL.Behaviours;
 using Implementation.Dummy;
 using PythonCommunication;
-using Utilities;
 using NaughtyAttributes;
-using Player;
-using UnityEditor;
 using UnityEngine;
 
 namespace Implementation.PythonInference {
-    [RequireComponent(typeof(PlayerBehaviouralController))]
-    public class InferenceAgent : Agent<DummyAction, Observation> {
-        MemoryBuffer<DummyAction, State> memory;
+    public class InferenceAgent : Agent<DummyAction, State> {
+        CyclingQueue<InferenceTransition> memory;
         [SerializeField, MinValue(1)] int memorySize;
-
-        PlayerBehaviouralController player;
 
         void Start() {
             Communicator.OpenConnection();
-            memory = new MemoryBuffer<DummyAction, State>(memorySize);
-            player = GetComponent<PlayerBehaviouralController>();
+            memory = new CyclingQueue<InferenceTransition>(memorySize);
         }
 
         void OnDestroy() => Communicator.CloseConnection();
 
-        public override void SaveStep(Observation observation, DummyAction action, float reward) =>
-            memory.Push(CreateStateFromObservation(observation), action, reward);
+        public override void SaveTransition(Transition<DummyAction, State> transition) => memory.Push(new InferenceTransition(transition));
 
-        public override DummyAction GetAction(Observation observation) {
+        public override DummyAction GetAction(State state) {
             var action = new DummyAction();
-            var message = new Message(MessageHeader.Inference, CreateStateFromObservation(observation).ToBytes());
+            var message = new Message(MessageHeader.Inference, state.ToBytes());
             action.AssignFromBytes(Communicator.Compute(message.ToBytes()));
             return action;
         }
@@ -39,9 +32,9 @@ namespace Implementation.PythonInference {
             if (memory.IsFull) Train();
         }
 
-        State CreateStateFromObservation(Observation observation) =>
-            new State(observation.enemiesPositions, observation.playerPosition, player.Angle, player.AngularSpeed, player.UpwardSpeed);
 
-        void Train() => Communicator.Compute(new Message(MessageHeader.Update, memory.ToBytes()).ToBytes());
+        void Train() =>
+            Communicator.Compute(new Message(MessageHeader.Update, ByteConverter.ConcatBytes(memory.Length.ToBytes(), memory.ToBytes()))
+                .ToBytes());
     }
 }

@@ -1,4 +1,6 @@
-﻿using AsyncIO;
+﻿using System;
+using System.Linq;
+using AsyncIO;
 using NetMQ;
 using NetMQ.Sockets;
 
@@ -7,10 +9,17 @@ namespace PythonCommunication {
         const string ADDRESS = "tcp://localhost:5555";
         static bool isConnected;
 
-        public static byte[] Compute(byte[] data) {
-            client.SendFrame(data);
-            var receiveFrameBytes = client.ReceiveFrameBytes();
-            return receiveFrameBytes;
+        public static byte[] Compute(byte[] requestData) {
+            client.SendFrame(requestData);
+
+            var message = client.ReceiveFrameBytes();
+
+            var header = (char) message[0];
+            var data = message.Skip(1).ToArray();
+
+            if (header == 'e') throw new Exception(System.Text.Encoding.ASCII.GetString(data));
+
+            return data;
         }
 
         static RequestSocket client;

@@ -1,7 +1,7 @@
 import struct
 
 # action is just a single number
-action_size = 1
+action_size = 2
 
 
 def action2bytes(action):
