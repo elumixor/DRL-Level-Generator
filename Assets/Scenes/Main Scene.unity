@@ -163,7 +163,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 89241501}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 623696a0e49d4c7887cbbf7688ee062c, type: 3}
+  m_Script: {fileID: 11500000, guid: 607a3195c64e464e8f02eaafbff308b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   environment: {fileID: 1050423151}
@@ -1199,7 +1199,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1050423149}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f25cb3af397419f9316e3cd398b886c, type: 3}
+  m_Script: {fileID: 11500000, guid: 90700d8610134373b31be63859c5d00f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   stepFrequency: 5
@@ -1483,6 +1483,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e21f00c74ebd42aab4f1e35ae8bfb824, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  memorySize: 1
 --- !u!1 &1793427452
 GameObject:
   m_ObjectHideFlags: 0

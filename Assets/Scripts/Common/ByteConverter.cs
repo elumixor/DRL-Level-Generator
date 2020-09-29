@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Common {
     public static class ByteConverter {
         public static byte[] ToBytes(this float value) => BitConverter.GetBytes(value);
         public static byte[] ToBytes(this bool value) => BitConverter.GetBytes(value);
         public static byte[] ToBytes(this int value) => BitConverter.GetBytes(value);
+
         public static byte[] ToBytes(this Vector2 value) {
             var result = new byte[2 * sizeof(float)];
-            Buffer.BlockCopy(value.x.ToBytes(), 0, result, 2 * i * sizeof(float), sizeof(float));
-            Buffer.BlockCopy(value.y.ToBytes(), 0, result, (2 * i + 1) * sizeof(float), sizeof(float));
+            Buffer.BlockCopy(value.x.ToBytes(), 0, result, 0, sizeof(float));
+            Buffer.BlockCopy(value.y.ToBytes(), 0, result, sizeof(float), sizeof(float));
             return result;
         }
 

@@ -15,6 +15,7 @@ namespace Utilities {
         }
         
         public int Length => states.Length;
+        public bool IsFull => states.IsFull;
 
         public void Clear() {
             states.Clear();

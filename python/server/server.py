@@ -11,7 +11,11 @@ on_message = Event()
 
 def start_server():
     while True:
-        on_message(socket.recv())
+        try:
+            on_message(socket.recv())
+        except RuntimeError as e:
+            send_message(b"Error on the python backend")
+            raise e
 
 
 def send_message(message):

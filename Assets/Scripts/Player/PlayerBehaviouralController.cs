@@ -34,7 +34,7 @@ namespace Player {
 
         public Vector2 Position => transform.localPosition;
         public float Angle { get; private set; }
-        public float AnglularSpeed => (swingSpeed + swingBoost) * direction;
+        public float AngularSpeed => (swingSpeed + swingBoost) * direction;
         public float UpwardSpeed => upwardSpeed + boost;
 
         void Update() {
@@ -42,13 +42,11 @@ namespace Player {
             Angle = Mathf.Sin(t) * maxAngle;
 
             rotatingPart.localEulerAngles = Vector3.forward * Angle;
-            transform.localPosition += UpwwardSpeed * Time.deltaTime * Vector3.up;
+            transform.localPosition += UpwardSpeed * Time.deltaTime * Vector3.up;
         }
 
 
-        public void Switch() {
-            direction *= -1;
-        }
+        public void Switch() { direction *= -1; }
 
         public void Boost() {
             IEnumerator UpwardSpeedBoostCoroutine() {

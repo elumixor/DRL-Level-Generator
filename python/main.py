@@ -8,10 +8,10 @@ def handle_message(message):
     data = message[1:]
 
     if header == 'i':
-        action = agent.infer(bytes2state(message))
+        action = agent.infer(bytes2state(data))
         send_message(action2bytes(action))
     else:
-        agent.train(bytes2training_data(message))  # updates the model
+        agent.train(bytes2training_data(data))  # updates the model
         send_message(b'')
 
 

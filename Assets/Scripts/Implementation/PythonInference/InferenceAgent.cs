@@ -1,33 +1,37 @@
-﻿using System;
+﻿using System.Linq;
+using Common;
 using DRL.Behaviours;
 using Implementation.Dummy;
 using PythonCommunication;
 using Utilities;
 using NaughtyAttributes;
+using Player;
+using UnityEditor;
+using UnityEngine;
 
 namespace Implementation.PythonInference {
-    [RequireComponent(typeof(PlayerBehaviourController))]
-    public class InferenceAgent : Agent<DummyAction, DummyObservation> {
+    [RequireComponent(typeof(PlayerBehaviouralController))]
+    public class InferenceAgent : Agent<DummyAction, Observation> {
         MemoryBuffer<DummyAction, State> memory;
         [SerializeField, MinValue(1)] int memorySize;
 
-        private PlayerBehaviourController player;
-        
+        PlayerBehaviouralController player;
+
         void Start() {
             Communicator.OpenConnection();
             memory = new MemoryBuffer<DummyAction, State>(memorySize);
-            player = GetComponent<PlayerBehaviourController>();
-        }
-        
-        void OnDestroy() { Communicator.CloseConnection(); }
-
-        public override void SaveStep(DummyObservation observation, DummyAction action, float reward) {
-            memory.Push(CreateStateFromObservation(observation), action, reward)
+            player = GetComponent<PlayerBehaviouralController>();
         }
 
-        public override DummyAction GetAction(DummyObservation observation) {
+        void OnDestroy() => Communicator.CloseConnection();
+
+        public override void SaveStep(Observation observation, DummyAction action, float reward) =>
+            memory.Push(CreateStateFromObservation(observation), action, reward);
+
+        public override DummyAction GetAction(Observation observation) {
             var action = new DummyAction();
-            action.AssignFromBytes(Communicator.Compute(CreateInferenceMessage(observation).ToBytes()));
+            var message = new Message(MessageHeader.Inference, CreateStateFromObservation(observation).ToBytes());
+            action.AssignFromBytes(Communicator.Compute(message.ToBytes()));
             return action;
         }
 
@@ -35,19 +39,9 @@ namespace Implementation.PythonInference {
             if (memory.IsFull) Train();
         }
 
-        State CreateStateFromObservation(DummyObservation observation) {
-            return new State(
-                FindObjectsOfType<Enemy>()
-                    .Select(e => (Vector2)e.transform.position)
-                    .ToArray(), 
-                (Vector2)player.Position, player.Angle, player.AnglularSpeed
-            player.UpwardSpeed);
-        } 
+        State CreateStateFromObservation(Observation observation) =>
+            new State(observation.enemiesPositions, observation.playerPosition, player.Angle, player.AngularSpeed, player.UpwardSpeed);
 
-        void Train() {
-            Communicator.Compute(new Message(MessageHeader.Training, memory.ToBytes()));
-        }
-
-        static Message CreateInferenceMessage(DummyObservation observation) => new Message(MessageHeader.Inference, observation.ToBytes());
+        void Train() => Communicator.Compute(new Message(MessageHeader.Update, memory.ToBytes()).ToBytes());
     }
 }

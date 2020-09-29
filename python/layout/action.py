@@ -5,4 +5,4 @@ action_size = 1
 
 
 def action2bytes(action):
-    return struct.pack('i', 1 if action.item() > 0 else 0)
+    return struct.pack('f', 1 if action.item() > 0 else 0)
