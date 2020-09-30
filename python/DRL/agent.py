@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 import torch
 import torch.nn as nn
 from torch.distributions import Uniform, Categorical
@@ -30,41 +32,40 @@ optim_critic = Adam(critic.parameters(), lr=0.005)
 
 discounting = 0.99
 
+Episode = Tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor]
+
 
 class Agent:
     @staticmethod
     def infer(state: torch.tensor) -> torch.tensor:
         p_tap = actor(state.cuda())
-        print(p_tap)
         return Categorical(probs=p_tap).sample() * 2 - 1
 
     @staticmethod
-    def train(training_data):
-        states, selected_actions, rewards, next_states = training_data
+    def train(training_data: List[Episode]):
+        loss_actor = 0
+        loss_critic = 0
+        total_len = 0
 
-        # 2nd step: use advantage function, estimated by critic
-        # bootstrap estimated next state values with rewards TD-1
-        values = critic(states)
+        for states, actions, rewards, next_states in training_data:
+            values = critic(states)
 
-        last_state = next_states[-1].unsqueeze(0)
+            last_state = next_states[-1].unsqueeze(0)
+            last_value = critic(last_state).item()
+            next_values = bootstrap(rewards, last_value, discounting)
 
-        last_value = critic(last_state).item()
-        next_values = bootstrap(rewards, last_value, discounting)
+            advantage = normalize(next_values - values).flatten()
 
-        advantages = normalize(next_values - values).flatten()
+            loss_critic = loss_critic + .5 * (advantage ** 2).sum()
 
-        loss_critic = .5 * (advantages ** 2).sum()
+            probabilities = actor(states)
+            probabilities = probabilities[range(states.shape[0]), actions.flatten()]
+            loss_actor = loss_actor + (-torch.log(probabilities) * advantage.detach()).sum()
 
-        # Get probabilities, shape (episode_length * num_actions)
-        # Then select only the probabilities corresponding to sampled actions
-        probabilities = actor(states)
-        probabilities = probabilities[range(states.shape[0]), selected_actions.long().flatten()]
-        loss_actor = (-torch.log(probabilities) * advantages.detach()).sum()
+            total_len += states.shape[0]
 
-        length = states.shape[0]
-
-        loss_actor = loss_actor / length
-        loss_critic = loss_critic / length
+        loss_actor = loss_actor / total_len
+        loss_critic = loss_critic / total_len
 
         optim_actor.zero_grad()
         loss_actor.backward()

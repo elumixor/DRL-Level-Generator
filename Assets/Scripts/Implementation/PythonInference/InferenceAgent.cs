@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Common;
 using DRL;
 using DRL.Behaviours;
@@ -8,18 +9,25 @@ using NaughtyAttributes;
 using UnityEngine;
 
 namespace Implementation.PythonInference {
+    using Episode = List<InferenceTransition>;
+
     public class InferenceAgent : Agent<DummyAction, State> {
-        CyclingQueue<InferenceTransition> memory;
         [SerializeField, MinValue(1)] int memorySize;
+
+        CyclingQueue<Episode> episodes;
+        Episode currentEpisode = new Episode();
+
 
         void Start() {
             Communicator.OpenConnection();
-            memory = new CyclingQueue<InferenceTransition>(memorySize);
+            episodes = new CyclingQueue<Episode>(memorySize);
         }
+
 
         void OnDestroy() => Communicator.CloseConnection();
 
-        public override void SaveTransition(Transition<DummyAction, State> transition) => memory.Push(new InferenceTransition(transition));
+        public override void SaveTransition(Transition<DummyAction, State> transition) =>
+            currentEpisode.Add(new InferenceTransition(transition));
 
         public override DummyAction GetAction(State state) {
             var action = new DummyAction();
@@ -29,12 +37,17 @@ namespace Implementation.PythonInference {
         }
 
         public override void OnEpisodeFinished() {
-            if (memory.IsFull) Train();
+            episodes.Push(currentEpisode);
+            currentEpisode = new Episode();
         }
 
+        public override void OnEpochFinished() => Train();
+
+        byte[] TrainingDataAsBytes => ByteConverter.ConcatBytes(episodes.Length.ToBytes(), episodes.Select(EpisodeToBytes).ToBytes());
+
+        static byte[] EpisodeToBytes(Episode episode) => ByteConverter.ConcatBytes(episode.Count.ToBytes(), episode.ToBytes());
 
         void Train() =>
-            Communicator.Compute(new Message(MessageHeader.Update, ByteConverter.ConcatBytes(memory.Length.ToBytes(), memory.ToBytes()))
-                .ToBytes());
+            Communicator.Compute(new Message(MessageHeader.Update, TrainingDataAsBytes).ToBytes());
     }
 }

@@ -30,6 +30,11 @@ namespace Common {
                 yield return items[i];
         }
 
+        public T this[int i] {
+            get => items[i];
+            set => items[i] = value;
+        }
+        
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
