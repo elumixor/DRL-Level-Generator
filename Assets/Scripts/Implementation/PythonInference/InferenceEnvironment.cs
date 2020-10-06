@@ -27,7 +27,7 @@ namespace Implementation.PythonInference {
         public override (float reward, bool isDone) Step(DummyAction action) {
             if (action.tap) playerInputHandler.OnTap();
 
-            return (1f, isDone);
+            return (player.Position.y, isDone);
         }
 
         protected override State CurrentState {

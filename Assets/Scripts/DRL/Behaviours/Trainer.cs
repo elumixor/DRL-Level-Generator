@@ -6,6 +6,7 @@ namespace DRL.Behaviours {
     public class Trainer<TAction, TState> : MonoBehaviour {
         [SerializeField] Environment<TAction, TState> environment;
         [SerializeField] Agent<TAction, TState> agent;
+        [SerializeField, Range(0, 15)] float timeSpeed;
 
         DRL.Trainer<TAction, TState> trainer;
 
@@ -16,6 +17,11 @@ namespace DRL.Behaviours {
         void Start() {
             trainer = new DRL.Trainer<TAction, TState>(environment, agent, epochs, episodesPerEpoch, maximumEpisodeLength);
             trainer.StartTraining();
+        }
+
+        void OnValidate() {
+            Time.timeScale = timeSpeed;
+            // Time.fixedDeltaTime = 0.02f * (1 - timeSpeed);
         }
     }
 }

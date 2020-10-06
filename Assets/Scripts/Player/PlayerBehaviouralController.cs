@@ -37,12 +37,14 @@ namespace Player {
         public float AngularSpeed => (swingSpeed + swingBoost) * direction;
         public float UpwardSpeed => upwardSpeed + boost;
 
-        void Update() {
-            t += Time.deltaTime * AngularSpeed;
+        static float DeltaTime => Time.deltaTime;
+        
+        void FixedUpdate() {
+            t += DeltaTime * AngularSpeed;
             Angle = Mathf.Sin(t) * maxAngle;
 
             rotatingPart.localEulerAngles = Vector3.forward * Angle;
-            transform.localPosition += UpwardSpeed * Time.deltaTime * Vector3.up;
+            transform.localPosition += UpwardSpeed * DeltaTime * Vector3.up;
         }
 
 
@@ -56,7 +58,7 @@ namespace Player {
                 while (elapsed < upwardSpeedBoostTime) {
                     boost = upwardSpeedBoostStrength * (1 - elapsed / upwardSpeedBoostTime);
 
-                    elapsed += Time.deltaTime;
+                    elapsed += DeltaTime;
                     yield return null;
                 }
 
@@ -70,7 +72,7 @@ namespace Player {
                 while (elapsed < swingBoostTime) {
                     swingBoost = swingBoostStrength * (1 - elapsed / swingBoostTime);
 
-                    elapsed += Time.deltaTime;
+                    elapsed += DeltaTime;
                     yield return null;
                 }
 

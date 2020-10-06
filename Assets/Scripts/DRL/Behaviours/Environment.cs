@@ -13,7 +13,7 @@ namespace DRL.Behaviours {
         public event Action<TState> Stepped = delegate { };
         public bool IsActive { get; set; }
 
-        protected virtual void Update() {
+        protected virtual void FixedUpdate() {
             if (!IsActive) return;
 
             if (currentStep < stepFrequency) {

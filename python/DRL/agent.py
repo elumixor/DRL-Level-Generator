@@ -6,13 +6,15 @@ from torch.distributions import Uniform, Categorical
 from torch.optim import Adam
 
 from layout import action_size, state_size
-from utilities import bootstrap, normalize
+from utilities import bootstrap, normalize, rewards_to_go
 
 hidden_size = 20
 
 # Actor maps state to probabilities of taking action
 actor = nn.Sequential(
     nn.Linear(state_size, hidden_size),
+    nn.ReLU(),
+    nn.Linear(hidden_size, hidden_size),
     nn.ReLU(),
     nn.Linear(hidden_size, hidden_size),
     nn.ReLU(),
@@ -25,6 +27,8 @@ critic = nn.Sequential(
     nn.ReLU(),
     nn.Linear(hidden_size, hidden_size),
     nn.ReLU(),
+    nn.Linear(hidden_size, hidden_size),
+    nn.ReLU(),
     nn.Linear(hidden_size, 1)).cuda()
 
 optim_actor = Adam(actor.parameters(), lr=0.01)
@@ -34,20 +38,29 @@ discounting = 0.99
 
 Episode = Tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor]
 
+total_means = []
+epoch = 0
+
 
 class Agent:
+
     @staticmethod
     def infer(state: torch.tensor) -> torch.tensor:
-        p_tap = actor(state.cuda())
-        return Categorical(probs=p_tap).sample() * 2 - 1
+        with torch.no_grad():
+            p_tap = actor(state.cuda())
+            return Categorical(probs=p_tap).sample() * 2 - 1
 
     @staticmethod
     def train(training_data: List[Episode]):
+        global epoch, t
+        epoch += 1
         loss_actor = 0
         loss_critic = 0
         total_len = 0
 
+        total_rewards = []
         for states, actions, rewards, next_states in training_data:
+            # A2C
             values = critic(states)
 
             last_state = next_states[-1].unsqueeze(0)
@@ -60,9 +73,24 @@ class Agent:
 
             probabilities = actor(states)
             probabilities = probabilities[range(states.shape[0]), actions.flatten()]
-            loss_actor = loss_actor + (-torch.log(probabilities) * advantage.detach()).sum()
+            loss_actor = loss_actor - (torch.log(probabilities) * advantage.detach()).sum()
+
+            # VPG
+            # # Improvement: use discounted rewards to go
+            # weights = rewards_to_go(rewards, discounting).flatten()
+            # weights = normalize(weights)
+            #
+            # # Get probabilities, shape (episode_length * numz_actions)
+            # # Then select only the probabilities corresponding to sampled actions
+            # probabilities = actor(states)
+            # probabilities = probabilities[range(states.shape[0]), actions.flatten()]
+            # loss_actor += (-probabilities.log() * weights).sum()
 
             total_len += states.shape[0]
+
+            total_rewards.append(rewards.sum())
+
+        print(f'epoch {epoch}\t average total reward: {torch.tensor(total_rewards).mean()}')
 
         loss_actor = loss_actor / total_len
         loss_critic = loss_critic / total_len

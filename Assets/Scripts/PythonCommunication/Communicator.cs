@@ -12,7 +12,9 @@ namespace PythonCommunication {
         public static byte[] Compute(byte[] requestData) {
             client.SendFrame(requestData);
 
-            var message = client.ReceiveFrameBytes();
+            var res = client.TryReceiveFrameBytes(new TimeSpan(0, 0, 1), out var message);
+            if (!res)
+                throw new Exception("Timeout. Backend unresponsive.");
 
             var header = (char) message[0];
             var data = message.Skip(1).ToArray();
