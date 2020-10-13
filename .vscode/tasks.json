@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start backend",
+      "type": "shell",
+      "command": "python ./python/main.py"
+    },
+    {
+      "label": "Unity",
+      "type": "shell",
+      "command": "'C:/Program Files/Unity/Hub/Editor/2020.1.0f1/Editor/Unity.exe' -projectPath 'C:/dev/DRL-Level-Generator'"
+    }
+  ]
+}
+``

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Assets.Scripts.Memory;
 using Common;
 
 namespace Utilities {
@@ -13,7 +14,7 @@ namespace Utilities {
             actions = new CyclingQueue<TAction>(size);
             rewards = new CyclingQueue<float>(size);
         }
-        
+
         public int Length => states.Length;
         public bool IsFull => states.IsFull;
 

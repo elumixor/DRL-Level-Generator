@@ -1,4 +1,3 @@
-import time
 import zmq
 from utilities import Event
 

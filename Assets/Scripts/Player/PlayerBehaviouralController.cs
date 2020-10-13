@@ -12,8 +12,6 @@ namespace Player {
 
         [SerializeField] Transform rotatingPart;
 
-        float angle;
-
         [SerializeField] float maxAngle;
         [SerializeField] float swingSpeed;
         [SerializeField] float upwardSpeed;
@@ -38,7 +36,7 @@ namespace Player {
         public float UpwardSpeed => upwardSpeed + boost;
 
         static float DeltaTime => Time.deltaTime;
-        
+
         void FixedUpdate() {
             t += DeltaTime * AngularSpeed;
             Angle = Mathf.Sin(t) * maxAngle;

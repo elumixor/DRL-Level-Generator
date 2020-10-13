@@ -55,13 +55,13 @@ def bytes2episode(b, offset=0):
 
     length_range = range(length)
 
-    states = torch.tensor([data[data_slice(state_size, 0, i)] for i in length_range],
-                          dtype=torch.float, device='cuda')
-    selected_actions = torch.tensor([data[data_slice(1, state_size, i)] for i in length_range],
-                                    dtype=torch.long, device='cuda')
-    rewards = torch.tensor([data[data_slice(1, state_size + 1, i)] for i in length_range],
-                           dtype=torch.float, device='cuda')
-    next_states = torch.tensor([data[data_slice(state_size, state_size + 1 + 1, i)] for i in length_range],
-                               dtype=torch.float, device='cuda')
+    states = torch.tensor([data[data_slice(state_size, 0, i)]
+                           for i in length_range], dtype=torch.float, device='cuda')
+    selected_actions = torch.tensor([data[data_slice(
+        1, state_size, i)] for i in length_range], dtype=torch.long, device='cuda')
+    rewards = torch.tensor([data[data_slice(1, state_size + 1, i)]
+                            for i in length_range], dtype=torch.float, device='cuda')
+    next_states = torch.tensor([data[data_slice(state_size, state_size + 1 + 1, i)]
+                                for i in length_range], dtype=torch.float, device='cuda')
 
     return states, selected_actions, rewards, next_states

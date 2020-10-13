@@ -1,26 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Common;
-using DRL;
+﻿using DRL;
 using DRL.Behaviours;
 using Implementation.Dummy;
 using PythonCommunication;
 using NaughtyAttributes;
 using UnityEngine;
+using Memory;
 
 namespace Implementation.PythonInference {
-    using Episode = List<InferenceTransition>;
-
     public class InferenceAgent : Agent<DummyAction, State> {
         [SerializeField, MinValue(1)] int memorySize;
 
-        CyclingQueue<Episode> episodes;
+        MemoryRRPB<Episode, InferenceTransition> memory;
         Episode currentEpisode = new Episode();
-
 
         void Start() {
             Communicator.OpenConnection();
-            episodes = new CyclingQueue<Episode>(memorySize);
+            memory = new MemoryRRPB<Episode, InferenceTransition>(memorySize);
         }
 
 
@@ -37,17 +32,14 @@ namespace Implementation.PythonInference {
         }
 
         public override void OnEpisodeFinished() {
-            episodes.Push(currentEpisode);
+            memory.Push(currentEpisode);
             currentEpisode = new Episode();
         }
 
-        public override void OnEpochFinished() => Train();
+        public override void OnEpochFinished() {
+            if (memory.IsFull) Train();
+        }
 
-        byte[] TrainingDataAsBytes => ByteConverter.ConcatBytes(episodes.Length.ToBytes(), episodes.Select(EpisodeToBytes).ToBytes());
-
-        static byte[] EpisodeToBytes(Episode episode) => ByteConverter.ConcatBytes(episode.Count.ToBytes(), episode.ToBytes());
-
-        void Train() =>
-            Communicator.Compute(new Message(MessageHeader.Update, TrainingDataAsBytes).ToBytes());
+        void Train() => Communicator.Compute(new Message(MessageHeader.Update, memory.ToBytes()).ToBytes());
     }
 }

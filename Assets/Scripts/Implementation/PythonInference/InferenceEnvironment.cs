@@ -13,11 +13,12 @@ namespace Implementation.PythonInference {
 
         bool isDone;
 
-        void Start() => player.Collided += () => {
-            Debug.Log("Collided!");
-            isDone = true;
-        };
+        void Start() => player.Collided += () => isDone = true;
+        protected override void FixedUpdate() {
+            base.FixedUpdate();
 
+            if (player.transform.position.y >= 9f) isDone = true;
+        }
         public override void ResetEnvironment() {
             player.ResetState();
             isDone = false;

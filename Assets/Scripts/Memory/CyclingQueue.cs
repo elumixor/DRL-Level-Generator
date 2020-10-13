@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Common {
+namespace Assets.Scripts.Memory {
     public class CyclingQueue<T> : IEnumerable<T> {
         readonly T[] items;
         readonly int size;
@@ -34,7 +34,7 @@ namespace Common {
             get => items[i];
             set => items[i] = value;
         }
-        
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

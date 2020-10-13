@@ -20,8 +20,11 @@ namespace Common {
 
         public static byte[] ToBytes(this IEnumerable<float> enumerable) => enumerable.Select(e => e.ToBytes()).ToBytes();
 
-        public static byte[] ToBytes<T>(this IEnumerable<T> enumerable) where T : IByteConvertible =>
-            enumerable.Select(e => e.ToBytes()).ToBytes();
+        public static byte[] ToBytes<T>(this IEnumerable<T> enumerable, bool writeLength = false) where T : IByteConvertible {
+            if (!writeLength) return enumerable.Select(e => e.ToBytes()).ToBytes();
+            var arr = enumerable.ToArray();
+            return arr.Length.ToBytes().Concat(arr.Select(e => e.ToBytes()).ToBytes()).ToArray();
+        }
 
         public static byte[] ConcatBytes(params byte[][] bytesArrays) {
             var length = bytesArrays.Select(arr => arr.Length).Sum();

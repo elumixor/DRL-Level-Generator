@@ -1,0 +1,20 @@
+{
+  "python.linting.flake8Args": ["--ignore", "E501"],
+  "files.exclude": {
+    "*.csproj": true,
+    "*.sln": true,
+    "*.sln.DotSettings.user": true,
+    "UserSettings": true,
+    "Temp": true,
+    "obj": true,
+    "Logs": true,
+    "Library": true,
+    "Packages": true,
+    "ProjectSettings": true,
+    "Assets/Plugins": true,
+    "Assets/Graphics": true,
+    "Assets/Scenes": true
+  },
+"omnisharp.enableEditorConfigSupport": true,
+"python.pythonPath": "C:\\Program Files\\Python37\\python.exe"
+}
