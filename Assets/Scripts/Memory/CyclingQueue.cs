@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UIElements;
 
-namespace Assets.Scripts.Memory {
+namespace Memory {
     public class CyclingQueue<T> : IEnumerable<T> {
         readonly T[] items;
         readonly int size;

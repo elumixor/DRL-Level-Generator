@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using Common;
+using Common.ByteConversions;
 using UnityEngine;
 
-namespace Implementation.PythonInference {
+namespace Training_Setups.Pendulum.Scripts.DRL {
     public class Observation : IByteConvertible {
         public Vector2[] enemiesPositions;
         public float playerPosition;

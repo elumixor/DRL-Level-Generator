@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using Common;
 using DRL.Behaviours;
 using Implementation.Dummy;
 using NaughtyAttributes;
 using Player;
 using UnityEngine;
 
-namespace Implementation.PythonInference {
+namespace Training_Setups.Pendulum.Scripts.DRL {
     public class InferenceEnvironment : Environment<DummyAction, State> {
         [SerializeField, Required] PlayerBehaviouralController player;
         [SerializeField, Required] PlayerInputHandler playerInputHandler;

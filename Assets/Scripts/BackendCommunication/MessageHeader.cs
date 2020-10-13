@@ -1,4 +1,4 @@
-﻿namespace PythonCommunication {
+﻿namespace BackendCommunication {
     public enum MessageHeader {
         Inference,
         Update

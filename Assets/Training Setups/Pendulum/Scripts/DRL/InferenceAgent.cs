@@ -1,12 +1,12 @@
-﻿using DRL;
+﻿using BackendCommunication;
+using DRL;
 using DRL.Behaviours;
 using Implementation.Dummy;
-using PythonCommunication;
+using Memory;
 using NaughtyAttributes;
 using UnityEngine;
-using Memory;
 
-namespace Implementation.PythonInference {
+namespace Training_Setups.Pendulum.Scripts.DRL {
     public class InferenceAgent : Agent<DummyAction, State> {
         [SerializeField, MinValue(1)] int memorySize;
 

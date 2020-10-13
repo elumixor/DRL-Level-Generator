@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Common {
+namespace Common.ByteConversions {
     public interface IByteConvertible {
         [Pure]
         byte[] ToBytes();

@@ -1,7 +1,7 @@
 ﻿using System;
-using Common;
+using Common.ByteConversions;
 
-namespace PythonCommunication {
+namespace BackendCommunication {
     public class Message : IByteConvertible {
         readonly MessageHeader header;
         readonly byte[] data;

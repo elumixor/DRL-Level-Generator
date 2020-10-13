@@ -1,8 +1,8 @@
-﻿using Common;
+﻿using Common.ByteConversions;
 using DRL;
 using Implementation.Dummy;
 
-namespace Implementation.PythonInference {
+namespace Training_Setups.Pendulum.Scripts.DRL {
     public class InferenceTransition : Transition<DummyAction, State>, IByteConvertible {
         public InferenceTransition(State previousState, DummyAction action, float reward, State nextState) : base(previousState, action,
             reward, nextState) { }

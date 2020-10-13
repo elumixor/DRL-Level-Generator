@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.ByteConversions;
 
 namespace Implementation.Dummy {
     public struct DummyAction : IByteConvertible, IByteAssignable {

@@ -4,7 +4,7 @@ using AsyncIO;
 using NetMQ;
 using NetMQ.Sockets;
 
-namespace PythonCommunication {
+namespace BackendCommunication {
     public static class Communicator {
         const string ADDRESS = "tcp://localhost:5555";
         static bool isConnected;

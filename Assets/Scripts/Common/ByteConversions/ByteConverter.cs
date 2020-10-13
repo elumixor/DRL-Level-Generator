@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Common {
+namespace Common.ByteConversions {
     public static class ByteConverter {
         public static byte[] ToBytes(this float value) => BitConverter.GetBytes(value);
         public static byte[] ToBytes(this bool value) => BitConverter.GetBytes(value);

@@ -1,4 +1,5 @@
 using Common;
+using Common.ByteConversions;
 
 namespace DRL {
     public interface IEpisode<TTransition> : IByteConvertible where TTransition : IByteConvertible {

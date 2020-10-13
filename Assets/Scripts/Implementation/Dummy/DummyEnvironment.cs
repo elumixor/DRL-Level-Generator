@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Common;
 using DRL.Behaviours;
 using NaughtyAttributes;
 using Player;
@@ -24,11 +25,7 @@ namespace Implementation.Dummy {
 
         protected override DummyObservation CurrentState {
             get {
-                var enemies = FindObjectsOfType<Enemy>();
-                var playerPosition = GameObject.FindWithTag("Player").transform.position;
-                var minDistance = enemies.Select(e => (e.transform.position - playerPosition).magnitude).Min();
-                
-                return new DummyObservation {distanceToClosest = minDistance};
+                return new DummyObservation {distanceToClosest = 0f};
             }
         }
     }
