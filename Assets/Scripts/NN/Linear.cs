@@ -1,24 +1,24 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace NN {
     public class Linear : Module {
         readonly int inputSize;
         readonly int outputSize;
 
-        float[][] W;
-        float[] b;
-        
+        float[] weight;
+        float[] bias;
+
         public Linear(int inputSize, int outputSize) {
             this.inputSize = inputSize;
             this.outputSize = outputSize;
-            
-            W = new float[outputSize][];
-            b = new float[outputSize];
+
+            weight = new float[outputSize * inputSize];
+            bias = new float[outputSize];
 
             for (var i = 0; i < outputSize; i++) {
-                W[i] = new float[inputSize];
-                for (var j = 0; j < inputSize; j++) W[i][j] = Random.Range(-1f, 1f);
-                b[i] = Random.Range(-1f, 1f);
+                for (var j = 0; j < inputSize; j++) weight[i * outputSize + j] = Random.Range(-1f, 1f);
+                bias[i] = Random.Range(-1f, 1f);
             }
         }
 
@@ -26,12 +26,19 @@ namespace NN {
             var output = new float[outputSize];
 
             for (var i = 0; i < outputSize; i++) {
-                var sum = b[i];
-                for (var j = 0; j < inputSize; j++) sum += input[j] * W[i][j];
+                var sum = bias[i];
+                for (var j = 0; j < inputSize; j++) sum += input[j] * weight[i * outputSize + j];
                 output[i] = sum;
             }
-            
+
             return output;
+        }
+
+        public override void LoadStateDict(StateDict stateDict) {
+            var (selfParameters, _) = stateDict;
+            
+            weight = selfParameters[ModuleParameterNames.Weight];
+            bias = selfParameters[ModuleParameterNames.Bias];
         }
     }
 }
