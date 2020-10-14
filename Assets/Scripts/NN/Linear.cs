@@ -37,8 +37,8 @@ namespace NN {
         public override void LoadStateDict(StateDict stateDict) {
             var (selfParameters, _) = stateDict;
             
-            weight = selfParameters[ModuleParameterNames.Weight];
-            bias = selfParameters[ModuleParameterNames.Bias];
+            weight = selfParameters[ModuleParameterName.Weight];
+            bias = selfParameters[ModuleParameterName.Bias];
         }
     }
 }

@@ -8,5 +8,7 @@ namespace Configuration {
     /// </summary>
     public class MasterController : SingletonBehaviour<MasterController> {
         [SerializeField, Expandable] Configuration configuration;
+        
+        
     }
 }

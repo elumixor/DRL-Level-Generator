@@ -10,6 +10,33 @@ from utilities import bootstrap, normalize, rewards_to_go
 
 hidden_size = 20
 
+base = nn.Sequential(
+    nn.Linear(state_size, hidden_size),
+    nn.ReLU(),
+    nn.Linear(hidden_size, hidden_size),
+    nn.ReLU()
+)
+
+actor_head = nn.Sequential(
+    base,
+    nn.Linear(hidden_size, action_size),
+    nn.Softmax(dim=-1)
+)
+
+critic_head = nn.Sequential(
+    base,
+    nn.Linear(hidden_size, 1)
+)
+
+# print(actor_head.state_dict().keys())
+print(nn.Linear(5, 5).state_dict().keys())
+# print(critic_head.state_dict().keys())
+print(nn.Sequential().forward(torch.tensor([5])))
+for p in actor_head.parameters():
+    print(p.shape)
+
+# print(critic_head.state_dict().keys())
+
 # Actor maps state to probabilities of taking action
 actor = nn.Sequential(
     nn.Linear(state_size, hidden_size),
@@ -40,6 +67,16 @@ Episode = Tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor]
 
 total_means = []
 epoch = 0
+
+
+def fit_networks(loss_actor, loss_critic):
+    optim_actor.zero_grad()
+    loss_actor.backward()
+    optim_actor.step()
+
+    # optim_critic.zero_grad()
+    # loss_critic.backward()
+    # optim_critic.step()
 
 
 class Agent:
@@ -98,10 +135,4 @@ class Agent:
         loss_actor = loss_actor / total_len
         loss_critic = loss_critic / total_len
 
-        optim_actor.zero_grad()
-        loss_actor.backward()
-        optim_actor.step()
-
-        # optim_critic.zero_grad()
-        # loss_critic.backward()
-        # optim_critic.step()
+        fit_networks(loss_actor, loss_critic)

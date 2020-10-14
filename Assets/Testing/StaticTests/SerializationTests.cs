@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
@@ -21,6 +22,7 @@ namespace Testing.StaticTests
         {
             // Use the Assert class to test conditions.
             // Use yield to skip a frame.
+            Console.WriteLine("this is a test output");
             yield return null;
         }
     }
