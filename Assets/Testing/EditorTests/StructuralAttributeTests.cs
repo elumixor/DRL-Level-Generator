@@ -1,10 +1,11 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using Serialization;
 using UnityEngine;
 
 namespace Testing.EditorTests {
     public class StructuralAttributeTests {
-        static void Check<T>(int size, string message = "") { Assert.AreEqual(StructuralAttribute.GetSize(typeof(T)), size, message); }
+        static void Check<T>(int size, string message = "") { Assert.AreEqual(size, StructuralAttribute.GetSize(typeof(T)), message); }
 
         class C1 {
             [Structural] public float a;
@@ -86,5 +87,19 @@ namespace Testing.EditorTests {
         class C8 : Base { }
 
         [Test] public void FindsInheritedMembers() => Check<C8>(2);
+
+        class C9 {
+            [Structural] float P => 1;
+        }
+
+        [Test] public void FindsPropertiesThatCanBeRead() => Check<C9>(1);
+
+        class C10 {
+            [Structural] float P {
+                set { }
+            }
+        }
+
+        [Test] public void TrowsOnPropertiesThatCannotBeRead() { Assert.Throws<Exception>(() => { Check<C10>(1); }); }
     }
 }
