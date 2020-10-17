@@ -1,9 +1,9 @@
 using Common.ByteConversions;
 
 namespace DRL {
-    public interface IEpisode<in TTransition> : IByteConvertible where TTransition : IByteConvertible {
-        void Add(TTransition transition);
+    public interface IEpisode<in TTransition> where TTransition : IByteConvertible {
         float TotalReward { get; }
         int Length { get; }
+        void Add(TTransition transition);
     }
 }

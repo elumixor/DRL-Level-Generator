@@ -1,5 +1,7 @@
-﻿namespace Common.ByteConversions {
+﻿using System.Collections.Generic;
+
+namespace Common.ByteConversions {
     public interface IByteAssignable {
-        void AssignFromBytes(byte[] bytes);
+        void FromBytes(IEnumerable<byte> bytes);
     }
 }

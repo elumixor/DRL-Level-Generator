@@ -1,13 +1,14 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using Common;
 using Common.ByteConversions;
 using UnityEngine;
 
 namespace TrainingSetups.Pendulum.Scripts.DRL {
     public class State : IByteConvertible {
-        readonly Vector2[] enemyPositions;
-        readonly float playerPosition;
         readonly float angle;
         readonly float angularSpeed;
+        readonly Vector2[] enemyPositions;
+        readonly float playerPosition;
         readonly float upwardSpeed;
 
         public State(Vector2[] enemyPositions, float playerPosition, float angle, float angularSpeed, float upwardSpeed) {
@@ -18,9 +19,10 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
             this.upwardSpeed = upwardSpeed;
         }
 
-        public byte[] ToBytes() {
-            var enemyPositionsBytes = enemyPositions.Select(p => p.ToBytes()).ToBytes();
-            var result = ByteConverter.ConcatBytes(enemyPositionsBytes, playerPosition.ToBytes(), angle.ToBytes(), angularSpeed.ToBytes(),
+        public IEnumerable<byte> ToBytes() {
+            var enemyPositionsBytes = enemyPositions.ToBytes(enemyPositions.Length);
+
+            var result = enemyPositionsBytes.ConcatMany(playerPosition.ToBytes(), angle.ToBytes(), angularSpeed.ToBytes(),
                 upwardSpeed.ToBytes());
             return result;
         }

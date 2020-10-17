@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using AsyncIO;
 using NetMQ;
 using NetMQ.Sockets;
@@ -9,8 +11,8 @@ namespace BackendCommunication {
         static bool isConnected;
         static RequestSocket client;
 
-        public static byte[] Compute(byte[] requestData) {
-            client.SendFrame(requestData);
+        public static byte[] Compute(IEnumerable<byte> requestData) {
+            client.SendFrame(requestData.ToArray());
 
             var res = client.TryReceiveFrameBytes(new TimeSpan(0, 0, 1), out var message);
             if (!res)
@@ -19,7 +21,7 @@ namespace BackendCommunication {
             var header = (char) message[0];
             var data = message.Skip(1).ToArray();
 
-            if (header == 'e') throw new Exception(System.Text.Encoding.ASCII.GetString(data));
+            if (header == 'e') throw new Exception(Encoding.ASCII.GetString(data));
 
             return data;
         }

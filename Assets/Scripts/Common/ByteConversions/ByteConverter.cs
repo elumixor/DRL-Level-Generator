@@ -5,45 +5,54 @@ using UnityEngine;
 
 namespace Common.ByteConversions {
     public static class ByteConverter {
-        public static byte[] ToBytes(this float value) => BitConverter.GetBytes(value);
-        public static byte[] ToBytes(this bool value) => BitConverter.GetBytes(value);
-        public static byte[] ToBytes(this int value) => BitConverter.GetBytes(value);
+        // Generic type
+        public static IEnumerable<byte> ToBytes<T>(this T value) where T : IByteConvertible { return value.ToBytes(); }
 
-        public static byte[] ToBytes(this Vector2 value) {
-            var result = new byte[2 * sizeof(float)];
-            Buffer.BlockCopy(value.x.ToBytes(), 0, result, 0, sizeof(float));
-            Buffer.BlockCopy(value.y.ToBytes(), 0, result, sizeof(float), sizeof(float));
-            return result;
+        // Basic types
+        public static IEnumerable<byte> ToBytes(this float value) { return BitConverter.GetBytes(value); }
+
+        public static IEnumerable<byte> ToBytes(this int value) { return BitConverter.GetBytes(value); }
+
+        public static IEnumerable<byte> ToBytes(this bool value) { return BitConverter.GetBytes(value); }
+
+        // Unity Vectors
+        public static IEnumerable<byte> ToBytes(this Vector2 value) { return value.x.ToBytes().Concat(value.y.ToBytes()); }
+
+        public static IEnumerable<byte> ToBytes(this Vector3 value) {
+            return value.x.ToBytes().Concat(value.y.ToBytes()).Concat(value.z.ToBytes());
         }
 
-        public static byte[] ToBytes(this IEnumerable<byte[]> enumerable) => ConcatBytes(enumerable.ToArray());
-
-        public static byte[] ToBytes(this IEnumerable<float> enumerable) => enumerable.Select(e => e.ToBytes()).ToBytes();
-
-        public static byte[] ToBytes<T>(this IEnumerable<T> enumerable, bool writeLength = false) where T : IByteConvertible {
-            if (!writeLength) return enumerable.Select(e => e.ToBytes()).ToBytes();
-            var arr = enumerable.ToArray();
-            return arr.Length.ToBytes().Concat(arr.Select(e => e.ToBytes()).ToBytes()).ToArray();
+        // When transforming enumerable of elements, also include length
+        public static IEnumerable<byte> ToBytes(this IEnumerable<float> enumerable, int length) {
+            return length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
         }
 
-        public static byte[] ConcatBytes(params byte[][] bytesArrays) {
-            var length = bytesArrays.Select(arr => arr.Length).Sum();
-            var res = new byte[length];
-            var offset = 0;
+        public static IEnumerable<byte> ToBytes(this IEnumerable<int> enumerable, int length) {
+            return length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
+        }
 
-            foreach (var bytesArray in bytesArrays) {
-                var bytesArrayLength = bytesArray.Length;
-                Buffer.BlockCopy(bytesArray, 0, res, offset, bytesArrayLength);
-                offset += bytesArrayLength;
-            }
+        public static IEnumerable<byte> ToBytes(this IEnumerable<bool> enumerable, int length) {
+            return length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
+        }
 
-            return res;
+        public static IEnumerable<byte> ToBytes(this IEnumerable<Vector2> enumerable, int length) {
+            return length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
+        }
+
+        public static IEnumerable<byte> ToBytes(this IEnumerable<Vector3> enumerable, int length) {
+            return length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
+        }
+
+        public static IEnumerable<byte> ToBytes<T>(this IEnumerable<T> enumerable, int length) where T : IByteConvertible {
+            return length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
         }
 
 
         // bytes -> data
-        public static float ToFloat(this byte[] bytes, int startIndex = 0) => BitConverter.ToSingle(bytes, startIndex);
-        public static bool ToBool(this byte[] bytes, int startIndex = 0) => BitConverter.ToBoolean(bytes, startIndex);
-        public static int ToInt(this byte[] bytes, int startIndex = 0) => BitConverter.ToInt32(bytes, startIndex);
+        public static float ToFloat(this byte[] bytes, int startIndex = 0) { return BitConverter.ToSingle(bytes, startIndex); }
+
+        public static int ToInt(this byte[] bytes, int startIndex = 0) { return BitConverter.ToInt32(bytes, startIndex); }
+
+        public static bool ToBool(this byte[] bytes, int startIndex = 0) { return BitConverter.ToBoolean(bytes, startIndex); }
     }
 }
