@@ -2,11 +2,11 @@ from typing import List, Tuple
 
 import torch
 import torch.nn as nn
-from torch.distributions import Uniform, Categorical
+from torch.distributions import Categorical
 from torch.optim import Adam
 
 from layout import action_size, state_size
-from utilities import bootstrap, normalize, rewards_to_go
+from .utilities import normalize, rewards_to_go
 
 hidden_size = 20
 
