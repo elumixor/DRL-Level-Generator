@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Common;
 using Common.ByteConversions;
@@ -6,7 +7,7 @@ using NUnit.Framework;
 using UnityEngine;
 
 namespace Testing.EditorTests {
-    public class ByteConversionTests {
+    public class SerializationTests {
         [Test] public void CanConvertSimpleTypes() {
             Assert.AreEqual(5.0f, 5.0f.ToBytes().ToArray().ToFloat());
             Assert.AreEqual(5, 5.ToBytes().ToArray().ToInt());
@@ -14,8 +15,24 @@ namespace Testing.EditorTests {
             Assert.AreEqual(false, false.ToBytes().ToArray().ToBool());
             const string str = "hello world";
             var (result, readCount) = "hello world".ToBytes().ToArray().GetString();
-            Assert.AreEqual(readCount, sizeof(int) + str.Length * sizeof(char));
+            Assert.AreEqual(readCount, sizeof(int) + str.Length);
             Assert.AreEqual(str, result);
+        }
+
+        [Test] public void ConversionsTakeCorrectNumberOfBytes() {
+            Assert.AreEqual(4, 5.ToBytes().Count());
+            Assert.AreEqual(4, 5.0f.ToBytes().Count());
+            Assert.AreEqual("string".Length + 4, "string".ToBytes().Count());
+        }
+
+        [Test] public void CanConvertEnum() {
+            Assert.AreEqual(MyEnum.HelloWorld.ToString(), nameof(MyEnum.HelloWorld));
+            var success = Enum.TryParse("GoodbyeWorld", out MyEnum result);
+            Assert.IsTrue(success);
+            Assert.AreEqual(result, MyEnum.GoodbyeWorld);
+            var failure = Enum.TryParse("Nothing", out result);
+            Assert.IsFalse(failure);
+            Assert.AreNotEqual(result, MyEnum.GoodbyeWorld);
         }
 
         [Test] public void CanConvertUnityTypes() {
@@ -70,6 +87,11 @@ namespace Testing.EditorTests {
             for (var i = 0; i < length; i++) Assert.AreEqual(list[i], reconstructed[i]);
 
             Assert.AreEqual(newOffset, sizeof(int) + sizeof(float) * 3 * (1 + 2 + 3));
+        }
+
+        enum MyEnum {
+            HelloWorld,
+            GoodbyeWorld,
         }
 
         class C : IByteSerializable {

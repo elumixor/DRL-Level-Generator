@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace Common.ByteConversions {
@@ -15,7 +16,8 @@ namespace Common.ByteConversions {
 
         public static IEnumerable<byte> ToBytes(this bool value) => BitConverter.GetBytes(value);
         public static IEnumerable<byte> ToBytes(this char value) => BitConverter.GetBytes(value);
-        public static IEnumerable<byte> ToBytes(this string value) => value.AsEnumerable().ToBytes(value.Length);
+
+        public static IEnumerable<byte> ToBytes(this string value) => value.Length.ToBytes().Concat(Encoding.ASCII.GetBytes(value));
 
         // Unity Vectors
         public static IEnumerable<byte> ToBytes(this Vector2 value) => value.x.ToBytes().Concat(value.y.ToBytes());
@@ -31,9 +33,6 @@ namespace Common.ByteConversions {
             length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
 
         public static IEnumerable<byte> ToBytes(this IEnumerable<bool> enumerable, int length) =>
-            length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
-
-        public static IEnumerable<byte> ToBytes(this IEnumerable<char> enumerable, int length) =>
             length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
 
         public static IEnumerable<byte> ToBytes(this IEnumerable<Vector2> enumerable, int length) =>
@@ -56,10 +55,7 @@ namespace Common.ByteConversions {
 
         public static (string result, int readCount) GetString(this byte[] bytes, int startIndex = 0) {
             var length = bytes.ToInt(startIndex);
-            var result = new char[length];
-
-            for (var i = 0; i < length; i++) result[i] = bytes.ToChar(startIndex + sizeof(int) + i * sizeof(char));
-            return (new string(result), sizeof(int) + length * sizeof(char));
+            return (Encoding.ASCII.GetString(bytes, startIndex + sizeof(int), length), length + sizeof(int));
         }
 
         public static Vector2 ToVector2(this byte[] bytes, int startIndex = 0) =>
