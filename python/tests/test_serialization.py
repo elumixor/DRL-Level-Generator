@@ -18,11 +18,11 @@ class C(ByteSerializable):
 
     def assign_from_bytes(self, bytes_value, start_index=0, Endianness=Endianness.Native):
         self.int_v = to_int(bytes_value, start_index, Endianness)
-        start_index += DataTypesSize.Int.value
+        start_index += DataTypesSize.Int
         self.float_v = to_float(bytes_value, start_index, Endianness)
-        start_index += DataTypesSize.Float.value
+        start_index += DataTypesSize.Float
         self.str_v, bytes_read = to_string(bytes_value, start_index)
-        return DataTypesSize.Int.value + DataTypesSize.Float.value + bytes_read
+        return DataTypesSize.Int + DataTypesSize.Float + bytes_read
 
 
 class CustomClassTests(TestCase):
@@ -39,7 +39,7 @@ class SerializationTests(TestCase):
         b = to_bytes(string)
         res, bytes_read = to_string(b)
         self.assertEqual(string, res)
-        self.assertEqual(bytes_read, DataTypesSize.Int.value + len(string) * DataTypesSize.Char.value)
+        self.assertEqual(bytes_read, DataTypesSize.Int + len(string) * DataTypesSize.Char)
 
     def test_simple_float(self):
         self.assertEqual(5.0, to_float(to_bytes(5.0)))
@@ -57,11 +57,11 @@ class SerializationTests(TestCase):
         self.assertEqual(my_list, my_list)
 
         def transformer(value, start_index, endianness):
-            return to_int(value, start_index, endianness), DataTypesSize.Int.value
+            return to_int(value, start_index, endianness), DataTypesSize.Int
 
         serialized, total_bytes = to_list(to_bytes(my_list), transformer)
         self.assertEqual(my_list, serialized)
-        self.assertEqual(total_bytes, len(my_list) * DataTypesSize.Int.value)
+        self.assertEqual(total_bytes, len(my_list) * DataTypesSize.Int)
 
     def test_float_list_serialization(self):
         my_list = [1.0, 2.0, 3.05]
@@ -69,11 +69,11 @@ class SerializationTests(TestCase):
         self.assertEqual(my_list, my_list)
 
         def transformer(value, start_index, endianness):
-            return to_float(value, start_index, endianness), DataTypesSize.Int.value
+            return to_float(value, start_index, endianness), DataTypesSize.Int
 
         serialized, total_bytes = to_list(to_bytes(my_list), transformer)
         self.assertEqual(len(my_list), len(serialized))
-        self.assertEqual(total_bytes, len(my_list) * DataTypesSize.Float.value)
+        self.assertEqual(total_bytes, len(my_list) * DataTypesSize.Float)
 
         # float has 7 decimal digits of precision
         for i in range(len(my_list)):
@@ -110,7 +110,7 @@ class SerializationTests(TestCase):
         bytes_count = other.assign_from_bytes(serialized_bytes)
 
         self.assertEqual(instance, other)
-        self.assertEqual(bytes_count, DataTypesSize.Int.value + DataTypesSize.Float.value + DataTypesSize.Int.value + len("hello"))
+        self.assertEqual(bytes_count, DataTypesSize.Int + DataTypesSize.Float + DataTypesSize.Int + len("hello"))
 
     def test_custom_class_list_serialization(self):
         my_list = [C(1, 2.0, "3.0"), C(2, 3.0, "4.0")]

@@ -11,7 +11,7 @@ from .serialization_exception import SerializationException
 
 
 def __get_format(data_type: DataTypes, endianness: Endianness, count: int) -> str:
-    return f"{endianness.value}{count}{data_type.value}"
+    return f"{endianness}{count}{data_type}"
 
 
 def to_bytes(value: Union[int, float, str, ByteConvertible, List[int], List[float], List[str], List[ByteConvertible]],
@@ -69,25 +69,25 @@ def to_bytes(value: Union[int, float, str, ByteConvertible, List[int], List[floa
 
 def to_int(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> int:
     fmt = __get_format(DataTypes.Int, endianness, 1)
-    return unpack(fmt, value[start_index: start_index + DataTypesSize.Int.value])[0]
+    return unpack(fmt, value[start_index: start_index + DataTypesSize.Int])[0]
 
 
 def to_float(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> float:
     fmt = __get_format(DataTypes.Float, endianness, 1)
-    return unpack(fmt, value[start_index: start_index + DataTypesSize.Float.value])[0]
+    return unpack(fmt, value[start_index: start_index + DataTypesSize.Float])[0]
 
 
 def to_string(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[str, int]:
     length = to_int(value, start_index, endianness)
-    value = value[start_index + DataTypesSize.Int.value:start_index + DataTypesSize.Int.value + length * DataTypesSize.Char.value]
+    value = value[start_index + DataTypesSize.Int:start_index + DataTypesSize.Int + length * DataTypesSize.Char]
     string = value.decode('ascii')
-    return string, DataTypesSize.Int.value + len(string) * DataTypesSize.Char.value
+    return string, DataTypesSize.Int + len(string) * DataTypesSize.Char
 
 
 def to_list(value: bytes, transformer: Callable, start_index: int = 0, endianness: Endianness = Endianness.Native):
-    length = unpack(__get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int.value])[0]
+    length = unpack(__get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int])[0]
     result = []
-    start_index = start_index + DataTypesSize.Int.value
+    start_index = start_index + DataTypesSize.Int
     total_read_bytes = 0
     for _ in range(length):
         item, read_bytes = transformer(value, start_index + total_read_bytes, endianness)

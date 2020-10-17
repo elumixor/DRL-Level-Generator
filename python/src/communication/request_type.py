@@ -1,5 +1,7 @@
 from enum import Enum
 
 
-class RequestType(Enum):
-    pass
+class RequestType(str, Enum):
+    Echo = "Echo",
+    Inference = "Inference",
+    Update = "Update",

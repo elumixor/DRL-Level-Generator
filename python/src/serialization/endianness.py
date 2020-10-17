@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Endianness(Enum):
+class Endianness(str, Enum):
     Native = '='
     Big = '>'
     Little = '<'
