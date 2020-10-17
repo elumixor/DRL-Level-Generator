@@ -5,6 +5,24 @@ using NN;
 namespace Configuration.NN {
     [Serializable]
     public class ModuleConfiguration : ICopyable<ModuleConfiguration> {
+        [Serializable]
+        public enum ModuleConfigurationParameterFloat {
+            None
+        }
+
+        [Serializable]
+        public enum ModuleConfigurationParameterInt {
+            None,
+            InputSize,
+            OutputSize,
+        }
+
+        [Serializable]
+        public class IntParametersDict : SerializableDictionary<ModuleConfigurationParameterInt, int> { }
+
+        [Serializable]
+        public class FloatParametersDict : SerializableDictionary<ModuleConfigurationParameterFloat, float> { }
+        
         public ModuleLayerName layerName;
 
         public FloatParametersDict floatParameters = new FloatParametersDict();

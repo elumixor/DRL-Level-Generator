@@ -1,5 +1,5 @@
 ﻿namespace Configuration {
-    public enum AlgorithmNames {
+    public enum Algorithm {
         VPG,
         A2C
     }

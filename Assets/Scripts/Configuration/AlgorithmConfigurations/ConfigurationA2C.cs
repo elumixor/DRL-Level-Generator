@@ -24,6 +24,8 @@ namespace Configuration.AlgorithmConfigurations {
 
         public Layout actorHead = new Layout();
 
+        public override Layout ActorLayout => actor;
+
         public class Editor : IEditor {
             readonly ConfigurationA2C configuration;
 
@@ -38,7 +40,7 @@ namespace Configuration.AlgorithmConfigurations {
                 this.configuration = configuration;
                 actorEditor = new Layout.Editor(configuration.actor, "Actor");
                 criticEditor = new Layout.Editor(configuration.critic, "Critic");
-                
+
                 baseEditor = new Layout.Editor(configuration.@base, "Base");
                 criticHeadEditor = new Layout.Editor(configuration.actorHead, "Actor Head");
                 actorHeadEditor = new Layout.Editor(configuration.criticHead, "Critic Head");
@@ -46,7 +48,7 @@ namespace Configuration.AlgorithmConfigurations {
 
             public void OnInspectorGUI() {
                 configuration.networksType = (A2CNetworksType) EditorGUILayout.EnumPopup("NN Architecture", configuration.networksType);
-                
+
                 if (configuration.networksType == A2CNetworksType.Separate) {
                     actorEditor.OnInspectorGUI();
                     criticEditor.OnInspectorGUI();

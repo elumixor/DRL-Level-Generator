@@ -1,7 +1,10 @@
 ﻿using System;
+using Configuration.NN;
 using UnityEngine;
 
 namespace Configuration.AlgorithmConfigurations {
     [Serializable]
-    public class AlgorithmConfiguration {}
+    public abstract class AlgorithmConfiguration {
+        public abstract Layout ActorLayout { get; }
+    }
 }
