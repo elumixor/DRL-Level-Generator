@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import threading
 from typing import Callable, Union
 
@@ -16,7 +18,7 @@ from .server_exception import ServerException
 
 
 class Server:
-    def __init__(self, address: str, handle_message: Callable[[RequestType, bytes], None]):
+    def __init__(self, address: str, handle_message: Callable[[Server, RequestType, bytes], None]):
         self.__context: zmq.Context = zmq.Context()
         self.__socket = self.__context.socket(zmq.REP)
         self.__address = address
@@ -49,7 +51,7 @@ class Server:
                         raise ServerException(f"Invalid request type: {request_type}")
 
                     log(f"Request received: [{request_type}] {len(data)} bytes")
-                    server.__handle_message(RequestType[request_type], data)
+                    server.__handle_message(server, RequestType[request_type], data)
                 except zmq.Again:
                     pass
                 except Exception as e:

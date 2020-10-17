@@ -36,13 +36,16 @@ class ServerTests(TestCase):
         self.assertFalse(self.server.is_running)
 
     def test_server_echo(self):
-        def handle_message(request_type, data):
+        def handle_message(server, request_type, data):
             self.assertEqual(request_type, RequestType.Echo)
+
             string, length = serialization.to_string(data)
+
             self.assertEqual(string, "hello world")
             self.assertEqual(length, serialization.DataTypesSize.Int + serialization.DataTypesSize.Char * len("hello world"))
-            self.server.send_message(ResponseType.Echo, serialization.to_bytes(string))
-            self.server.stop()
+
+            server.send_message(ResponseType.Echo, serialization.to_bytes(string))
+            server.stop()
 
         self.server = Server(ADDRESS, handle_message)
         self.server.start()
