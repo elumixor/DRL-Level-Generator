@@ -8,6 +8,7 @@ namespace BackendCommunication {
     public static class Communicator {
         const string ADDRESS = "tcp://localhost:5555";
         static bool isConnected;
+        static RequestSocket client;
 
         public static byte[] Compute(byte[] requestData) {
             client.SendFrame(requestData);
@@ -24,7 +25,6 @@ namespace BackendCommunication {
             return data;
         }
 
-        static RequestSocket client;
 
         public static void OpenConnection() {
             if (isConnected) return;
