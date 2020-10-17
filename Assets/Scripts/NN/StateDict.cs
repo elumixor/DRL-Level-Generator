@@ -11,7 +11,7 @@ namespace NN {
         }
 
         public void Deconstruct(out IDictionary<ModuleParameterName, float[]> selfParameters,
-            out IEnumerable<(int childIndex, StateDict stateDict)> childParameters) {
+                                out IEnumerable<(int childIndex, StateDict stateDict)> childParameters) {
             selfParameters = this.selfParameters;
             childParameters = this.childParameters;
         }

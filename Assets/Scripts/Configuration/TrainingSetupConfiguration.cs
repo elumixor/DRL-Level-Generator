@@ -6,9 +6,9 @@ namespace Configuration {
     [CreateAssetMenu(fileName = "Training Setup.asset", menuName = "Training Setup Configuration", order = 0)]
     public partial class TrainingSetupConfiguration : ScriptableObject {
         [SerializeField] Algorithm algorithm;
+        [SerializeField] ConfigurationA2C configurationA2C;
 
         [SerializeField] ConfigurationVPG configurationVPG;
-        [SerializeField] ConfigurationA2C configurationA2C;
 
         // Hyperparameters
         public float discounting;

@@ -5,6 +5,7 @@ using UnityEngine;
 namespace Utility {
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class UserInputDisplayer : MonoBehaviour {
+        IEnumerator currentCoroutine;
         [SerializeField] float fadeTime;
 
         string Text {
@@ -28,16 +29,11 @@ namespace Utility {
             }
         }
 
-        IEnumerator currentCoroutine;
-
 
         void Update() { HandleInput(); }
 
         void HandleInput() {
-            if (Input.GetMouseButtonDown(0)) {
-                Text = "Click";
-                return;
-            }
+            if (Input.GetMouseButtonDown(0)) Text = "Click";
         }
     }
 }

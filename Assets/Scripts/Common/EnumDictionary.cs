@@ -5,8 +5,8 @@ using System.ComponentModel;
 namespace Common {
     [Serializable]
     public class EnumDictionary<TEnum, TValue> where TEnum : Enum {
-        public TEnum[] values;
         public TValue[] data;
+        public TEnum[] values;
 
         public EnumDictionary() {
             values = (TEnum[]) Enum.GetValues(typeof(TEnum));
@@ -19,12 +19,6 @@ namespace Common {
             foreach (var (@enum, value) in valuePairs) this[@enum] = value;
         }
 
-        public void Clear() { FillDefaults(); }
-
-        void FillDefaults() {
-            for (var i = 0; i < data.Length; i++) data[i] = default;
-        }
-
         public TValue this[TEnum i] {
             get => data[getIndex(i)];
             set => data[getIndex(i)] = value;
@@ -35,10 +29,16 @@ namespace Common {
             set => data[i] = value;
         }
 
+        public void Clear() { FillDefaults(); }
+
+        void FillDefaults() {
+            for (var i = 0; i < data.Length; i++) data[i] = default;
+        }
+
         int getIndex(TEnum i) {
-            for (var j = 0; j < values.Length; j++) {
-                if (Equals(values[j], i)) return j;
-            }
+            for (var j = 0; j < values.Length; j++)
+                if (Equals(values[j], i))
+                    return j;
 
             throw new InvalidEnumArgumentException();
         }

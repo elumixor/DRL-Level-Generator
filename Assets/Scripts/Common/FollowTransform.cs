@@ -9,14 +9,15 @@ namespace Common {
             None = 0,
             X = 1,
             Y = 2,
-            Z = 4
+            Z = 4,
         }
 
+        public float followStrength;
+
         [EnumFlags] public LockPosition lockPosition;
+        public Vector3 offset;
 
         public Transform toFollow;
-        public float followStrength;
-        public Vector3 offset;
 
         void Update() {
             var p = transform.position;

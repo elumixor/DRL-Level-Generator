@@ -9,16 +9,9 @@ using UnityEngine;
 namespace Configuration.NN {
     public partial class Layout {
         public class Editor : IEditor {
-            enum LayerAction {
-                None,
-                Remove,
-                Copy,
-                MoveUp,
-                MoveDown,
-            }
+            readonly string label;
 
             readonly Layout layout;
-            readonly string label;
 
             public Editor(Layout layout, string label = null) {
                 this.layout = layout;
@@ -89,7 +82,7 @@ namespace Configuration.NN {
                 TKey newKey = default;
                 TValue newValue = default;
 
-                foreach (var parameter in parameters.Where(parameter => !Equals(parameter.Key, default(TKey)))) {
+                foreach (var parameter in parameters.Where(parameter => !Equals(parameter.Key, default(TKey))))
                     using (new GUILayout.HorizontalScope()) {
                         var newK = (TKey) EditorGUILayout.EnumPopup(parameter.Key);
 
@@ -106,14 +99,13 @@ namespace Configuration.NN {
                             newKey = parameter.Key;
                         }
                     }
-                }
 
                 if (changeValue) parameters[newKey] = newValue;
 
                 if (changeKey) {
-                    if (Equals(newKey, default(TKey))) {
+                    if (Equals(newKey, default(TKey)))
                         parameters.Remove(oldKey);
-                    } else {
+                    else {
                         var temp = parameters[newKey];
                         parameters[newKey] = parameters[oldKey];
                         parameters[oldKey] = temp;
@@ -121,7 +113,7 @@ namespace Configuration.NN {
                 }
 
                 var remaining = ((TKey[]) Enum.GetValues(typeof(TKey))).Where(p => !Equals(p, default) && !parameters.ContainsKey(p))
-                    .ToArray();
+                                                                       .ToArray();
 
                 TKey toAdd = default;
                 foreach (var parameterInt in remaining)
@@ -160,6 +152,14 @@ namespace Configuration.NN {
                     default:
                         return;
                 }
+            }
+
+            enum LayerAction {
+                None,
+                Remove,
+                Copy,
+                MoveUp,
+                MoveDown,
             }
         }
     }

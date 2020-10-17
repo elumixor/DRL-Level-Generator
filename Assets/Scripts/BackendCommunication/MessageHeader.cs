@@ -1,6 +1,6 @@
 ﻿namespace BackendCommunication {
     public enum MessageHeader {
         Inference,
-        Update
+        Update,
     }
 }

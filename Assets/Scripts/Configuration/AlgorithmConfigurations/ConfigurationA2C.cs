@@ -8,32 +8,31 @@ namespace Configuration.AlgorithmConfigurations {
     public class ConfigurationA2C : AlgorithmConfiguration {
         public enum A2CNetworksType {
             TwoHeaded,
-            Separate
+            Separate,
         }
-
-        public A2CNetworksType networksType;
 
         public Layout actor = new Layout();
 
-        public Layout critic = new Layout();
+        public Layout actorHead = new Layout();
 
         public Layout @base = new Layout();
 
+        public Layout critic = new Layout();
+
         public Layout criticHead = new Layout();
 
-        public Layout actorHead = new Layout();
+        public A2CNetworksType networksType;
 
         public override Layout ActorLayout => actor;
 
         public class Editor : IEditor {
-            readonly ConfigurationA2C configuration;
-
             readonly Layout.Editor actorEditor;
-            readonly Layout.Editor criticEditor;
+            readonly Layout.Editor actorHeadEditor;
 
             readonly Layout.Editor baseEditor;
+            readonly ConfigurationA2C configuration;
+            readonly Layout.Editor criticEditor;
             readonly Layout.Editor criticHeadEditor;
-            readonly Layout.Editor actorHeadEditor;
 
             public Editor(ConfigurationA2C configuration) {
                 this.configuration = configuration;

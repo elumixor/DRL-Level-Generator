@@ -2,7 +2,7 @@
 
 namespace DRL {
     /// <summary>
-    /// Agent with NN
+    ///     Agent with NN
     /// </summary>
     public interface INNAgent {
         void InitializeNN(Layout layout);

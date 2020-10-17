@@ -8,9 +8,8 @@ using Serialization;
 using UnityEngine;
 
 /// <summary>
-/// Reads and stores global training configurations (<see cref="TrainingSetupConfiguration"/>)
-///
-/// Should be unique per every training setup
+///     Reads and stores global training configurations (<see cref="TrainingSetupConfiguration" />)
+///     Should be unique per every training setup
 /// </summary>
 public class MasterController<TAction, TState> : SingletonBehaviour<MasterController<TAction, TState>> {
     const string TPP_ADDRESS = "tcp://localhost:5555";
@@ -19,12 +18,11 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
     static TrainingSetupConfiguration TrainingSetupConfiguration => instance.trainingSetupConfiguration;
 
     /// <summary>
-    /// The main entry point for each Training Setup
+    ///     The main entry point for each Training Setup
     /// </summary>
-    ///
     /// Initializes NNs in all the agents in the scene
     /// Initializes serializers, given the state size and action size
-    /// Sends initial data via communicator to initialize backend 
+    /// Sends initial data via communicator to initialize backend
     void Start() {
         var actionSize = StructuralAttribute.GetSize(typeof(TAction));
         var stateSize = StructuralAttribute.GetSize(typeof(TState));

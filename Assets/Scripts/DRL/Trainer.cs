@@ -1,32 +1,30 @@
-﻿namespace DRL {
+﻿using System;
+
+namespace DRL {
     /// <summary>
-    /// Connects training environment and an agent to control the general training.
-    /// Designed asynchronously around Unity's update. Listens to <see cref="IEnvironment{TAction,TObservation}.Stepped"/> event to control training. 
+    ///     Connects training environment and an agent to control the general training.
+    ///     Designed asynchronously around Unity's update. Listens to <see cref="IEnvironment{TAction,TObservation}.Stepped" /> event to control
+    ///     training.
     /// </summary>
     public class Trainer<TAction, TState> {
-        readonly IEnvironment<TAction, TState> environment;
         readonly IAgent<TAction, TState> agent;
-        readonly int epochs;
+        readonly IEnvironment<TAction, TState> environment;
         readonly int episodesPerEpoch;
+        readonly int epochs;
         readonly int maximumEpisodeLength;
-
-        TState previousState;
-        TAction previousAction;
-        float previousReward;
+        int episode;
+        float episodeReward;
 
         // Track current training data
         int epoch;
-        int episode;
+        TAction previousAction;
+        float previousReward;
+
+        TState previousState;
         int step;
-        float episodeReward;
 
         /// <summary>
-        /// Fires when the episode is finished, with the total accumulated reward in this episode
-        /// </summary>
-        public event System.Action<float> EpisodeFinished = delegate { };
-
-        /// <summary>
-        /// Create a new trainer instance
+        ///     Create a new trainer instance
         /// </summary>
         /// <param name="environment">Training environment</param>
         /// <param name="agent">Agent to be used while training</param>
@@ -34,7 +32,7 @@
         /// <param name="episodesPerEpoch">Number of episodes within an epoch</param>
         /// <param name="maximumEpisodeLength">Maximum number of steps in an episode. Used to cutoff the long (possibly infinite) episodes</param>
         public Trainer(IEnvironment<TAction, TState> environment, IAgent<TAction, TState> agent, int epochs = 100, int episodesPerEpoch = 1,
-            int maximumEpisodeLength = -1) {
+                       int maximumEpisodeLength = -1) {
             this.environment = environment;
             this.agent = agent;
             this.epochs = epochs;
@@ -45,7 +43,12 @@
         }
 
         /// <summary>
-        /// Starts the training for the specified number of epochs, episodes and steps
+        ///     Fires when the episode is finished, with the total accumulated reward in this episode
+        /// </summary>
+        public event Action<float> EpisodeFinished = delegate { };
+
+        /// <summary>
+        ///     Starts the training for the specified number of epochs, episodes and steps
         /// </summary>
         public void StartTraining() {
             epoch = 0;

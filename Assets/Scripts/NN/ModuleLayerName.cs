@@ -4,6 +4,6 @@
         ReLU,
         Softmax,
         Sequential,
-        Identity
+        Identity,
     }
 }

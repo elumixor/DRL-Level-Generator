@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace DRL.Behaviours {
     public abstract class Environment<TAction, TState> : MonoBehaviour, IEnvironment<TAction, TState> {
+        int currentStep;
         [SerializeField, MinValue(1)] int stepFrequency;
 
-        int currentStep;
+        protected abstract TState CurrentState { get; }
 
         public abstract void ResetEnvironment();
         public abstract (float reward, bool isDone) Step(TAction action);
@@ -25,7 +26,5 @@ namespace DRL.Behaviours {
 
             currentStep = 0;
         }
-
-        protected abstract TState CurrentState { get; }
     }
 }

@@ -4,9 +4,9 @@ namespace NN {
     public class Linear : Module {
         readonly int inputSize;
         readonly int outputSize;
+        float[] bias;
 
         float[] weight;
-        float[] bias;
 
         public Linear(int inputSize, int outputSize) {
             this.inputSize = inputSize;

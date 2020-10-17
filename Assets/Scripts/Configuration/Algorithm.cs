@@ -1,6 +1,6 @@
 ﻿namespace Configuration {
     public enum Algorithm {
         VPG,
-        A2C
+        A2C,
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Configuration.NN {
     [Serializable]
     public partial class Layout {
-        public List<ModuleConfiguration> modules = new List<ModuleConfiguration>();
         bool displayed;
+        public List<ModuleConfiguration> modules = new List<ModuleConfiguration>();
     }
 }

@@ -7,10 +7,10 @@ namespace Configuration {
     public partial class TrainingSetupConfiguration {
         [CustomEditor(typeof(TrainingSetupConfiguration))]
         public class ConfigurationEditor : Editor {
-            TrainingSetupConfiguration trainingSetupConfiguration;
+            ConfigurationA2C.Editor editorA2C;
 
             ConfigurationVPG.Editor editorVPG;
-            ConfigurationA2C.Editor editorA2C;
+            TrainingSetupConfiguration trainingSetupConfiguration;
 
             void OnEnable() {
                 trainingSetupConfiguration = (TrainingSetupConfiguration) target;

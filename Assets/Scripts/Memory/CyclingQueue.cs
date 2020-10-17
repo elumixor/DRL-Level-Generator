@@ -9,18 +9,19 @@ namespace Memory {
 
         int pointer;
 
-        public bool IsFull => pointer >= size;
-
-        public int Length => Math.Min(pointer, size);
-
         public CyclingQueue(int size) {
             this.size = size;
             items = new T[size];
         }
 
-        public void Push(T item) => items[pointer++ % size] = item;
+        public bool IsFull => pointer >= size;
 
-        public void Clear() => pointer = 0;
+        public int Length => Math.Min(pointer, size);
+
+        public T this[int i] {
+            get => items[i];
+            set => items[i] = value;
+        }
 
         public IEnumerator<T> GetEnumerator() {
             var l = Length;
@@ -28,11 +29,10 @@ namespace Memory {
                 yield return items[i];
         }
 
-        public T this[int i] {
-            get => items[i];
-            set => items[i] = value;
-        }
-
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Push(T item) => items[pointer++ % size] = item;
+
+        public void Clear() => pointer = 0;
     }
 }
