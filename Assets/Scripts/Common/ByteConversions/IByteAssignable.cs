@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace Common.ByteConversions {
+﻿namespace Common.ByteConversions {
     public interface IByteAssignable {
-        void FromBytes(IEnumerable<byte> bytes);
+        /// <summary>
+        ///     Assigns self from bytes and returns the number of bytes read
+        /// </summary>
+        int AssignFromBytes(byte[] bytes, int start = 0);
     }
 }

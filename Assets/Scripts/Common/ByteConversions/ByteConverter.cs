@@ -54,5 +54,27 @@ namespace Common.ByteConversions {
         public static int ToInt(this byte[] bytes, int startIndex = 0) { return BitConverter.ToInt32(bytes, startIndex); }
 
         public static bool ToBool(this byte[] bytes, int startIndex = 0) { return BitConverter.ToBoolean(bytes, startIndex); }
+
+        public static Vector2 ToVector2(this byte[] bytes, int startIndex = 0) {
+            return new Vector2(bytes.ToFloat(startIndex), bytes.ToFloat(startIndex + sizeof(float)));
+        }
+
+        public static Vector3 ToVector3(this byte[] bytes, int startIndex = 0) {
+            return new Vector3(bytes.ToFloat(startIndex), bytes.ToFloat(startIndex + sizeof(float)),
+                bytes.ToFloat(startIndex + 2 * sizeof(float)));
+        }
+
+        public static (T[] result, int startIndex) ToArray<T>(this byte[] bytes, int startIndex = 0) where T : IByteAssignable, new() {
+            var length = bytes.ToInt(startIndex);
+            startIndex += sizeof(int);
+
+            var result = new T[length];
+            for (var i = 0; i < length; i++) {
+                result[i] = new T();
+                startIndex += result[i].AssignFromBytes(bytes, startIndex);
+            }
+
+            return (result, startIndex);
+        }
     }
 }
