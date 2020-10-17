@@ -1,92 +1,90 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Serialization;
 using UnityEngine;
 
 namespace Testing.EditorTests {
-    public class ReflectionTests {
+    public class StructuralAttributeTests {
+        static void Check<T>(int size, string message = "") { Assert.AreEqual(StructuralAttribute.GetSize(typeof(T)), size, message); }
 
-        abstract class Base {
-            [Structural] float shouldNotBeInherited = 5;
-            [Structural] protected float shouldBeInherited = 6;
-            [Structural] protected abstract float inheritedMethod();
+        class C1 {
+            [Structural] public float a;
+            [Structural] public float b;
+            [Structural] public float c;
+
+            public float d;
+            public float e;
         }
 
-        class C1 : Base {
-            float privateField = 5;
-            public float publicField = 5;
-            static float staticField = 5;
-            public float Method() => 5;
-            static float Getter => 5;
-
-            [Structural] float markedPrivateField = 1;
-            [Structural] public float markedPublicField = 2;
-            [Structural] static float markedStaticField = 3;
-            [Structural] public float markedMethod() => 4;
-            [Structural] static float markedGetter => 5;
-
-            protected override float inheritedMethod() { return 7; }
-        }
-
-        static IEnumerable<MemberInfo> GetMembers(Type t) =>
-            t.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(member => member.IsDefined(typeof(StructuralAttribute), true));
-
-        // A Test behaves as an ordinary method
-        [Test]
-        public void FindingMembersByCustomAttributePasses() {
-            // Use the Assert class to test conditions
-
-            var properties = GetMembers(typeof(C1)).ToArray();
-            Assert.AreEqual(7, properties.Length, "Should return exactly seven marked properties");
-        }
+        [Test] public void FindsMarkedPublicInstanceFields() => Check<C1>(3);
 
         class C2 {
-            [Structural] float field = 1;
-            [Structural] string wrongField = "wrong";
-            [Structural] float Getter => 2;
-            [Structural] string WrongGetter => "wrong";
-            [Structural] float Method() => 3;
-            [Structural] string WrongMethod() => "wrong";
-            [Structural] Vector3 MethodVector3() => Vector3.one * 4;
-            [Structural] Vector2 MethodVector2() => Vector2.one * 5;
+            [Structural] float a;
+            [Structural] float b;
+            [Structural] float c;
+
+            float d;
+            float e;
         }
 
-        static bool CheckCorrectType(Type t) => t == typeof(float) || t == typeof(Vector3) || t == typeof(Vector2);
+        [Test] public void FindsMarkedPrivateInstanceFields() => Check<C2>(3);
 
-        static IEnumerable<Type> GetMembersWithCorrectType(Type t) =>
-            GetMembers(typeof(C2)).Select(member => {
-                switch (member) {
-                    case FieldInfo fieldInfo:
-                        return fieldInfo.FieldType;
-                    case PropertyInfo propertyInfo:
-                        return propertyInfo.PropertyType;
-                    case MethodInfo memberInfo:
-                        return memberInfo.ReturnType;
-                    default:
-                        throw new Exception("Member is not a field, property or a method?");
-                }
-            }).Where(CheckCorrectType);
 
-        // A Test behaves as an ordinary method
-        [Test]
-        public void FindingMembersThatHaveFloatOrVec3ReturnTypePasses() {
-            // Use the Assert class to test conditions
+        class C3 {
+            [Structural] public static float a;
+            [Structural] public static float b;
+            [Structural] public static float c;
 
-            var properties = GetMembersWithCorrectType(typeof(C2)).ToArray();
-            Assert.AreEqual(5, properties.Length, "Should return exactly 4 marked properties with the correct type");
+            public static float d;
+            public static float e;
         }
 
+        [Test] public void FindsMarkedPublicStaticFields() => Check<C3>(3);
 
-        [Test]
-        public void ShouldCalculateTheCorrectSizeOfAClass() {
-            var length = GetMembersWithCorrectType(typeof(C2)).Select(GetFieldSize).Sum();
-            Assert.AreEqual(length, 3 + 2 + 3, "Should return 8 floats");
+        class C4 {
+            [Structural] static float a;
+            [Structural] static float b;
+            [Structural] static float c;
+
+            static float d;
+            static float e;
         }
 
-        static int GetFieldSize(Type t) { return t == typeof(Vector3) ? 3 : t == typeof(Vector2) ? 2 : 1; }
+        [Test] public void FindsMarkedPrivateStaticFields() => Check<C4>(3);
+
+        class C5 {
+            [Structural] Vector3 vector3;
+            Vector3 vector3Hidden;
+        }
+
+        [Test] public void ReturnsThreeFromVector3() => Check<C5>(3);
+
+        class C6 {
+            [Structural] Vector2 vector2;
+            Vector3 vector2Hidden;
+        }
+
+        [Test] public void ReturnsTwoFromVector2() => Check<C6>(2);
+
+        class C7 {
+            [Structural] float a;
+            [Structural] Vector2 vector2;
+            [Structural] Vector3 vector3;
+        }
+
+        [Test] public void ReturnsSumOfFloatVector2Vector3() => Check<C7>(1 + 2 + 3);
+
+        class Base {
+            [Structural] public float a;
+            [Structural] protected float b;
+            [Structural] float cPrivateSoMustBeHidden;
+
+            public float aHidden;
+            protected float bHidden;
+            float cPrivateHidden;
+        }
+
+        class C8 : Base { }
+
+        [Test] public void FindsInheritedMembers() => Check<C8>(2);
     }
 }
