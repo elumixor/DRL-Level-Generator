@@ -12,6 +12,10 @@ namespace Testing.EditorTests {
             Assert.AreEqual(5, 5.ToBytes().ToArray().ToInt());
             Assert.AreEqual(true, true.ToBytes().ToArray().ToBool());
             Assert.AreEqual(false, false.ToBytes().ToArray().ToBool());
+            const string str = "hello world";
+            var (result, readCount) = "hello world".ToBytes().ToArray().GetString();
+            Assert.AreEqual(readCount, sizeof(int) + str.Length * sizeof(char));
+            Assert.AreEqual(str, result);
         }
 
         [Test] public void CanConvertUnityTypes() {
@@ -21,9 +25,9 @@ namespace Testing.EditorTests {
 
         [Test] public void CanConvertWithOffset() {
             var bytes = 5.ToBytes().ConcatMany(6.ToBytes(), new Vector2(7, 8).ToBytes(), 9.ToBytes(), new Vector3(1, 2, 3).ToBytes())
-                .ToArray();
+                         .ToArray();
 
-            var v2 = bytes.ToVector2(sizeof(int) + sizeof(int));
+            var v2 = bytes.ToVector2(sizeof(int)                                   + sizeof(int));
             var v3 = bytes.ToVector3(sizeof(int) + sizeof(int) + 2 * sizeof(float) + sizeof(int));
 
             Assert.AreEqual(new Vector2(7, 8), v2);
@@ -55,7 +59,7 @@ namespace Testing.EditorTests {
             var list = new List<C> {
                 new C {f1 = 1, v2 = new Vector2(2, 3), v3 = new Vector3(4, 5, 6)},
                 new C {f1 = 2, v2 = new Vector2(3, 4), v3 = new Vector3(5, 6, 8)},
-                new C {f1 = 3, v2 = new Vector2(4, 5), v3 = new Vector3(6, 7, 9)}
+                new C {f1 = 3, v2 = new Vector2(4, 5), v3 = new Vector3(6, 7, 9)},
             };
             var serialized = list.ToBytes(list.Count).ToArray();
             var length = serialized.ToInt();
@@ -73,16 +77,16 @@ namespace Testing.EditorTests {
             public Vector2 v2;
             public Vector3 v3;
 
-            public IEnumerable<byte> ToBytes() { return f1.ToBytes().ConcatMany(v2.ToBytes(), v3.ToBytes()); }
+            public IEnumerable<byte> ToBytes() => f1.ToBytes().ConcatMany(v2.ToBytes(), v3.ToBytes());
 
             public int AssignFromBytes(byte[] bytes, int start = 0) {
                 f1 = bytes.ToFloat(start);
-                v2 = bytes.ToVector2(start + sizeof(float));
+                v2 = bytes.ToVector2(start                                 + sizeof(float));
                 v3 = bytes.ToVector3(start + sizeof(float) + sizeof(float) + sizeof(float));
                 return sizeof(float) * (1 + 2 + 3);
             }
 
-            bool Equals(C other) { return f1.Equals(other.f1) && v2 == other.v2 && v3 == other.v3; }
+            bool Equals(C other) => f1.Equals(other.f1) && v2 == other.v2 && v3 == other.v3;
 
             public override bool Equals(object obj) {
                 if (ReferenceEquals(null, obj)) return false;
