@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using Serialization;
 using UnityEngine;
 
 namespace Testing.EditorTests {
     public class ReflectionTests {
-        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
-        class MyAttribute : Attribute { }
 
         abstract class Base {
-            [My] float shouldNotBeInherited = 5;
-            [My] protected float shouldBeInherited = 6;
-            [My] protected abstract float inheritedMethod();
+            [Structural] float shouldNotBeInherited = 5;
+            [Structural] protected float shouldBeInherited = 6;
+            [Structural] protected abstract float inheritedMethod();
         }
 
         class C1 : Base {
@@ -23,18 +22,18 @@ namespace Testing.EditorTests {
             public float Method() => 5;
             static float Getter => 5;
 
-            [My] float markedPrivateField = 1;
-            [My] public float markedPublicField = 2;
-            [My] static float markedStaticField = 3;
-            [My] public float markedMethod() => 4;
-            [My] static float markedGetter => 5;
+            [Structural] float markedPrivateField = 1;
+            [Structural] public float markedPublicField = 2;
+            [Structural] static float markedStaticField = 3;
+            [Structural] public float markedMethod() => 4;
+            [Structural] static float markedGetter => 5;
 
             protected override float inheritedMethod() { return 7; }
         }
 
         static IEnumerable<MemberInfo> GetMembers(Type t) =>
             t.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(member => member.IsDefined(typeof(MyAttribute), true));
+                .Where(member => member.IsDefined(typeof(StructuralAttribute), true));
 
         // A Test behaves as an ordinary method
         [Test]
@@ -46,14 +45,14 @@ namespace Testing.EditorTests {
         }
 
         class C2 {
-            [My] float field = 1;
-            [My] string wrongField = "wrong";
-            [My] float Getter => 2;
-            [My] string WrongGetter => "wrong";
-            [My] float Method() => 3;
-            [My] string WrongMethod() => "wrong";
-            [My] Vector3 MethodVector3() => Vector3.one * 4;
-            [My] Vector2 MethodVector2() => Vector2.one * 5;
+            [Structural] float field = 1;
+            [Structural] string wrongField = "wrong";
+            [Structural] float Getter => 2;
+            [Structural] string WrongGetter => "wrong";
+            [Structural] float Method() => 3;
+            [Structural] string WrongMethod() => "wrong";
+            [Structural] Vector3 MethodVector3() => Vector3.one * 4;
+            [Structural] Vector2 MethodVector2() => Vector2.one * 5;
         }
 
         static bool CheckCorrectType(Type t) => t == typeof(float) || t == typeof(Vector3) || t == typeof(Vector2);
