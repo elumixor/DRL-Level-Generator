@@ -2,7 +2,7 @@
 using Common;
 using DRL.Behaviours;
 using NaughtyAttributes;
-using Player;
+using TrainingSetups.Pendulum.Scripts.Player;
 using UnityEngine;
 
 namespace TrainingSetups.Pendulum.Scripts.DRL {
@@ -18,6 +18,7 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
 
             if (player.transform.position.y >= 9f) isDone = true;
         }
+
         public override void ResetEnvironment() {
             player.ResetState();
             isDone = false;

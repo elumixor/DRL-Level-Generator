@@ -1,8 +1,6 @@
 ﻿using System;
 
-namespace Player.Configuration {
+namespace TrainingSetups.Pendulum.Scripts.Player.Configuration {
     [Serializable]
-    public struct BehaviouralConfiguration {
-        
-    }
+    public struct BehaviouralConfiguration { }
 }

@@ -31,9 +31,7 @@ namespace Utility {
         IEnumerator currentCoroutine;
 
 
-        void Update() {
-            HandleInput();
-        }
+        void Update() { HandleInput(); }
 
         void HandleInput() {
             if (Input.GetMouseButtonDown(0)) {

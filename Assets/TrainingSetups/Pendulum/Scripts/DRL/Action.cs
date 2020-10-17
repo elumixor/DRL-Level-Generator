@@ -1,5 +1,4 @@
 ﻿using Common.ByteConversions;
-using DRL;
 
 namespace TrainingSetups.Pendulum.Scripts.DRL {
     public struct Action {

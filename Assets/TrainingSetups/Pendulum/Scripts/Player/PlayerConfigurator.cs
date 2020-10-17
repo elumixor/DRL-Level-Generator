@@ -1,10 +1,9 @@
-﻿using System;
-using NaughtyAttributes;
-using Player.Configuration;
-using Player.Configuration.Configurators;
+﻿using NaughtyAttributes;
+using TrainingSetups.Pendulum.Scripts.Player.Configuration;
+using TrainingSetups.Pendulum.Scripts.Player.Configuration.Configurators;
 using UnityEngine;
 
-namespace Player {
+namespace TrainingSetups.Pendulum.Scripts.Player {
     /// <summary>
     /// Master class for configuring the player
     /// </summary>
@@ -12,7 +11,7 @@ namespace Player {
     public class PlayerConfigurator : MonoBehaviour {
         [SerializeField] StructuralConfiguration structuralConfiguration;
         [SerializeField] BehaviouralConfiguration behaviouralConfiguration;
-        
+
         [SerializeField, Foldout("Components")] BobConfigurator bobConfigurator;
         [SerializeField, Foldout("Components")] ConnectorConfigurator connectorConfigurator;
         [SerializeField] bool watchForChanges = true;
@@ -25,9 +24,7 @@ namespace Player {
         /// Applies the structural and behavioural configuration to the player
         /// </summary>
         [Button]
-        void ApplyConfiguration() {
-            ApplyStructuralConfiguration();
-        }
+        void ApplyConfiguration() { ApplyStructuralConfiguration(); }
 
         void ApplyStructuralConfiguration() {
             connectorConfigurator.ApplyConfiguration(structuralConfiguration);

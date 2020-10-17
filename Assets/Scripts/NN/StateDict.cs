@@ -10,7 +10,8 @@ namespace NN {
             this.childParameters = childParameters;
         }
 
-        public void Deconstruct(out IDictionary<ModuleParameterName, float[]> selfParameters, out IEnumerable<(int childIndex, StateDict stateDict)> childParameters) {
+        public void Deconstruct(out IDictionary<ModuleParameterName, float[]> selfParameters,
+            out IEnumerable<(int childIndex, StateDict stateDict)> childParameters) {
             selfParameters = this.selfParameters;
             childParameters = this.childParameters;
         }

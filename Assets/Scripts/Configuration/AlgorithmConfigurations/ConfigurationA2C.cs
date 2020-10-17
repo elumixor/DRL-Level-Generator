@@ -1,7 +1,6 @@
 ﻿using System;
 using Common;
 using Configuration.NN;
-using NaughtyAttributes;
 using UnityEditor;
 
 namespace Configuration.AlgorithmConfigurations {

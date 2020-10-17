@@ -22,7 +22,7 @@ namespace Configuration.NN {
 
         [Serializable]
         public class FloatParametersDict : SerializableDictionary<ModuleConfigurationParameterFloat, float> { }
-        
+
         public ModuleLayerName layerName;
 
         public FloatParametersDict floatParameters = new FloatParametersDict();

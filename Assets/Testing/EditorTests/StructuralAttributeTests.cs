@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
-namespace Testing.StaticTests {
+namespace Testing.EditorTests {
     public class ReflectionTests {
         [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
         class MyAttribute : Attribute { }
 
         abstract class Base {
-            [MyAttribute] float shouldNotBeInherited = 5;
-            [MyAttribute] protected float shouldBeInherited = 6;
-            [MyAttribute] protected abstract float inheritedMethod();
+            [My] float shouldNotBeInherited = 5;
+            [My] protected float shouldBeInherited = 6;
+            [My] protected abstract float inheritedMethod();
         }
 
         class C1 : Base {

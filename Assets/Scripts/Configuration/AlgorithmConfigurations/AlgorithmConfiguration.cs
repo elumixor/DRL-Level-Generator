@@ -1,6 +1,5 @@
 ﻿using System;
 using Configuration.NN;
-using UnityEngine;
 
 namespace Configuration.AlgorithmConfigurations {
     [Serializable]

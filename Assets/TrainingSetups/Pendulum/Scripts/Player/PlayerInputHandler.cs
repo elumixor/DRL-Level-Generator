@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Player {
+namespace TrainingSetups.Pendulum.Scripts.Player {
     /// <summary>
     /// Handles input and sends corresponding commands to <see cref="PlayerBehaviouralController"/>
     /// </summary>
@@ -15,7 +14,7 @@ namespace Player {
 
         public void OnTap() {
             var playerBehaviouralController = GetComponent<PlayerBehaviouralController>();
-            
+
             playerBehaviouralController.Switch();
             playerBehaviouralController.Boost();
         }

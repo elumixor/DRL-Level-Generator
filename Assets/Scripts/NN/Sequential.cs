@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace NN {
+﻿namespace NN {
     public class Sequential : Module {
         readonly Module[] layers;
         public Sequential(params Module[] layers) => this.layers = layers;

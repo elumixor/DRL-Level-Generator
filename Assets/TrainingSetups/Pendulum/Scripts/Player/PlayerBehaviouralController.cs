@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Player {
+namespace TrainingSetups.Pendulum.Scripts.Player {
     /// <summary>
     /// Responsible for player movement and executing player actions
     /// </summary>

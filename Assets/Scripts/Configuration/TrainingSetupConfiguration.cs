@@ -12,7 +12,7 @@ namespace Configuration {
 
         // Hyperparameters
         public float discounting;
-        
+
         // Configuration of selected Algorithm
         public AlgorithmConfiguration AlgorithmConfiguration {
             get {

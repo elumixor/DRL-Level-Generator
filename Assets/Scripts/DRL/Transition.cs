@@ -1,6 +1,4 @@
-﻿using Common;
-
-namespace DRL {
+﻿namespace DRL {
     public class Transition<TAction, TState> {
         public readonly TState previousState;
         public readonly TAction action;

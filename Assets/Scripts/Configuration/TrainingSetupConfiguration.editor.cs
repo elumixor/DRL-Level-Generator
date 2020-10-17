@@ -1,8 +1,6 @@
 ﻿using System;
-using Common;
 using Configuration.AlgorithmConfigurations;
 using UnityEditor;
-using UnityEngine;
 using static Configuration.Algorithm;
 
 namespace Configuration {
@@ -23,7 +21,8 @@ namespace Configuration {
 
             public override void OnInspectorGUI() {
                 serializedObject.Update();
-                trainingSetupConfiguration.algorithm = (Algorithm) EditorGUILayout.EnumPopup("Algorithm", trainingSetupConfiguration.algorithm);
+                trainingSetupConfiguration.algorithm =
+                    (Algorithm) EditorGUILayout.EnumPopup("Algorithm", trainingSetupConfiguration.algorithm);
 
                 switch (trainingSetupConfiguration.algorithm) {
                     case VPG:
@@ -35,7 +34,7 @@ namespace Configuration {
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                
+
                 serializedObject.ApplyModifiedProperties();
             }
         }

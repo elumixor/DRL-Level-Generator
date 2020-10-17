@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace NN {
     public class Linear : Module {
@@ -36,7 +35,7 @@ namespace NN {
 
         public override void LoadStateDict(StateDict stateDict) {
             var (selfParameters, _) = stateDict;
-            
+
             weight = selfParameters[ModuleParameterName.Weight];
             bias = selfParameters[ModuleParameterName.Bias];
         }

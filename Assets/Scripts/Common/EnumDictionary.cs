@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using UnityEngine;
 
 namespace Common {
     [Serializable]
@@ -15,6 +14,7 @@ namespace Common {
             data = new TValue[length];
             FillDefaults();
         }
+
         public EnumDictionary(IEnumerable<(TEnum @enum, TValue value)> valuePairs) : this() {
             foreach (var (@enum, value) in valuePairs) this[@enum] = value;
         }
@@ -29,7 +29,7 @@ namespace Common {
             get => data[getIndex(i)];
             set => data[getIndex(i)] = value;
         }
-        
+
         public TValue this[int i] {
             get => data[i];
             set => data[i] = value;
@@ -39,7 +39,7 @@ namespace Common {
             for (var j = 0; j < values.Length; j++) {
                 if (Equals(values[j], i)) return j;
             }
-            
+
             throw new InvalidEnumArgumentException();
         }
     }

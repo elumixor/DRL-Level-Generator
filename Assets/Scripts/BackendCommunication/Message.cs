@@ -14,7 +14,7 @@ namespace BackendCommunication {
         public byte[] ToBytes() {
             var result = new byte[data.Length + 1];
             result[0] = (byte) (header == MessageHeader.Inference ? 'i' : 't');
-            
+
             Buffer.BlockCopy(data, 0, result, 1, data.Length);
             return result;
         }

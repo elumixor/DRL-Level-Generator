@@ -1,8 +1,7 @@
-﻿using System;
-using NaughtyAttributes;
+﻿using NaughtyAttributes;
 using UnityEngine;
 
-namespace Player.Configuration.Configurators {
+namespace TrainingSetups.Pendulum.Scripts.Player.Configuration.Configurators {
     [RequireComponent(typeof(LineRenderer))]
     public class ConnectorConfigurator : MonoBehaviour {
         [SerializeField, Range(2, 100)] int smoothness;
