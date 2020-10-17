@@ -7,6 +7,7 @@ from .byte_serializable import ByteSerializable
 from .data_types import DataTypes
 from .data_types_size import DataTypesSize
 from .endianness import Endianness
+from .serialization_exception import SerializationException
 
 
 def __get_format(data_type: DataTypes, endianness: Endianness, count: int) -> str:
@@ -52,7 +53,7 @@ def to_bytes(value: Union[int, float, str, ByteConvertible, List[int], List[floa
 
             return result
 
-        raise Exception(f"Cannot convert list of type {type(value)} to bytes")
+        raise SerializationException(f"Cannot convert list of type {type(value)} to bytes")
 
     if isinstance(value, int):
         return pack(__get_format(DataTypes.Int, endianness, 1), value)
@@ -63,7 +64,7 @@ def to_bytes(value: Union[int, float, str, ByteConvertible, List[int], List[floa
     if isinstance(value, str):
         return pack(__get_format(DataTypes.Int, endianness, 1), len(value)) + bytes(value, 'ascii')
 
-    raise Exception(f"Cannot type {type(value)} to bytes")
+    raise SerializationException(f"Cannot type {type(value)} to bytes")
 
 
 def to_int(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> int:

@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from serialization import DataTypesSize, to_int, ByteSerializable, to_bytes, to_float, to_string, Endianness, to_list
+from serialization import DataTypesSize, to_int, ByteSerializable, to_bytes, to_float, to_string, Endianness, to_list, \
+    SerializationException
 
 
 class C(ByteSerializable):
@@ -127,10 +128,10 @@ class SerializationTests(TestCase):
         class C2:
             pass
 
-        self.assertRaises(Exception, lambda: to_bytes(C2()))
+        self.assertRaises(SerializationException, lambda: to_bytes(C2()))
 
     def test_unserializable_list(self):
         class C2:
             pass
 
-        self.assertRaises(Exception, lambda: to_bytes([C2()]))
+        self.assertRaises(SerializationException, lambda: to_bytes([C2()]))
