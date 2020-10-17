@@ -1,19 +1,18 @@
 ﻿using System.Linq;
 using Common;
 using DRL.Behaviours;
-using Implementation.Dummy;
 using NaughtyAttributes;
 using Player;
 using UnityEngine;
 
-namespace Training_Setups.Pendulum.Scripts.DRL {
-    public class InferenceEnvironment : Environment<DummyAction, State> {
+namespace TrainingSetups.Pendulum.Scripts.DRL {
+    public class InferenceEnvironment : Environment<Action, State> {
         [SerializeField, Required] PlayerBehaviouralController player;
         [SerializeField, Required] PlayerInputHandler playerInputHandler;
 
         bool isDone;
 
-        void Start() => player.Collided += () => isDone = true;
+        // void Start() => player.Collided += () => isDone = true;
         protected override void FixedUpdate() {
             base.FixedUpdate();
 
@@ -25,7 +24,7 @@ namespace Training_Setups.Pendulum.Scripts.DRL {
             foreach (var followTransform in FindObjectsOfType<FollowTransform>()) followTransform.Synchronize();
         }
 
-        public override (float reward, bool isDone) Step(DummyAction action) {
+        public override (float reward, bool isDone) Step(Action action) {
             if (action.tap) playerInputHandler.OnTap();
 
             return (player.Position.y, isDone);

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
 
-namespace Training_Setups.Pendulum.Scripts {
+namespace TrainingSetups.Pendulum.Scripts {
     public class Enemy : MonoBehaviour { }
 }

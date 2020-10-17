@@ -2,7 +2,7 @@
 using Common.ByteConversions;
 using UnityEngine;
 
-namespace Training_Setups.Pendulum.Scripts.DRL {
+namespace TrainingSetups.Pendulum.Scripts.DRL {
     public class State : IByteConvertible {
         readonly Vector2[] enemyPositions;
         readonly float playerPosition;

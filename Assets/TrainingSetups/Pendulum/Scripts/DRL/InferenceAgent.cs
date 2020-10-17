@@ -1,31 +1,24 @@
 ﻿using BackendCommunication;
 using DRL;
 using DRL.Behaviours;
-using Implementation.Dummy;
 using Memory;
 using NaughtyAttributes;
 using UnityEngine;
 
-namespace Training_Setups.Pendulum.Scripts.DRL {
-    public class InferenceAgent : Agent<DummyAction, State> {
+namespace TrainingSetups.Pendulum.Scripts.DRL {
+    public class InferenceAgent : Agent<Action, State> {
         [SerializeField, MinValue(1)] int memorySize;
 
         MemoryRRPB<Episode, InferenceTransition> memory;
         Episode currentEpisode = new Episode();
 
-        void Start() {
-            Communicator.OpenConnection();
-            memory = new MemoryRRPB<Episode, InferenceTransition>(memorySize);
-        }
+        void Start() { memory = new MemoryRRPB<Episode, InferenceTransition>(memorySize); }
 
-
-        void OnDestroy() => Communicator.CloseConnection();
-
-        public override void SaveTransition(Transition<DummyAction, State> transition) =>
+        public override void SaveTransition(Transition<Action, State> transition) =>
             currentEpisode.Add(new InferenceTransition(transition));
 
-        public override DummyAction GetAction(State state) {
-            var action = new DummyAction();
+        public override Action GetAction(State state) {
+            var action = new Action();
             var message = new Message(MessageHeader.Inference, state.ToBytes());
             action.AssignFromBytes(Communicator.Compute(message.ToBytes()));
             return action;
