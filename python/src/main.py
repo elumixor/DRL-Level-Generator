@@ -5,6 +5,7 @@ from utilities import log
 
 
 def handle_message(message):
+    # Parse message
     header = message[0:1].decode()
     data = message[1:]
 
