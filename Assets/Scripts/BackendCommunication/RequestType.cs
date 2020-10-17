@@ -1,5 +1,6 @@
 ﻿namespace BackendCommunication {
-    public enum MessageHeader {
+    public enum RequestType {
+        Echo,
         Inference,
         Update,
     }

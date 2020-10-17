@@ -7,10 +7,10 @@ using UnityEngine;
 
 namespace TrainingSetups.Pendulum.Scripts.DRL {
     public class InferenceAgent : Agent<Action, State> {
-        [SerializeField, MinValue(1)] int memorySize;
+        Episode currentEpisode = new Episode();
 
         MemoryRRPB<Episode, InferenceTransition> memory;
-        Episode currentEpisode = new Episode();
+        [SerializeField, MinValue(1)] int memorySize;
 
         void Start() { memory = new MemoryRRPB<Episode, InferenceTransition>(memorySize); }
 
@@ -19,8 +19,8 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
 
         public override Action GetAction(State state) {
             var action = new Action();
-            var message = new Message(MessageHeader.Inference, state.ToBytes());
-            action.AssignFromBytes(Communicator.Compute(message.ToBytes()));
+            var (bytes, _, startIndex) = Communicator.Send(RequestType.Inference, state.ToBytes());
+            action.AssignFromBytes(bytes, startIndex);
             return action;
         }
 
@@ -33,6 +33,6 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
             if (memory.IsFull) Train();
         }
 
-        void Train() => Communicator.Compute(new Message(MessageHeader.Update, memory.ToBytes()).ToBytes());
+        void Train() => Communicator.Send(RequestType.Update, memory.ToBytes());
     }
 }

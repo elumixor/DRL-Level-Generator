@@ -1,7 +1,8 @@
 import time
 from unittest import TestCase
 
-from communication import Server
+import serialization
+from communication import Server, RequestType, ResponseType
 from communication.server_exception import ServerException
 
 ADDRESS = "tcp://*:5555"
@@ -31,5 +32,18 @@ class ServerTests(TestCase):
         time.sleep(0.1)
         self.assertTrue(self.server.is_running)
         self.server.stop()
-        time.sleep(0.1)
+        self.server.wait_for_stop()
         self.assertFalse(self.server.is_running)
+
+    def test_server_echo(self):
+        def handle_message(request_type, data):
+            self.assertEqual(request_type, RequestType.Echo)
+            string, length = serialization.to_string(data)
+            self.assertEqual(string, "hello world")
+            self.assertEqual(length, serialization.DataTypesSize.Int + serialization.DataTypesSize.Char * len("hello world"))
+            self.server.send_message(ResponseType.Echo, serialization.to_bytes(string))
+            self.server.stop()
+
+        self.server = Server(ADDRESS, handle_message)
+        self.server.start()
+        self.server.wait_for_stop()
