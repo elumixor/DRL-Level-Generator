@@ -6,7 +6,6 @@ using NetMQ.Sockets;
 
 namespace BackendCommunication {
     public static class Communicator {
-        const string ADDRESS = "tcp://localhost:5555";
         static bool isConnected;
         static RequestSocket client;
 
@@ -26,14 +25,14 @@ namespace BackendCommunication {
         }
 
 
-        public static void OpenConnection() {
+        public static void OpenConnection(string address) {
             if (isConnected) return;
             ForceDotNet.Force();
 
             isConnected = true;
 
             client = new RequestSocket();
-            client.Connect(ADDRESS);
+            client.Connect(address);
         }
 
         public static void CloseConnection() {
