@@ -35,11 +35,11 @@ class CustomClassTests(TestCase):
 
 class SerializationTests(TestCase):
     def test_string_serialization(self):
-        string = "hello with \0 inside string"
+        string = "hello with \0 inside string с утф-восемь ыё"
         b = to_bytes(string)
         res, bytes_read = to_string(b)
         self.assertEqual(string, res)
-        self.assertEqual(bytes_read, DataTypesSize.Int + len(string) * DataTypesSize.Char)
+        self.assertEqual(bytes_read, DataTypesSize.Int + len(string.encode('utf-8')))
 
     def test_simple_float(self):
         self.assertEqual(5.0, to_float(to_bytes(5.0)))

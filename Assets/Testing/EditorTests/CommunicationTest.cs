@@ -13,7 +13,7 @@ namespace Testing.EditorTests {
         [TearDown] public void CloseConnection() => Communicator.CloseConnection();
 
         [Test] public void EchoMessageWorks() {
-            const string requestData = "hello world";
+            const string requestData = "hello вёрльд";
             var (bytes, responseType, startIndex) = Communicator.Send(RequestType.Echo, requestData.ToBytes());
             var responseString = bytes.GetString(startIndex).result;
 

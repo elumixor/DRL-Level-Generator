@@ -62,7 +62,8 @@ def to_bytes(value: Union[int, float, str, ByteConvertible, List[int], List[floa
         return pack(__get_format(DataTypes.Float, endianness, 1), value)
 
     if isinstance(value, str):
-        return pack(__get_format(DataTypes.Int, endianness, 1), len(value)) + bytes(value, 'ascii')
+        b = bytes(value, 'utf-8')
+        return pack(__get_format(DataTypes.Int, endianness, 1), len(b)) + b
 
     raise SerializationException(f"Cannot type {type(value)} to bytes")
 
@@ -79,9 +80,9 @@ def to_float(value: bytes, start_index: int = 0, endianness: Endianness = Endian
 
 def to_string(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[str, int]:
     length = to_int(value, start_index, endianness)
-    value = value[start_index + DataTypesSize.Int:start_index + DataTypesSize.Int + length * DataTypesSize.Char]
-    string = value.decode('ascii')
-    return string, DataTypesSize.Int + len(string) * DataTypesSize.Char
+    value = value[start_index + DataTypesSize.Int:start_index + DataTypesSize.Int + length]
+    string = value.decode('utf-8')
+    return string, DataTypesSize.Int + length
 
 
 def to_list(value: bytes, transformer: Callable, start_index: int = 0, endianness: Endianness = Endianness.Native):

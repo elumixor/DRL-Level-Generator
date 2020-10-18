@@ -13,16 +13,9 @@ namespace Testing.EditorTests {
             Assert.AreEqual(5, 5.ToBytes().ToArray().ToInt());
             Assert.AreEqual(true, true.ToBytes().ToArray().ToBool());
             Assert.AreEqual(false, false.ToBytes().ToArray().ToBool());
-            const string str = "hello world";
-            var (result, readCount) = "hello world".ToBytes().ToArray().GetString();
-            Assert.AreEqual(readCount, sizeof(int) + str.Length);
+            const string str = "hello world с утфčaraktёрщі";
+            var (result, readCount) = str.ToBytes().ToArray().GetString();
             Assert.AreEqual(str, result);
-        }
-
-        [Test] public void ConversionsTakeCorrectNumberOfBytes() {
-            Assert.AreEqual(4, 5.ToBytes().Count());
-            Assert.AreEqual(4, 5.0f.ToBytes().Count());
-            Assert.AreEqual("string".Length + 4, "string".ToBytes().Count());
         }
 
         [Test] public void CanConvertEnum() {

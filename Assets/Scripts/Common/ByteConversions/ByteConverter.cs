@@ -15,9 +15,11 @@ namespace Common.ByteConversions {
         public static IEnumerable<byte> ToBytes(this int value) => BitConverter.GetBytes(value);
 
         public static IEnumerable<byte> ToBytes(this bool value) => BitConverter.GetBytes(value);
-        public static IEnumerable<byte> ToBytes(this char value) => BitConverter.GetBytes(value);
 
-        public static IEnumerable<byte> ToBytes(this string value) => value.Length.ToBytes().Concat(Encoding.ASCII.GetBytes(value));
+        public static IEnumerable<byte> ToBytes(this string value) {
+            var bytes = Encoding.UTF8.GetBytes(value);
+            return bytes.Length.ToBytes().Concat(bytes);
+        }
 
         // Unity Vectors
         public static IEnumerable<byte> ToBytes(this Vector2 value) => value.x.ToBytes().Concat(value.y.ToBytes());
@@ -55,7 +57,7 @@ namespace Common.ByteConversions {
 
         public static (string result, int readCount) GetString(this byte[] bytes, int startIndex = 0) {
             var length = bytes.ToInt(startIndex);
-            return (Encoding.ASCII.GetString(bytes, startIndex + sizeof(int), length), length + sizeof(int));
+            return (Encoding.UTF8.GetString(bytes, startIndex + sizeof(int), length), length + sizeof(int));
         }
 
         public static Vector2 ToVector2(this byte[] bytes, int startIndex = 0) =>
