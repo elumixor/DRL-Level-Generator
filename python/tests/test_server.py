@@ -44,7 +44,7 @@ class ServerTests(TestCase):
             self.assertEqual(string, "hello вёрльд")
             self.assertEqual(length, serialization.DataTypesSize.Int + len("hello вёрльд".encode('utf-8')))
 
-            server.send_message(ResponseType.Echo, serialization.to_bytes(string))
+            server.send_message(ResponseType.Ok, serialization.to_bytes(string))
             server.stop()
 
         self.server = Server(ADDRESS, handle_message)

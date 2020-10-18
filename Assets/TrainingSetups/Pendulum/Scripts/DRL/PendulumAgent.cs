@@ -1,16 +1,21 @@
-﻿using BackendCommunication;
+﻿using System;
+using BackendCommunication;
+using Configuration.NN;
 using DRL;
 using DRL.Behaviours;
 using Memory;
 using NaughtyAttributes;
+using NN;
 using UnityEngine;
 
 namespace TrainingSetups.Pendulum.Scripts.DRL {
-    public class InferenceAgent : Agent<Action, State> {
+    public class PendulumAgent : Agent<Action, State>, INNAgent {
         Episode currentEpisode = new Episode();
 
         MemoryRRPB<Episode, InferenceTransition> memory;
         [SerializeField, MinValue(1)] int memorySize;
+        public Module NN { get; private set; }
+        public void InitializeNN(Layout layout) { throw new NotImplementedException(); }
 
         void Start() { memory = new MemoryRRPB<Episode, InferenceTransition>(memorySize); }
 
@@ -19,7 +24,7 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
 
         public override Action GetAction(State state) {
             var action = new Action();
-            var (bytes, _, startIndex) = Communicator.Send(RequestType.Inference, state.ToBytes());
+            var (bytes, startIndex) = Communicator.Send(RequestType.SendTrainingData, state.ToBytes());
             action.AssignFromBytes(bytes, startIndex);
             return action;
         }
@@ -33,6 +38,6 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
             if (memory.IsFull) Train();
         }
 
-        void Train() => Communicator.Send(RequestType.Update, memory.ToBytes());
+        void Train() => Communicator.Send(RequestType.SendTrainingData, memory.ToBytes());
     }
 }

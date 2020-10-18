@@ -2,6 +2,5 @@
     public enum ResponseType {
         Failure,
         Ok,
-        Echo,
     }
 }

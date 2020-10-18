@@ -14,10 +14,9 @@ namespace Testing.EditorTests {
 
         [Test] public void EchoMessageWorks() {
             const string requestData = "hello вёрльд";
-            var (bytes, responseType, startIndex) = Communicator.Send(RequestType.Echo, requestData.ToBytes());
+            var (bytes, startIndex) = Communicator.Send(RequestType.Echo, requestData.ToBytes());
             var responseString = bytes.GetString(startIndex).result;
 
-            Assert.AreEqual(responseType, ResponseType.Echo);
             Assert.AreEqual(responseString, requestData);
         }
     }
