@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using BackendCommunication;
 using Configuration.NN;
 using DRL;
@@ -6,6 +6,7 @@ using DRL.Behaviours;
 using Memory;
 using NaughtyAttributes;
 using NN;
+using Serialization;
 using UnityEngine;
 
 namespace TrainingSetups.Pendulum.Scripts.DRL {
@@ -15,7 +16,8 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
         MemoryRRPB<Episode, InferenceTransition> memory;
         [SerializeField, MinValue(1)] int memorySize;
         public Module NN { get; private set; }
-        public void InitializeNN(Layout layout) { throw new NotImplementedException(); }
+
+        public void InitializeNN(Layout layout) => NN = new Sequential(layout.modules.Select(m => m.ToModule()).ToArray());
 
         void Start() { memory = new MemoryRRPB<Episode, InferenceTransition>(memorySize); }
 

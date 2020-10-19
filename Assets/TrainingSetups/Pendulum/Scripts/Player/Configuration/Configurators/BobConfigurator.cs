@@ -6,7 +6,7 @@ namespace TrainingSetups.Pendulum.Scripts.Player.Configuration.Configurators {
             var t = transform;
 
             t.localScale = structuralConfiguration.bobSize * Vector3.one;
-            t.localPosition = Vector3.down * structuralConfiguration.connectorLength;
+            t.localPosition = Vector3.down                 * structuralConfiguration.connectorLength;
         }
     }
 }

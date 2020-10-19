@@ -23,7 +23,7 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
             var enemyPositionsBytes = enemyPositions.ToBytes(enemyPositions.Length);
 
             var result = enemyPositionsBytes.ConcatMany(playerPosition.ToBytes(), angle.ToBytes(), angularSpeed.ToBytes(),
-                upwardSpeed.ToBytes());
+                                                        upwardSpeed.ToBytes());
             return result;
         }
     }

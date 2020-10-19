@@ -13,7 +13,7 @@ namespace DRL.Behaviours {
 
         DRL.Trainer<TAction, TState> trainer;
 
-        void Start() {
+        public void StartTraining() {
             trainer = new DRL.Trainer<TAction, TState>(environment, agent, epochs, episodesPerEpoch, maximumEpisodeLength);
             trainer.StartTraining();
         }

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Common;
+using Common.ByteConversions;
 using Configuration.NN;
 using UnityEditor;
 
@@ -24,6 +27,14 @@ namespace Configuration.AlgorithmConfigurations {
         public A2CNetworksType networksType;
 
         public override Layout ActorLayout => actor;
+
+        public override IEnumerable<byte> ToBytes() {
+            var networksBytes = networksType == A2CNetworksType.Separate
+                                    ? actor.ToBytes().Concat(critic.ToBytes())
+                                    : @base.ToBytes().ConcatMany(actorHead.ToBytes(), criticHead.ToBytes());
+
+            return networksType.ToString().ToBytes().Concat(networksBytes);
+        }
 
         public class Editor : IEditor {
             readonly Layout.Editor actorEditor;

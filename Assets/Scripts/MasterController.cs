@@ -4,7 +4,9 @@ using Common;
 using Configuration;
 using DRL;
 using DRL.Behaviours;
+using NN;
 using Serialization;
+using UnityEditor;
 using UnityEngine;
 
 /// <summary>
@@ -13,8 +15,10 @@ using UnityEngine;
 /// </summary>
 public class MasterController<TAction, TState> : SingletonBehaviour<MasterController<TAction, TState>> {
     const string TPP_ADDRESS = "tcp://localhost:5555";
+    [SerializeField] DRL.Behaviours.Trainer<TAction, TState> trainer;
 
     [SerializeField] TrainingSetupConfiguration trainingSetupConfiguration;
+
     static TrainingSetupConfiguration TrainingSetupConfiguration => instance.trainingSetupConfiguration;
 
     /// <summary>
@@ -24,17 +28,35 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
     /// Initializes serializers, given the state size and action size
     /// Sends initial data via communicator to initialize backend
     void Start() {
-        var actionSize = StructuralAttribute.GetSize(typeof(TAction));
-        var stateSize = StructuralAttribute.GetSize(typeof(TState));
+        try {
+            // Open connection and ping back end to see if it is responsive
+            Communicator.OpenConnection(TPP_ADDRESS);
+            Communicator.Send(RequestType.WakeUp);
 
-        foreach (var nnAgent in FindObjectsOfType<Agent<TAction, TState>>().OfType<INNAgent>())
-            nnAgent.InitializeNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout);
+            // If everything is ok, send initial configuration data
+            var actionSize = StructuralAttribute.GetSize(typeof(TAction));
+            var stateSize = StructuralAttribute.GetSize(typeof(TState));
 
-        Communicator.OpenConnection(TPP_ADDRESS);
+            var configuration = TrainingSetupConfiguration;
+            configuration.actionSize = actionSize;
+            configuration.stateSize = stateSize;
 
-        // TODO
-        // var message = new { };
-        // var response = Communicator.SendMessage(message);
+            // Communicator should return the initial nn learnable parameters
+            var (nnData, startIndex) = Communicator.Send(RequestType.SendConfiguration, configuration.ToBytes());
+            var stateDict = new StateDict(nnData, startIndex);
+
+            // Initialize agents with current parameters and configuration
+            foreach (var nnAgent in FindObjectsOfType<Agent<TAction, TState>>().OfType<INNAgent>()) {
+                nnAgent.InitializeNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout);
+                nnAgent.NN.LoadStateDict(stateDict);
+            }
+
+            // Start training
+            trainer.StartTraining();
+        } catch (CommunicationException e) {
+            Debug.LogError(e.Message);
+            EditorApplication.isPlaying = false;
+        }
     }
 
     void OnDestroy() { Communicator.CloseConnection(); }
