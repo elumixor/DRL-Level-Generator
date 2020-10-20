@@ -11,7 +11,7 @@ from .data_types_size import DataTypesSize
 from .endianness import Endianness
 from .serialization_exception import SerializationException
 from .simple_types_serialization import int_to_bytes, float_to_bytes, string_to_bytes, to_string, to_float, to_int, to_list, list_to_bytes, \
-    to_float_list, to_string_list, to_int_list
+    to_list_float, to_string_list, to_list_int
 from .torch_serialization import to_bytes as state_dict_to_bytes, to_state_dict, tensor_to_bytes, to_tensor_int, to_tensor_float
 from .utils import __get_format
 

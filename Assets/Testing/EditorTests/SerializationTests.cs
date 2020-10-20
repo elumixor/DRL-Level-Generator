@@ -82,6 +82,14 @@ namespace Testing.EditorTests {
             Assert.AreEqual(newOffset, sizeof(int) + sizeof(float) * 3 * (1 + 2 + 3));
         }
 
+        [Test] public void CanSerializeTensor() {
+            var tensor = new Tensor(new float[] {1, 2, 3, 4, 5, 6}, new[] {2, 3});
+            var serialized = tensor.ToBytes().ToArray();
+            Console.WriteLine(serialized.FormString());
+            var (reconstructed, bytes_read) = serialized.Get<Tensor>();
+            Assert.AreEqual(tensor, reconstructed);
+        }
+
         enum MyEnum {
             HelloWorld,
             GoodbyeWorld,

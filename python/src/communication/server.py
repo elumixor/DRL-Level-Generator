@@ -75,3 +75,9 @@ class Server:
     def wait_for_stop(self):
         if self.__thread is not None:
             self.__thread.join()
+
+    def send_ok(self, data: bytes = b''):
+        self.send_message(ResponseType.Ok, data)
+
+    def send_failure(self, data: bytes = b''):
+        self.send_message(ResponseType.Failure, data)

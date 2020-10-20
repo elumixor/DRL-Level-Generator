@@ -7,7 +7,7 @@ namespace Testing.EditorTests {
     public class StateDictTests {
         [Test] public void CreatingFromLinearWorks() {
             var linear = new Linear(5, 4);
-            var sd = linear.GetStateDict();
+            var sd = linear.StateDict;
 
             Assert.IsEmpty(sd.childParameters);
             Assert.IsNotEmpty(sd.selfParameters);
@@ -21,7 +21,7 @@ namespace Testing.EditorTests {
 
         [Test] public void CreatingFomSequentialWorks() {
             var sequential = new Sequential(new Linear(5, 4), new ReLU(), new Linear(4, 2));
-            var sd = sequential.GetStateDict();
+            var sd = sequential.StateDict;
 
             Assert.IsNotEmpty(sd.childParameters);
             Assert.IsEmpty(sd.selfParameters);
@@ -42,7 +42,7 @@ namespace Testing.EditorTests {
                                                            new Linear(4, 2)
                                                           ),
                                             new Linear(4, 2));
-            var sd = sequential.GetStateDict();
+            var sd = sequential.StateDict;
             Assert.IsNotEmpty(sd.childParameters);
             Assert.IsEmpty(sd.selfParameters);
 
@@ -55,7 +55,7 @@ namespace Testing.EditorTests {
 
             Assert.AreNotEqual(l1, l2);
 
-            var sd = l1.GetStateDict();
+            var sd = l1.StateDict;
             l2.LoadStateDict(sd);
 
             Assert.AreEqual(l1, l2);
@@ -68,7 +68,7 @@ namespace Testing.EditorTests {
 
             Assert.AreNotEqual(s1, s2);
 
-            var sd = s1.GetStateDict();
+            var sd = s1.StateDict;
             s2.LoadStateDict(sd);
 
             Assert.AreEqual(s1, s2);
@@ -102,7 +102,7 @@ namespace Testing.EditorTests {
 
             Assert.AreNotEqual(s1, s2);
 
-            var sd = s1.GetStateDict();
+            var sd = s1.StateDict;
             s2.LoadStateDict(sd);
 
             Assert.AreEqual(s1, s2);
@@ -111,7 +111,7 @@ namespace Testing.EditorTests {
         // Byte serialization
         [Test] public void SerializationOfStateDictWorks() {
             var l1 = new Linear(4, 5);
-            var sd = l1.GetStateDict();
+            var sd = l1.StateDict;
             var bytes = sd.ToBytes().ToArray();
             var sd2 = bytes.Get<StateDict>().result;
             Assert.AreEqual(sd, sd2);
@@ -130,7 +130,7 @@ namespace Testing.EditorTests {
                                                   new Linear(4, 2)
                                                  ),
                                    new Linear(4, 2));
-            var sd = s.GetStateDict();
+            var sd = s.StateDict;
             var bytes = sd.ToBytes().ToArray();
             var sd2 = bytes.Get<StateDict>().result;
             Assert.AreEqual(sd, sd2);

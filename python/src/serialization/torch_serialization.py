@@ -5,7 +5,7 @@ import torch
 
 from .data_types_size import DataTypesSize
 from .endianness import Endianness
-from .simple_types_serialization import int_to_bytes, string_to_bytes, list_to_bytes, to_int, to_string, to_int_list, to_float_list
+from .simple_types_serialization import int_to_bytes, string_to_bytes, list_to_bytes, to_int, to_string, to_list_int, to_list_float
 
 
 def to_bytes(state_dict: OrderedDict, endianness: Endianness = Endianness.Native):
@@ -36,20 +36,20 @@ def tensor_to_bytes(tensor_value: torch.Tensor, endianness: Endianness = Endiann
 
 
 def to_tensor_float(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[torch.Tensor, int]:
-    shape, bytes_read = to_int_list(value, start_index, endianness)
+    shape, bytes_read = to_list_int(value, start_index, endianness)
     total_read = bytes_read
 
-    items, bytes_read = to_float_list(value, start_index + total_read, endianness)
+    items, bytes_read = to_list_float(value, start_index + total_read, endianness)
     total_read += bytes_read
 
     return torch.tensor(items).reshape(shape), total_read
 
 
 def to_tensor_int(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[torch.Tensor, int]:
-    shape, bytes_read = to_int_list(value, start_index, endianness)
+    shape, bytes_read = to_list_int(value, start_index, endianness)
     total_read = bytes_read
 
-    items, bytes_read = to_int_list(value, start_index + total_read, endianness)
+    items, bytes_read = to_list_int(value, start_index + total_read, endianness)
     total_read += bytes_read
 
     return torch.tensor(items).reshape(shape), total_read

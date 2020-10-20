@@ -91,7 +91,7 @@ def to_list(value: bytes, transformer: Callable[[bytes, int, Endianness], Tuple[
     return result, total_read_bytes + DataTypesSize.Int
 
 
-def to_int_list(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[List[int], int]:
+def to_list_int(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[List[int], int]:
     length = unpack(__get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int])[0]
     start_index += DataTypesSize.Int
     total_read_bytes = length * DataTypesSize.Int
@@ -100,7 +100,7 @@ def to_int_list(value: bytes, start_index: int = 0, endianness: Endianness = End
     return result, total_read_bytes + DataTypesSize.Int
 
 
-def to_float_list(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[List[float], int]:
+def to_list_float(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[List[float], int]:
     length = unpack(__get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int])[0]
     start_index += DataTypesSize.Int
     total_read_bytes = length * DataTypesSize.Float

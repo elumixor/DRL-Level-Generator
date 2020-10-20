@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from serialization import DataTypesSize, to_int, ByteSerializable, to_bytes, to_float, to_string, Endianness, to_list, \
-    SerializationException, to_int_list, to_float_list, to_string_list
+    SerializationException, to_list_int, to_list_float, to_string_list
 
 
 class C(ByteSerializable):
@@ -63,7 +63,7 @@ class SerializationTests(TestCase):
         self.assertEqual(my_list, serialized)
         self.assertEqual(total_bytes, len(my_list) * DataTypesSize.Int + DataTypesSize.Int)
 
-        serialized, total_bytes = to_int_list(to_bytes(my_list))
+        serialized, total_bytes = to_list_int(to_bytes(my_list))
         self.assertEqual(my_list, serialized)
 
     def test_float_list_serialization(self):
@@ -82,7 +82,7 @@ class SerializationTests(TestCase):
         for i in range(len(my_list)):
             self.assertAlmostEqual(my_list[i], serialized[i], 7)
 
-        serialized, total_bytes = to_float_list(to_bytes(my_list))
+        serialized, total_bytes = to_list_float(to_bytes(my_list))
         self.assertEqual(len(my_list), len(serialized))
         self.assertEqual(total_bytes, len(my_list) * DataTypesSize.Float + DataTypesSize.Int)
 

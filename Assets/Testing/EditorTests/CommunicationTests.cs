@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using BackendCommunication;
 using Common.ByteConversions;
 using NUnit.Framework;
@@ -13,12 +14,14 @@ namespace Testing.EditorTests {
             var args = new Dictionary<string, string> {{"address", addressServer}};
             using (var p = ProcessRunner.CreateProcess(filePath, args, separateWindow: true)) {
                 p.Start();
+                Thread.Sleep(1000); // give some time to the process to launch
                 Assert.False(p.HasExited);
                 Communicator.OpenConnection(addressClient);
                 var (responseBytes, startIndex) = Communicator.Send(RequestType.Echo, "echo".ToBytes());
                 Assert.AreEqual("echo", responseBytes.GetString(startIndex).result);
                 Communicator.Send(RequestType.Echo, "stop".ToBytes());
                 Communicator.CloseConnection();
+                Thread.Sleep(1000); // give some time to the process to exit
                 Assert.True(p.HasExited);
                 p.Close();
             }

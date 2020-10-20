@@ -17,7 +17,7 @@ namespace BackendCommunication {
             var bytes = requestMessage.ToBytes().Concat(requestData ?? EmptyBytes).ToArray();
             client.SendFrame(bytes);
 
-            var res = client.TryReceiveFrameBytes(new TimeSpan(0, 0, 1), out var response);
+            var res = client.TryReceiveFrameBytes(new TimeSpan(0, 0, 0, 1), out var response);
             if (!res)
                 throw new CommunicationException("Timeout. Backend unresponsive.");
 

@@ -28,6 +28,20 @@ namespace NN {
 
         static float RandomValue => (float) r.NextDouble() * 2f - 1f;
 
+        public override StateDict StateDict {
+            get {
+                var weightTensor = new Tensor(weight, new[] {outputSize, inputSize});
+                var biasTensor = new Tensor(bias, new[] {outputSize});
+
+                var parameters = new Dictionary<ModuleParameterName, Tensor> {
+                    {ModuleParameterName.weight, weightTensor},
+                    {ModuleParameterName.bias, biasTensor},
+                };
+
+                return new StateDict(parameters);
+            }
+        }
+
         // return Random.Range(-1f, 1f);
         public override float[] Forward(float[] input) {
             var output = new float[outputSize];
@@ -58,18 +72,6 @@ namespace NN {
                 default:
                     throw new ArgumentOutOfRangeException(nameof(parameterName), parameterName, null);
             }
-        }
-
-        public override StateDict GetStateDict() {
-            var weightTensor = new Tensor(weight, new[] {outputSize, inputSize});
-            var biasTensor = new Tensor(bias, new[] {outputSize});
-
-            var parameters = new Dictionary<ModuleParameterName, Tensor> {
-                {ModuleParameterName.weight, weightTensor},
-                {ModuleParameterName.bias, biasTensor},
-            };
-
-            return new StateDict(parameters);
         }
 
         bool Equals(Linear other) =>

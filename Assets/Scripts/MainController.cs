@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BackendCommunication;
 using Common;
+using Common.ByteConversions;
 using Configuration;
 using DRL;
 using DRL.Behaviours;
@@ -9,6 +11,7 @@ using NN;
 using Serialization;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 ///     Reads and stores global training configurations (<see cref="TrainingSetupConfiguration" />)
@@ -17,6 +20,9 @@ using UnityEngine;
 public class MasterController<TAction, TState> : SingletonBehaviour<MasterController<TAction, TState>> {
     const string SERVER_MAIN_PATH = "src/main.py";
     const string TCP_ADDRESS = "tcp://localhost:5555";
+    const string TCP_ADDRESS_SERVER = "tcp://*:5555";
+
+    Process serverProcess;
     [SerializeField] DRL.Behaviours.Trainer<TAction, TState> trainer;
 
     [SerializeField] TrainingSetupConfiguration trainingSetupConfiguration;
@@ -31,8 +37,8 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
     /// Sends initial data via communicator to initialize backend
     void Start() {
         // Launch backend server (use separate window to monitor stuff)
-        var serverProcess = ProcessRunner.CreateProcess(SERVER_MAIN_PATH, new Dictionary<string, string> {{"address", TCP_ADDRESS}},
-                                                        separateWindow: true);
+        serverProcess = ProcessRunner.CreateProcess(SERVER_MAIN_PATH, new Dictionary<string, string> {{"address", TCP_ADDRESS_SERVER}},
+                                                    separateWindow: true);
         serverProcess.Start();
 
         try {
@@ -50,11 +56,12 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
 
             // Communicator should return the initial nn learnable parameters
             var (nnData, startIndex) = Communicator.Send(RequestType.SendConfiguration, configuration.ToBytes());
-            var stateDict = new StateDict(nnData, startIndex);
+            var stateDict = nnData.Get<StateDict>(startIndex).result;
 
             // Initialize agents with current parameters and configuration
             foreach (var nnAgent in FindObjectsOfType<Agent<TAction, TState>>().OfType<INNAgent>()) {
                 nnAgent.InitializeNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout);
+
                 nnAgent.NN.LoadStateDict(stateDict);
             }
 
@@ -64,10 +71,10 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
             Debug.LogError(e.Message);
             EditorApplication.isPlaying = false;
         }
-
-        serverProcess.Kill();
-        serverProcess.Close();
     }
 
-    void OnDestroy() { Communicator.CloseConnection(); }
+    void OnDestroy() {
+        Communicator.Send(RequestType.ShutDown);
+        Communicator.CloseConnection();
+    }
 }

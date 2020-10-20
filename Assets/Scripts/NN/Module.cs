@@ -2,6 +2,10 @@
 
 namespace NN {
     public abstract class Module {
+        public virtual StateDict StateDict => new StateDict(new Dictionary<ModuleParameterName, Tensor>(),
+                                                            new List<(int[] path, (ModuleParameterName name, Tensor value) parameter)
+                                                            >());
+
         public abstract float[] Forward(float[] input);
         public virtual void SetParameter(ModuleParameterName parameterName, Tensor value) { }
 
@@ -9,9 +13,5 @@ namespace NN {
             foreach (var kvp in stateDict.selfParameters)
                 SetParameter(kvp.Key, kvp.Value);
         }
-
-        public virtual StateDict GetStateDict() => new StateDict(new Dictionary<ModuleParameterName, Tensor>(),
-                                                                 new List<(int[] path, (ModuleParameterName name, Tensor value) parameter)
-                                                                 >());
     }
 }

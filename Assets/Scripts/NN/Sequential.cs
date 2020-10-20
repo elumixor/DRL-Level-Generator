@@ -9,6 +9,8 @@ namespace NN {
         readonly Module[] layers;
         public Sequential(params Module[] layers) => this.layers = layers;
 
+        public override StateDict StateDict => GetStateDict(new int[0]);
+
         public override float[] Forward(float[] input) {
             var numLayers = layers.Length;
 
@@ -43,7 +45,7 @@ namespace NN {
             for (var i = 0; i < layers.Length; i++) {
                 var layer = layers[i];
                 nextPath[currentPath.Length] = i;
-                var childDict = layer is Sequential sequential ? sequential.GetStateDict(nextPath) : layer.GetStateDict();
+                var childDict = layer is Sequential sequential ? sequential.GetStateDict(nextPath) : layer.StateDict;
 
                 childParameters.AddRange(childDict.selfParameters.Select(parameter => (nextPath.Copy(), (parameter.Key, parameter.Value))));
                 childParameters.AddRange(childDict.childParameters);
@@ -51,8 +53,6 @@ namespace NN {
 
             return new StateDict(childParameters);
         }
-
-        public override StateDict GetStateDict() => GetStateDict(new int[0]);
 
         bool Equals(Sequential other) {
             if (layers.Length != other.layers.Length) return false;
