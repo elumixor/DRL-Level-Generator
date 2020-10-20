@@ -9,3 +9,4 @@ if __name__ == '__main__':
     server = Server("tcp://*:5555", handle_message)
     server.start()
     server.wait_for_stop()
+

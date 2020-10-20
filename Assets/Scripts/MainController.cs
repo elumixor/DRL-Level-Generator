@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using BackendCommunication;
 using Common;
 using Configuration;
@@ -14,7 +15,8 @@ using UnityEngine;
 ///     Should be unique per every training setup
 /// </summary>
 public class MasterController<TAction, TState> : SingletonBehaviour<MasterController<TAction, TState>> {
-    const string TPP_ADDRESS = "tcp://localhost:5555";
+    const string SERVER_MAIN_PATH = "src/main.py";
+    const string TCP_ADDRESS = "tcp://localhost:5555";
     [SerializeField] DRL.Behaviours.Trainer<TAction, TState> trainer;
 
     [SerializeField] TrainingSetupConfiguration trainingSetupConfiguration;
@@ -28,9 +30,14 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
     /// Initializes serializers, given the state size and action size
     /// Sends initial data via communicator to initialize backend
     void Start() {
+        // Launch backend server (use separate window to monitor stuff)
+        var serverProcess = ProcessRunner.CreateProcess(SERVER_MAIN_PATH, new Dictionary<string, string> {{"address", TCP_ADDRESS}},
+                                                        separateWindow: true);
+        serverProcess.Start();
+
         try {
             // Open connection and ping back end to see if it is responsive
-            Communicator.OpenConnection(TPP_ADDRESS);
+            Communicator.OpenConnection(TCP_ADDRESS);
             Communicator.Send(RequestType.WakeUp);
 
             // If everything is ok, send initial configuration data
@@ -57,6 +64,9 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
             Debug.LogError(e.Message);
             EditorApplication.isPlaying = false;
         }
+
+        serverProcess.Kill();
+        serverProcess.Close();
     }
 
     void OnDestroy() { Communicator.CloseConnection(); }

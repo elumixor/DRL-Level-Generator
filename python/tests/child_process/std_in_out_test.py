@@ -1,0 +1,2 @@
+message = input()
+print(message)

@@ -13,7 +13,7 @@ namespace BackendCommunication {
 
         static readonly IEnumerable<byte> EmptyBytes = Enumerable.Empty<byte>();
 
-        public static (byte[] response, int startIndex) Send(string requestMessage, IEnumerable<byte> requestData = null) {
+        static (byte[] response, int startIndex) Send(string requestMessage, IEnumerable<byte> requestData = null) {
             var bytes = requestMessage.ToBytes().Concat(requestData ?? EmptyBytes).ToArray();
             client.SendFrame(bytes);
 
