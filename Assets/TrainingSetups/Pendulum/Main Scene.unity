@@ -166,12 +166,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 607a3195c64e464e8f02eaafbff308b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  environment: {fileID: 1050423151}
   agent: {fileID: 1604179787}
-  timeSpeed: 2.5
-  epochs: 1000000
+  environment: {fileID: 1050423151}
   episodesPerEpoch: 20
+  epochs: 1000000
   maximumEpisodeLength: 100
+  timeSpeed: 2.5
 --- !u!1 &344981988
 GameObject:
   m_ObjectHideFlags: 0
@@ -574,10 +574,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96d7a0a20747f424a895ca4d61cc6941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lockPosition: 4
-  toFollow: {fileID: 1604179783}
   followStrength: 2.5
+  lockPosition: 4
   offset: {x: 0, y: 2, z: 0}
+  toFollow: {fileID: 1604179783}
 --- !u!1 &534332123
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,6 +587,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 534332125}
+  - component: {fileID: 534332124}
   m_Layer: 0
   m_Name: Master Controller
   m_TagString: Untagged
@@ -594,6 +595,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &534332124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534332123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c75e43965a2c48be901e163c67cd5c47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trainer: {fileID: 89241503}
+  trainingSetupConfiguration: {fileID: 11400000, guid: 99973a57c7dfe734f906ec99069be964, type: 2}
 --- !u!4 &534332125
 Transform:
   m_ObjectHideFlags: 0
@@ -1473,14 +1488,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14fa91742103424c9a4c0b3cfcdff62d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotatingPart: {fileID: 344981989}
   maxAngle: 50
+  rotatingPart: {fileID: 344981989}
+  swingBoostStrength: 5
+  swingBoostTime: 0.5
   swingSpeed: 4
   upwardSpeed: 1
   upwardSpeedBoostStrength: 2.5
   upwardSpeedBoostTime: 0.5
-  swingBoostStrength: 5
-  swingBoostTime: 0.5
 --- !u!114 &1604179787
 MonoBehaviour:
   m_ObjectHideFlags: 0

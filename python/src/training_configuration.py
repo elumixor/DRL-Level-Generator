@@ -5,4 +5,4 @@ class TrainingConfiguration:
 
     @property
     def actor_byte_data(self) -> bytes:
-        return b''
+        pass

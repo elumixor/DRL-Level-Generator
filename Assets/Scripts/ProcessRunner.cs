@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using Debug = UnityEngine.Debug;
 
 public static class ProcessRunner {
     public const string BACKEND_BASE_DIRECTORY = "C:/dev/DRL-Level-Generator/python/";
     public const string BASE_SOURCES_DIR = BACKEND_BASE_DIRECTORY + "src/";
     public const string BASE_TESTS_DIR = BACKEND_BASE_DIRECTORY   + "tests/";
-    public const string PYTHON_COMMAND = "python";
+    public const string PYTHON_COMMAND = "C:/Program Files/Python37/python.exe";
 
     public const string WORKING_DIR_PARAMETER_NAME = "working_directory";
 
@@ -15,7 +17,13 @@ public static class ProcessRunner {
                                         bool redirectStandardOutput = true, bool useTestDir = false, bool separateWindow = false) {
         var dir = useTestDir ? BASE_TESTS_DIR : BASE_SOURCES_DIR;
         var argumentsString = $"\"{BACKEND_BASE_DIRECTORY}{path}\" {ParseArguments(arguments, dir)}";
-        // Console.WriteLine($"Running command: {PYTHON_COMMAND} {argumentsString}");
+
+#if UNITY_EDITOR
+        Debug.Log($"Running command: {PYTHON_COMMAND} {argumentsString}");
+#else
+        Console.WriteLine($"Running command: {PYTHON_COMMAND} {argumentsString}");
+#endif
+        
         return new Process {
             StartInfo = new ProcessStartInfo {
                 FileName = PYTHON_COMMAND,

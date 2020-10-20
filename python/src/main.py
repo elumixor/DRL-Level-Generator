@@ -1,5 +1,8 @@
 import argparse
 import sys
+import traceback
+
+import serialization
 
 
 def get_args(*keys):
@@ -24,19 +27,31 @@ configuration = None
 
 
 def handle_message(server: Server, request_type: RequestType, data: bytes):
-    if request_type == RequestType.WakeUp:
-        server.send_ok()
-        return
+    try:
+        if request_type == RequestType.WakeUp:
+            server.send_ok()
+            return
 
-    if request_type == RequestType.SendConfiguration:
-        global configuration
-        configuration = TrainingConfiguration(data)
-        server.send_ok(configuration.actor_byte_data)
-        return
+        if request_type == RequestType.SendConfiguration:
+            global configuration
+            configuration = TrainingConfiguration(data)
+            server.send_ok(configuration.actor_byte_data)
+            return
 
-    if request_type == RequestType.ShutDown:
-        server.send_ok()
+        if request_type == RequestType.ShutDown:
+            server.send_ok()
+            server.stop()
+    except Exception as e:
+        traceback.print_exc()
+        try:
+            server.send_failure(serialization.to_bytes(str(e)))
+        except Exception as e:
+            print("Could not send error response", file=sys.stderr)
+            print(e, file=sys.stderr)
+
         server.stop()
+        print("Press [Enter] to continue...")
+        input()
 
 
 server = Server(address, handle_message)

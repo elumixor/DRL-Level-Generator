@@ -13,13 +13,17 @@ namespace BackendCommunication {
 
         static readonly IEnumerable<byte> EmptyBytes = Enumerable.Empty<byte>();
 
-        static (byte[] response, int startIndex) Send(string requestMessage, IEnumerable<byte> requestData = null) {
+        static (byte[] response, int startIndex) Send(string requestMessage, IEnumerable<byte> requestData, int timeout) {
             var bytes = requestMessage.ToBytes().Concat(requestData ?? EmptyBytes).ToArray();
             client.SendFrame(bytes);
 
-            var res = client.TryReceiveFrameBytes(new TimeSpan(0, 0, 0, 1), out var response);
-            if (!res)
-                throw new CommunicationException("Timeout. Backend unresponsive.");
+            bool res;
+            byte[] response;
+            res = timeout <= 0
+                      ? client.TryReceiveFrameBytes(new TimeSpan(0, 0, 15), out response)
+                      : client.TryReceiveFrameBytes(new TimeSpan(0, 0, 0, 0, timeout), out response);
+
+            if (!res) throw new CommunicationException("Timeout. Backend unresponsive.");
 
             var (responseTypeString, bytesRead) = response.GetString();
 
@@ -32,8 +36,10 @@ namespace BackendCommunication {
             return (response, bytesRead);
         }
 
-        public static (byte[]response, int startIndex) Send(RequestType requestType, IEnumerable<byte> requestData = null) =>
-            Send(requestType.ToString(), requestData);
+        /// <param name="timeout">Milliseconds</param>
+        public static (byte[]response, int startIndex) Send(RequestType requestType, IEnumerable<byte> requestData = null,
+                                                            int timeout = 1000) =>
+            Send(requestType.ToString(), requestData, timeout);
 
 
         public static void OpenConnection(string address) {

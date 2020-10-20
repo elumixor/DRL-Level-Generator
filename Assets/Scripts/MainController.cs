@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using BackendCommunication;
 using Common;
 using Common.ByteConversions;
@@ -44,7 +46,7 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
         try {
             // Open connection and ping back end to see if it is responsive
             Communicator.OpenConnection(TCP_ADDRESS);
-            Communicator.Send(RequestType.WakeUp);
+            Communicator.Send(RequestType.WakeUp, timeout: -1);
 
             // If everything is ok, send initial configuration data
             var actionSize = StructuralAttribute.GetSize(typeof(TAction));
@@ -68,13 +70,19 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
             // Start training
             trainer.StartTraining();
         } catch (CommunicationException e) {
-            Debug.LogError(e.Message);
+            Debug.LogException(e);
             EditorApplication.isPlaying = false;
         }
     }
 
     void OnDestroy() {
-        Communicator.Send(RequestType.ShutDown);
+        try {
+            Communicator.Send(RequestType.ShutDown);
+        } catch (Exception exception) {
+            Debug.LogWarning(exception);
+        }
+
         Communicator.CloseConnection();
+        serverProcess.Close();
     }
 }

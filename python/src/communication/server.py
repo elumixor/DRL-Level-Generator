@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import signal
 import threading
 from typing import Callable, Union
 
@@ -26,6 +27,12 @@ class Server:
         self.__is_running = False
         self.__thread: Union[threading.Thread, None] = None
 
+        def signal_handler(s, f):
+            self.__is_running = False
+
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+
     @property
     def is_running(self):
         return self.__is_running
@@ -36,8 +43,8 @@ class Server:
 
         self.__is_running = True
 
-        def thread_function(server: Server):
-            server.__socket.bind(self.__address)
+        def thread_function():
+            self.__socket.bind(self.__address)
             log("Server started")
             while self.__is_running:
                 try:
@@ -51,18 +58,19 @@ class Server:
                         raise ServerException(f"Invalid request type: {request_type}")
 
                     log(f"Request received: [{request_type}] {len(data)} bytes")
-                    server.__handle_message(server, RequestType[request_type], data)
+                    self.__handle_message(self, RequestType[request_type], data)
                 except zmq.Again:
                     pass
                 except Exception as e:
-                    server.send_message(ResponseType.Failure, serialization.to_bytes(str(e)))
+                    self.send_message(ResponseType.Failure, serialization.to_bytes(str(e)))
                     raise e
             log("Server stopped")
 
-        self.__thread = threading.Thread(target=thread_function, args=(self,), daemon=True)
+        self.__thread = threading.Thread(target=thread_function, daemon=True)
         self.__thread.start()
 
     def stop(self):
+        self.__socket.close()
         if not self.__is_running:
             return
 
@@ -73,8 +81,10 @@ class Server:
         self.__socket.send(serialization.to_bytes(response_type) + data)
 
     def wait_for_stop(self):
-        if self.__thread is not None:
-            self.__thread.join()
+        while self.__is_running:
+            pass
+
+        self.__thread.join()
 
     def send_ok(self, data: bytes = b''):
         self.send_message(ResponseType.Ok, data)

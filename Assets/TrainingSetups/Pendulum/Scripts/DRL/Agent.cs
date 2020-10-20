@@ -10,7 +10,7 @@ using Serialization;
 using UnityEngine;
 
 namespace TrainingSetups.Pendulum.Scripts.DRL {
-    public class PendulumAgent : Agent<Action, State>, INNAgent {
+    public class Agent : Agent<Action, State>, INNAgent {
         Episode currentEpisode = new Episode();
 
         MemoryRRPB<Episode, InferenceTransition> memory;
