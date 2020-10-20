@@ -55,9 +55,15 @@ namespace Common.ByteConversions {
         public static bool ToBool(this byte[] bytes, int startIndex = 0) => BitConverter.ToBoolean(bytes, startIndex);
         public static char ToChar(this byte[] bytes, int startIndex = 0) => BitConverter.ToChar(bytes, startIndex);
 
-        public static (string result, int readCount) GetString(this byte[] bytes, int startIndex = 0) {
+        public static (string result, int bytesRead) GetString(this byte[] bytes, int startIndex = 0) {
             var length = bytes.ToInt(startIndex);
             return (Encoding.UTF8.GetString(bytes, startIndex + sizeof(int), length), length + sizeof(int));
+        }
+
+        public static (T result, int bytesRead) Get<T>(this byte[] bytes, int startIndex = 0) where T : IByteAssignable, new() {
+            var result = new T();
+            var bytesRead = result.AssignFromBytes(bytes, startIndex);
+            return (result, bytesRead);
         }
 
         public static Vector2 ToVector2(this byte[] bytes, int startIndex = 0) =>
@@ -67,14 +73,41 @@ namespace Common.ByteConversions {
             new Vector3(bytes.ToFloat(startIndex), bytes.ToFloat(startIndex + sizeof(float)),
                         bytes.ToFloat(startIndex                            + 2 * sizeof(float)));
 
-        public static (T[] result, int readCount) ToArray<T>(this byte[] bytes, int startIndex = 0) where T : IByteAssignable, new() {
+        public static (int[] result, int bytesRead) GetListInt(this byte[] bytes, int startIndex = 0) {
+            var length = bytes.ToInt(startIndex);
+            var readCount = sizeof(int);
+
+            var result = new int[length];
+            for (var i = 0; i < length; i++) {
+                result[i] = bytes.ToInt(startIndex + readCount);
+                readCount += sizeof(int);
+            }
+
+            return (result, readCount);
+        }
+
+        public static (float[] result, int bytesRead) GetListFloat(this byte[] bytes, int startIndex = 0) {
+            var length = bytes.ToInt(startIndex);
+            var readCount = sizeof(int);
+
+            var result = new float[length];
+            for (var i = 0; i < length; i++) {
+                result[i] = bytes.ToFloat(startIndex + readCount);
+                readCount += sizeof(float);
+            }
+
+            return (result, readCount);
+        }
+
+        public static (T[] result, int bytesRead) GetList<T>(this byte[] bytes, int startIndex = 0) where T : IByteAssignable, new() {
             var length = bytes.ToInt(startIndex);
             var readCount = sizeof(int);
 
             var result = new T[length];
             for (var i = 0; i < length; i++) {
-                result[i] = new T();
-                readCount += result[i].AssignFromBytes(bytes, startIndex + readCount);
+                var (value, bytesRead) = bytes.Get<T>(startIndex + readCount);
+                result[i] = value;
+                readCount += bytesRead;
             }
 
             return (result, readCount);

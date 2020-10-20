@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace NN {
     public class ReLU : Module {
@@ -10,5 +11,13 @@ namespace NN {
 
             return output;
         }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == GetType();
+        }
+
+        public override int GetHashCode() => throw new NotImplementedException();
     }
 }

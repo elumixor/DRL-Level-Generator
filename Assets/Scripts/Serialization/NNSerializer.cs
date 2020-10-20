@@ -5,7 +5,7 @@ using NN;
 namespace Serialization {
     public static class NNSerializer {
         public static Module ToModule(this ModuleConfiguration moduleConfiguration) {
-            var (layerName, floatParameters, intParameters) = moduleConfiguration;
+            var (layerName, _, intParameters) = moduleConfiguration;
             switch (layerName) {
                 case ModuleLayerName.Linear:
                     return new Linear(intParameters[ModuleConfiguration.ModuleConfigurationParameterInt.InputSize],

@@ -3,6 +3,6 @@
         /// <summary>
         ///     Assigns self from bytes and returns the number of bytes read
         /// </summary>
-        int AssignFromBytes(byte[] bytes, int start = 0);
+        int AssignFromBytes(byte[] bytes, int startIndex = 0);
     }
 }

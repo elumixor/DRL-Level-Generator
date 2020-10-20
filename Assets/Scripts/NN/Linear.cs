@@ -1,11 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace NN {
     public class Linear : Module {
+        static readonly Random r = new Random();
+
         readonly int inputSize;
         readonly int outputSize;
-        float[] bias;
 
+        float[] bias;
         float[] weight;
 
         public Linear(int inputSize, int outputSize) {
@@ -16,28 +21,68 @@ namespace NN {
             bias = new float[outputSize];
 
             for (var i = 0; i < outputSize; i++) {
-                for (var j = 0; j < inputSize; j++) weight[i * outputSize + j] = Random.Range(-1f, 1f);
-                bias[i] = Random.Range(-1f, 1f);
+                for (var j = 0; j < inputSize; j++) weight[i * inputSize + j] = RandomValue;
+                bias[i] = RandomValue;
             }
         }
 
+        static float RandomValue => (float) r.NextDouble() * 2f - 1f;
+
+        // return Random.Range(-1f, 1f);
         public override float[] Forward(float[] input) {
             var output = new float[outputSize];
 
             for (var i = 0; i < outputSize; i++) {
                 var sum = bias[i];
-                for (var j = 0; j < inputSize; j++) sum += input[j] * weight[i * outputSize + j];
+                for (var j = 0; j < inputSize; j++) sum += input[j] * weight[i * inputSize + j];
                 output[i] = sum;
             }
 
             return output;
         }
 
-        public override void LoadStateDict(StateDict stateDict) {
-            var (selfParameters, _) = stateDict;
-
-            weight = selfParameters[ModuleParameterName.Weight];
-            bias = selfParameters[ModuleParameterName.Bias];
+        public override void SetParameter(ModuleParameterName parameterName, Tensor value) {
+            switch (parameterName) {
+                case ModuleParameterName.bias:
+                    if (value.shape[0] != outputSize)
+                        throw new SerializationException("Assigning to bias parameter with a different shape." +
+                                                         $"[{outputSize}] != [{value.shape[0]}]");
+                    bias = value.data;
+                    break;
+                case ModuleParameterName.weight:
+                    if (value.shape[0] != outputSize || value.shape[1] != inputSize)
+                        throw new SerializationException("Assigning to weight parameter with a different shape." +
+                                                         $" [{outputSize}, {inputSize}] != [{value.shape[0]}, {value.shape[1]}]");
+                    weight = value.data;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(parameterName), parameterName, null);
+            }
         }
+
+        public override StateDict GetStateDict() {
+            var weightTensor = new Tensor(weight, new[] {outputSize, inputSize});
+            var biasTensor = new Tensor(bias, new[] {outputSize});
+
+            var parameters = new Dictionary<ModuleParameterName, Tensor> {
+                {ModuleParameterName.weight, weightTensor},
+                {ModuleParameterName.bias, biasTensor},
+            };
+
+            return new StateDict(parameters);
+        }
+
+        bool Equals(Linear other) =>
+            inputSize == other.inputSize && outputSize == other.outputSize && weight.SequenceEqual(other.weight) &&
+            bias.SequenceEqual(other.bias);
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+
+            return obj.GetType() == GetType() && Equals((Linear) obj);
+        }
+
+        public override int GetHashCode() => throw new NotImplementedException();
     }
 }

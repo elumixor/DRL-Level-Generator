@@ -75,7 +75,7 @@ namespace Testing.EditorTests {
             var length = serialized.ToInt();
 
             Assert.AreEqual(length, list.Count);
-            var (reconstructed, newOffset) = serialized.ToArray<C>();
+            var (reconstructed, newOffset) = serialized.GetList<C>();
 
             for (var i = 0; i < length; i++) Assert.AreEqual(list[i], reconstructed[i]);
 
@@ -94,10 +94,10 @@ namespace Testing.EditorTests {
 
             public IEnumerable<byte> ToBytes() => f1.ToBytes().ConcatMany(v2.ToBytes(), v3.ToBytes());
 
-            public int AssignFromBytes(byte[] bytes, int start = 0) {
-                f1 = bytes.ToFloat(start);
-                v2 = bytes.ToVector2(start                                 + sizeof(float));
-                v3 = bytes.ToVector3(start + sizeof(float) + sizeof(float) + sizeof(float));
+            public int AssignFromBytes(byte[] bytes, int startIndex = 0) {
+                f1 = bytes.ToFloat(startIndex);
+                v2 = bytes.ToVector2(startIndex                                 + sizeof(float));
+                v3 = bytes.ToVector3(startIndex + sizeof(float) + sizeof(float) + sizeof(float));
                 return sizeof(float) * (1 + 2 + 3);
             }
 
