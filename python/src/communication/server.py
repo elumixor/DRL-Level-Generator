@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import signal
 import threading
+import time
 from typing import Callable, Union
 
 import zmq
@@ -82,6 +83,7 @@ class Server:
 
     def wait_for_stop(self):
         while self.__is_running:
+            time.sleep(.5)
             pass
 
         self.__thread.join()

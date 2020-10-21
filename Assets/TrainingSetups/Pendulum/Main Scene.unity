@@ -168,9 +168,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 1604179787}
   environment: {fileID: 1050423151}
-  episodesPerEpoch: 5
+  episodesPerEpoch: 10
   epochs: 1000000
-  maximumEpisodeLength: 100
+  maximumEpisodeLength: 150
   timeSpeed: 2.5
 --- !u!1 &344981988
 GameObject:
