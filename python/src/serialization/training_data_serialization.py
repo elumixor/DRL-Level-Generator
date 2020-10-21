@@ -41,7 +41,7 @@ def episode_to_tensors(episode: List[float], state_size, action_size, device):
 
     states = torch.tensor(states, dtype=torch.float32, device=device)
     next_states = torch.tensor(next_states, dtype=torch.float32, device=device)
-    actions = torch.tensor(actions, dtype=torch.float32, device=device).int()
+    actions = torch.tensor(actions, dtype=torch.float32, device=device).long()
     rewards = torch.tensor(rewards, dtype=torch.float32, device=device)
 
     return states, actions, rewards, next_states

@@ -3,6 +3,7 @@ import torch
 import DRL.agents
 import serialization
 from configuration import TrainingConfiguration, AlgorithmType
+from utilities import log
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -18,12 +19,10 @@ class TrainingController:
         elif configuration.algorithm == AlgorithmType.A2C:
             self.agent = DRL.agents.A2CAgent(configuration.algorithm_configuration.actor_layout,
                                              configuration.algorithm_configuration.critic_layout)
-
-        print(f"State size: {self.state_size}")
-        print(f"Action size: {self.action_size}")
+        log(f"Received configuration: Algorithm {configuration.algorithm}. State size: {self.state_size}. Action size: {self.action_size}")
 
     def train(self, training_data_bytes: bytes, start_index: int):
-        training_data, _ = serialization.to_training_data(training_data_bytes, start_index, self.state_size, self.action_size, device)
+        training_data, _ = serialization.to_training_data(training_data_bytes, start_index, self.state_size, self.action_size, 'cpu')
         self.agent.train(training_data)
 
     @property

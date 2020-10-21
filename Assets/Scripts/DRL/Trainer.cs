@@ -83,6 +83,7 @@ namespace DRL {
 
             if (episodeIndex >= episodesPerEpoch) {
                 epochIndex++;
+                episodeIndex = 0;
                 agent.OnEpochFinished();
             }
 

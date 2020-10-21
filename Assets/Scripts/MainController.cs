@@ -60,6 +60,8 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
             var (nnData, startIndex) = Communicator.Send(RequestType.SendConfiguration, configuration.ToBytes());
             var stateDict = nnData.Get<StateDict>(startIndex).result;
 
+            Debug.Log($"Received state dict: {stateDict}");
+            
             // Initialize agents with current parameters and configuration
             foreach (var nnAgent in FindObjectsOfType<Agent<TAction, TState>>().OfType<INNAgent>())
                 nnAgent.InitializeNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout, stateDict);

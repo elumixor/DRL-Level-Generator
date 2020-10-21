@@ -12,7 +12,8 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
 
         bool isDone;
 
-        // void Start() => player.Collided += () => isDone = true;
+        void Start() => player.Collided += () => isDone = true;
+
         protected override void FixedUpdate() {
             base.FixedUpdate();
 
@@ -28,7 +29,7 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
         public override (float reward, bool isDone) Step(Action action) {
             if (action.tap) playerInputHandler.OnTap();
 
-            return (player.Position.y, isDone);
+            return (1f, isDone);
         }
 
         protected override State CurrentState {
