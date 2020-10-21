@@ -6,7 +6,6 @@ namespace DRL {
     ///     Agent with NN
     /// </summary>
     public interface INNAgent {
-        Module NN { get; }
-        void InitializeNN(Layout layout);
+        void InitializeNN(Layout layout, StateDict stateDict);
     }
 }

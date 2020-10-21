@@ -6,7 +6,7 @@ namespace NN {
                                                             new List<(int[] path, (ModuleParameterName name, Tensor value) parameter)
                                                             >());
 
-        public abstract float[] Forward(float[] input);
+        public abstract IEnumerable<float> Forward(IEnumerable<float> input);
         public virtual void SetParameter(ModuleParameterName parameterName, Tensor value) { }
 
         public virtual void LoadStateDict(StateDict stateDict) {

@@ -1,9 +1,9 @@
 ﻿namespace DRL {
-    public interface IAgent<TAction, TState> {
-        void Initialize(IEnvironment<TAction, TState> environment);
+    public interface IAgent<TAction, in TState> {
+        void OnEnvironmentCreated(IEnvironment<TAction, TState> environment);
         void OnEpisodeStarted();
         TAction GetAction(TState state);
-        void SaveTransition(Transition<TAction, TState> transition);
+        void OnTransition(TState previousState, TAction action, float reward, TState nextState);
         void OnEpisodeFinished();
         void OnEpochFinished();
     }

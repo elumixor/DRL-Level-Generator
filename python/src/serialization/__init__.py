@@ -1,21 +1,9 @@
-from collections import OrderedDict
-from typing import Union, List
+from typing import List
 
-import torch
-
-from .byte_assignable import ByteAssignable
-from .byte_convertible import ByteConvertible
-from .byte_serializable import ByteSerializable
-from .data_types import DataTypes
-from .data_types_size import DataTypesSize
-from .endianness import Endianness
-from .serialization_exception import SerializationException
-from .simple_types_serialization import int_to_bytes, float_to_bytes, string_to_bytes, to_string, to_float, to_int, to_list, list_to_bytes, \
-    to_list_float, to_string_list, to_list_int
-from .torch_serialization import to_bytes as state_dict_to_bytes, to_state_dict, tensor_to_bytes, to_tensor_int, to_tensor_float
-from .utils import __get_format
-
-Serializable = Union[int, float, str, ByteConvertible, OrderedDict, torch.Tensor]
+from .general import *
+from .torch_serialization import tensor_to_bytes, state_dict_to_bytes, to_tensor_int, to_tensor_float, to_state_dict
+from .training_data_serialization import to_training_data
+from .utils import get_format
 
 
 def to_bytes(value: Union[Serializable, List[int], List[float], List[str], List[ByteConvertible]],

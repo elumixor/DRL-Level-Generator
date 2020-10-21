@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Common.ByteConversions;
 
 namespace Configuration.NN {
@@ -7,7 +8,6 @@ namespace Configuration.NN {
     public partial class Layout {
         bool displayed;
         public List<ModuleConfiguration> modules = new List<ModuleConfiguration>();
-
-        public IEnumerable<byte> ToBytes() => modules.ToBytes(modules.Count);
+        public IEnumerable<byte> ToBytes() => modules.Count.ToBytes().Concat(modules.SelectMany(m => m.ToBytes()));
     }
 }

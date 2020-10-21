@@ -11,13 +11,8 @@ namespace NN {
 
         public override StateDict StateDict => GetStateDict(new int[0]);
 
-        public override float[] Forward(float[] input) {
-            var numLayers = layers.Length;
-
-            for (var i = 0; i < numLayers; i++) input = layers[i].Forward(input);
-
-            return input;
-        }
+        public override IEnumerable<float> Forward(IEnumerable<float> input) =>
+            layers.Aggregate(input, (current, layer) => layer.Forward(current));
 
         public override void LoadStateDict(StateDict stateDict) {
             var parameters = stateDict.childParameters;

@@ -1,17 +1,17 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace NN {
     public class Softmax : Module {
-        public override float[] Forward(float[] input) {
+        public override IEnumerable<float> Forward(IEnumerable<float> enumerable) {
+            var input = enumerable.ToArray();
             var length = input.Length;
-            var output = new float[length];
 
             var sum = 0f;
 
             for (var i = 0; i < length; i++) sum += Mathf.Exp(input[i]);
-            for (var i = 0; i < length; i++) output[i] = Mathf.Exp(input[i]) / sum;
-
-            return output;
+            for (var i = 0; i < length; i++) yield return Mathf.Exp(input[i]) / sum;
         }
     }
 }

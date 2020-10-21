@@ -26,7 +26,7 @@ namespace Configuration.NN {
 
         public ModuleLayerName layerName;
 
-        public IEnumerable<byte> ToBytes() => layerName.ToString().ToBytes().ConcatMany(floatParameters.ToBytes(), intParameters.ToBytes());
+        public IEnumerable<byte> ToBytes() => layerName.ToString().ToBytes().ConcatMany(intParameters.ToBytes(), floatParameters.ToBytes());
 
         public ModuleConfiguration Copy() => new ModuleConfiguration
             {layerName = layerName, floatParameters = floatParameters, intParameters = intParameters};
@@ -40,14 +40,22 @@ namespace Configuration.NN {
 
         [Serializable]
         public class IntParametersDict : SerializableDictionary<ModuleConfigurationParameterInt, int>, IByteConvertible {
-            public IEnumerable<byte> ToBytes() =>
-                Count.ToBytes().Concat(this.SelectMany(kvp => kvp.Key.ToString().ToBytes().Concat(kvp.Value.ToBytes())));
+            public IEnumerable<byte> ToBytes() {
+                var selected = this.Where(kvp => kvp.Key != ModuleConfigurationParameterInt.None).ToArray();
+
+                return selected.Length.ToBytes()
+                               .Concat(selected.SelectMany(kvp => kvp.Key.ToString().ToBytes().Concat(kvp.Value.ToBytes())));
+            }
         }
 
         [Serializable]
         public class FloatParametersDict : SerializableDictionary<ModuleConfigurationParameterFloat, float>, IByteConvertible {
-            public IEnumerable<byte> ToBytes() =>
-                Count.ToBytes().Concat(this.SelectMany(kvp => kvp.Key.ToString().ToBytes().Concat(kvp.Value.ToBytes())));
+            public IEnumerable<byte> ToBytes() {
+                var selected = this.Where(kvp => kvp.Key != ModuleConfigurationParameterFloat.None).ToArray();
+
+                return selected.Length.ToBytes()
+                               .Concat(selected.SelectMany(kvp => kvp.Key.ToString().ToBytes().Concat(kvp.Value.ToBytes())));
+            }
         }
     }
 }

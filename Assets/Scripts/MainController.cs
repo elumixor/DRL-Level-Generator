@@ -61,11 +61,8 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
             var stateDict = nnData.Get<StateDict>(startIndex).result;
 
             // Initialize agents with current parameters and configuration
-            foreach (var nnAgent in FindObjectsOfType<Agent<TAction, TState>>().OfType<INNAgent>()) {
-                nnAgent.InitializeNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout);
-
-                nnAgent.NN.LoadStateDict(stateDict);
-            }
+            foreach (var nnAgent in FindObjectsOfType<Agent<TAction, TState>>().OfType<INNAgent>())
+                nnAgent.InitializeNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout, stateDict);
 
             // Start training
             trainer.StartTraining();

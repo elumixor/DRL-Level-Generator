@@ -5,20 +5,20 @@ from . import SerializationException, ByteConvertible
 from .data_types import DataTypes
 from .data_types_size import DataTypesSize
 from .endianness import Endianness
-from .utils import __get_format
+from ..utils import get_format
 
 
 def int_to_bytes(value: int, endianness: Endianness = Endianness.Native) -> bytes:
-    return pack(__get_format(DataTypes.Int, endianness, 1), value)
+    return pack(get_format(DataTypes.Int, endianness, 1), value)
 
 
 def float_to_bytes(value: float, endianness: Endianness = Endianness.Native) -> bytes:
-    return pack(__get_format(DataTypes.Float, endianness, 1), value)
+    return pack(get_format(DataTypes.Float, endianness, 1), value)
 
 
 def string_to_bytes(value: str, endianness: Endianness = Endianness.Native) -> bytes:
     b = bytes(value, 'utf-8')
-    return pack(__get_format(DataTypes.Int, endianness, 1), len(b)) + b
+    return pack(get_format(DataTypes.Int, endianness, 1), len(b)) + b
 
 
 def list_to_bytes(value: Union[List[int], List[float], List[str], List[ByteConvertible]],
@@ -32,12 +32,12 @@ def list_to_bytes(value: Union[List[int], List[float], List[str], List[ByteConve
 
     # more efficient conversions when using simple types
     if isinstance(first, int):
-        result += pack(__get_format(DataTypes.Int, endianness, length), *value)
+        result += pack(get_format(DataTypes.Int, endianness, length), *value)
 
         return result
 
     if isinstance(first, float):
-        result += pack(__get_format(DataTypes.Float, endianness, length), *value)
+        result += pack(get_format(DataTypes.Float, endianness, length), *value)
 
         return result
 
@@ -58,12 +58,12 @@ def list_to_bytes(value: Union[List[int], List[float], List[str], List[ByteConve
 
 
 def to_int(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> int:
-    fmt = __get_format(DataTypes.Int, endianness, 1)
+    fmt = get_format(DataTypes.Int, endianness, 1)
     return unpack(fmt, value[start_index: start_index + DataTypesSize.Int])[0]
 
 
 def to_float(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> float:
-    fmt = __get_format(DataTypes.Float, endianness, 1)
+    fmt = get_format(DataTypes.Float, endianness, 1)
     return unpack(fmt, value[start_index: start_index + DataTypesSize.Float])[0]
 
 
@@ -79,7 +79,7 @@ T = TypeVar('T')
 
 def to_list(value: bytes, transformer: Callable[[bytes, int, Endianness], Tuple[T, int]], start_index: int = 0,
             endianness: Endianness = Endianness.Native) -> Tuple[List[T], int]:
-    length = unpack(__get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int])[0]
+    length = unpack(get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int])[0]
     result = []
     start_index += DataTypesSize.Int
     total_read_bytes = 0
@@ -92,22 +92,37 @@ def to_list(value: bytes, transformer: Callable[[bytes, int, Endianness], Tuple[
 
 
 def to_list_int(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[List[int], int]:
-    length = unpack(__get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int])[0]
+    length = unpack(get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int])[0]
     start_index += DataTypesSize.Int
     total_read_bytes = length * DataTypesSize.Int
 
-    result = list(unpack(__get_format(DataTypes.Int, endianness, length), value[start_index: start_index + total_read_bytes]))
+    result = list(unpack(get_format(DataTypes.Int, endianness, length), value[start_index: start_index + total_read_bytes]))
     return result, total_read_bytes + DataTypesSize.Int
 
 
 def to_list_float(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[List[float], int]:
-    length = unpack(__get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int])[0]
+    length = unpack(get_format(DataTypes.Int, endianness, 1), value[start_index: start_index + DataTypesSize.Int])[0]
     start_index += DataTypesSize.Int
     total_read_bytes = length * DataTypesSize.Float
 
-    result = list(unpack(__get_format(DataTypes.Float, endianness, length), value[start_index: start_index + total_read_bytes]))
+    result = list(unpack(get_format(DataTypes.Float, endianness, length), value[start_index: start_index + total_read_bytes]))
     return result, total_read_bytes + DataTypesSize.Int
 
 
-def to_string_list(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[List[str], int]:
+def to_list_int_fixed(value: bytes, length: int, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[List[int], int]:
+    total_read_bytes = length * DataTypesSize.Int
+
+    result = list(unpack(get_format(DataTypes.Int, endianness, length), value[start_index: start_index + total_read_bytes]))
+    return result, total_read_bytes
+
+
+def to_list_float_fixed(value: bytes, length: float, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[
+    List[int], int]:
+    total_read_bytes = length * DataTypesSize.Float
+
+    result = list(unpack(get_format(DataTypes.Float, endianness, length), value[start_index: start_index + total_read_bytes]))
+    return result, total_read_bytes
+
+
+def to_list_strings(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> Tuple[List[str], int]:
     return to_list(value, to_string, start_index, endianness)

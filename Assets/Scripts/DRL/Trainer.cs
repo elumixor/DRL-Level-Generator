@@ -12,16 +12,14 @@ namespace DRL {
         readonly int episodesPerEpoch;
         readonly int epochs;
         readonly int maximumEpisodeLength;
-        int episode;
-        float episodeReward;
 
-        // Track current training data
-        int epoch;
+        int epochIndex;
+        int episodeIndex;
+        int stateIndex;
+        
         TAction previousAction;
         float previousReward;
-
         TState previousState;
-        int step;
 
         /// <summary>
         ///     Create a new trainer instance
@@ -39,64 +37,56 @@ namespace DRL {
             this.episodesPerEpoch = episodesPerEpoch;
             this.maximumEpisodeLength = maximumEpisodeLength;
 
-            agent.Initialize(environment);
+            agent.OnEnvironmentCreated(environment);
         }
-
-        /// <summary>
-        ///     Fires when the episode is finished, with the total accumulated reward in this episode
-        /// </summary>
-        public event Action<float> EpisodeFinished = delegate { };
 
         /// <summary>
         ///     Starts the training for the specified number of epochs, episodes and steps
         /// </summary>
         public void StartTraining() {
-            epoch = 0;
-            episode = 0;
+            epochIndex = 0;
+            episodeIndex = 0;
+            stateIndex = 0;
 
             environment.Stepped += OnEnvironmentStepped;
             environment.IsActive = true;
             StartNewEpisode();
         }
 
-        void OnEnvironmentStepped(TState state) {
-            if (step != 0)
-                agent.SaveTransition(new Transition<TAction, TState>(previousState, previousAction, previousReward, state));
+        void OnEnvironmentStepped(TState newState) {
+            if (stateIndex != 0)
+                agent.OnTransition(previousState, previousAction, previousReward, newState);
 
-            var action = agent.GetAction(state);
+            var action = agent.GetAction(newState);
 
             var (reward, isDone) = environment.Step(action);
 
             previousAction = action;
-            previousState = state;
+            previousState = newState;
             previousReward = reward;
 
-            step++;
-            episodeReward += reward;
+            stateIndex++;
 
-            if (isDone || step >= maximumEpisodeLength) OnEpisodeFinished();
+            if (isDone || stateIndex >= maximumEpisodeLength) OnEpisodeFinished();
         }
 
         void StartNewEpisode() {
-            step = 0;
-            episodeReward = 0;
+            stateIndex = 0;
 
             environment.ResetEnvironment();
             agent.OnEpisodeStarted();
         }
 
         void OnEpisodeFinished() {
-            episode++;
+            episodeIndex++;
             agent.OnEpisodeFinished();
 
-            EpisodeFinished(episodeReward);
-
-            if (episode >= episodesPerEpoch) {
-                epoch++;
+            if (episodeIndex >= episodesPerEpoch) {
+                epochIndex++;
                 agent.OnEpochFinished();
             }
 
-            if (epoch < epochs) StartNewEpisode();
+            if (epochIndex < epochs) StartNewEpisode();
             else OnTrainingFinished();
         }
 

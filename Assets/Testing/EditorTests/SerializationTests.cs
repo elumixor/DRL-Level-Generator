@@ -71,7 +71,7 @@ namespace Testing.EditorTests {
                 new C {f1 = 2, v2 = new Vector2(3, 4), v3 = new Vector3(5, 6, 8)},
                 new C {f1 = 3, v2 = new Vector2(4, 5), v3 = new Vector3(6, 7, 9)},
             };
-            var serialized = list.ToBytes(list.Count).ToArray();
+            var serialized = list.Count.ToBytes().Concat(list.SelectMany(c => c.ToBytes())).ToArray();
             var length = serialized.ToInt();
 
             Assert.AreEqual(length, list.Count);

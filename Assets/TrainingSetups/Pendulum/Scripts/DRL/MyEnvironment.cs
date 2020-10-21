@@ -6,7 +6,7 @@ using TrainingSetups.Pendulum.Scripts.Player;
 using UnityEngine;
 
 namespace TrainingSetups.Pendulum.Scripts.DRL {
-    public class InferenceEnvironment : Environment<Action, State> {
+    public class MyEnvironment : Environment<Action, State> {
         [SerializeField, Required] PlayerBehaviouralController player;
         [SerializeField, Required] PlayerInputHandler playerInputHandler;
 
@@ -36,7 +36,7 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
                 var playerPosition = GameObject.FindWithTag("Player").transform.position.x;
                 var enemiesPositions = FindObjectsOfType<Enemy>().Select(e => (Vector2) e.transform.position).ToArray();
 
-                return new State(enemiesPositions, playerPosition, player.Angle, player.AngularSpeed, player.UpwardSpeed);
+                return new State(playerPosition, player.Angle, player.AngularSpeed, player.UpwardSpeed);
             }
         }
     }

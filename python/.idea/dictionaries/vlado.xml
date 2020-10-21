@@ -3,6 +3,7 @@
     <words>
       <w>cuda</w>
       <w>optim</w>
+      <w>softmax</w>
     </words>
   </dictionary>
 </component>

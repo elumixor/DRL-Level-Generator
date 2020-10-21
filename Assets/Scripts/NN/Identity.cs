@@ -1,5 +1,7 @@
-﻿namespace NN {
+﻿using System.Collections.Generic;
+
+namespace NN {
     public class Identity : Module {
-        public override float[] Forward(float[] input) => input;
+        public override IEnumerable<float> Forward(IEnumerable<float> input) => input;
     }
 }

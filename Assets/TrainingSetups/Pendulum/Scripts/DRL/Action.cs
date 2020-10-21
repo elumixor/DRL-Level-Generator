@@ -1,15 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Common.ByteConversions;
+using Serialization;
 
 namespace TrainingSetups.Pendulum.Scripts.DRL {
-    public struct Action : IByteSerializable {
-        public bool tap;
-        public IEnumerable<byte> ToBytes() => (tap ? 1f : -1f).ToBytes();
+    public readonly struct Action : IByteConvertible, IEnumerable<float> {
+        [Structural]
+        public float FloatValue => tap ? 1f : -1f;
 
-        public int AssignFromBytes(byte[] bytes, int startIndex = 0) {
-            var value = bytes.ToFloat(startIndex);
+        public readonly bool tap;
+
+        public Action(IEnumerable<float> result) {
+            var value = result.First();
             tap = value > 0;
-            return sizeof(float);
         }
+
+        public IEnumerable<byte> ToBytes() => FloatValue.ToBytes();
+        public IEnumerator<float> GetEnumerator() { yield return FloatValue; }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

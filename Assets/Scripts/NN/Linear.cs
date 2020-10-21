@@ -43,16 +43,15 @@ namespace NN {
         }
 
         // return Random.Range(-1f, 1f);
-        public override float[] Forward(float[] input) {
-            var output = new float[outputSize];
+        public override IEnumerable<float> Forward(IEnumerable<float> input) {
+            var x = input.ToArray();
 
+            // This is probably the faster version
             for (var i = 0; i < outputSize; i++) {
                 var sum = bias[i];
-                for (var j = 0; j < inputSize; j++) sum += input[j] * weight[i * inputSize + j];
-                output[i] = sum;
+                for (var j = 0; j < inputSize; j++) sum += x[j] * weight[i * inputSize + j];
+                yield return sum;
             }
-
-            return output;
         }
 
         public override void SetParameter(ModuleParameterName parameterName, Tensor value) {

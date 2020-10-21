@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from serialization import DataTypesSize, to_int, ByteSerializable, to_bytes, to_float, to_string, Endianness, to_list, \
-    SerializationException, to_list_int, to_list_float, to_string_list
+    SerializationException, to_list_int, to_list_float, to_list_strings
 
 
 class C(ByteSerializable):
@@ -102,7 +102,7 @@ class SerializationTests(TestCase):
         serialized, total_bytes = to_list(to_bytes(my_list), transformer)
         self.assertEqual(my_list, serialized)
 
-        serialized, total_bytes = to_string_list(to_bytes(my_list))
+        serialized, total_bytes = to_list_strings(to_bytes(my_list))
         self.assertEqual(my_list, serialized)
 
     def test_empty_list_serialization(self):

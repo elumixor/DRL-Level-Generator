@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List
 
 import torch
 import torch.nn as nn
@@ -6,64 +6,64 @@ from torch.distributions import Categorical
 from torch.optim import Adam
 
 from layout import action_size, state_size
-from .utilities import normalize, rewards_to_go
+from .episode import Episode
+from .utils import normalize, rewards_to_go
 
 hidden_size = 20
 
 base = nn.Sequential(
-    nn.Linear(state_size, hidden_size),
-    nn.ReLU(),
-    nn.Linear(hidden_size, hidden_size),
-    nn.ReLU()
+        nn.Linear(state_size, hidden_size),
+        nn.ReLU(),
+        nn.Linear(hidden_size, hidden_size),
+        nn.ReLU()
 )
 
 actor_head = nn.Sequential(
-    base,
-    nn.Linear(hidden_size, action_size),
-    nn.Softmax(dim=-1)
+        base,
+        nn.Linear(hidden_size, action_size),
+        nn.Softmax(dim=-1)
 )
 
 critic_head = nn.Sequential(
-    base,
-    nn.Linear(hidden_size, 1)
+        base,
+        nn.Linear(hidden_size, 1)
 )
 
 # print(actor_head.state_dict().keys())
-print(nn.Linear(5, 5).state_dict().keys())
-# print(critic_head.state_dict().keys())
-print(nn.Sequential().forward(torch.tensor([5])))
-for p in actor_head.parameters():
-    print(p.shape)
+# print(nn.Linear(5, 5).state_dict().keys())
+# # print(critic_head.state_dict().keys())
+# print(nn.Sequential().forward(torch.tensor([5])))
+# for p in actor_head.parameters():
+#     print(p.shape)
 
 # print(critic_head.state_dict().keys())
 
 # Actor maps state to probabilities of taking action
 actor = nn.Sequential(
-    nn.Linear(state_size, hidden_size),
-    nn.ReLU(),
-    # nn.Linear(hidden_size, hidden_size),
-    # nn.ReLU(),
-    nn.Linear(hidden_size, hidden_size),
-    nn.ReLU(),
-    nn.Linear(hidden_size, action_size),
-    nn.Softmax(dim=-1)).cuda()
+        nn.Linear(state_size, hidden_size),
+        nn.ReLU(),
+        # nn.Linear(hidden_size, hidden_size),
+        # nn.ReLU(),
+        nn.Linear(hidden_size, hidden_size),
+        nn.ReLU(),
+        nn.Linear(hidden_size, action_size),
+        nn.Softmax(dim=-1)).cuda()
 
 # Critic maps state to value of the state
 critic = nn.Sequential(
-    nn.Linear(state_size, hidden_size),
-    nn.ReLU(),
-    # nn.Linear(hidden_size, hidden_size),
-    # nn.ReLU(),
-    nn.Linear(hidden_size, hidden_size),
-    nn.ReLU(),
-    nn.Linear(hidden_size, 1)).cuda()
+        nn.Linear(state_size, hidden_size),
+        nn.ReLU(),
+        # nn.Linear(hidden_size, hidden_size),
+        # nn.ReLU(),
+        nn.Linear(hidden_size, hidden_size),
+        nn.ReLU(),
+        nn.Linear(hidden_size, 1)).cuda()
 
 optim_actor = Adam(actor.parameters(), lr=0.01)
 optim_critic = Adam(critic.parameters(), lr=0.005)
 
 discounting = 0.99
 
-Episode = Tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor]
 
 total_means = []
 epoch = 0
@@ -129,8 +129,7 @@ class Agent:
 
             total_rewards.append(rewards.sum())
 
-        print(
-            f'epoch {epoch}\t average total reward: {torch.tensor(total_rewards).mean()}')
+        print(f'epoch {epoch}\t average total reward: {torch.tensor(total_rewards).mean()}')
 
         loss_actor = loss_actor / total_len
         loss_critic = loss_critic / total_len

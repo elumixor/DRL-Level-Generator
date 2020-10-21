@@ -20,7 +20,7 @@ namespace BackendCommunication {
             bool res;
             byte[] response;
             res = timeout <= 0
-                      ? client.TryReceiveFrameBytes(new TimeSpan(0, 0, 15), out response)
+                      ? client.TryReceiveFrameBytes(new TimeSpan(0, 0, 10), out response)
                       : client.TryReceiveFrameBytes(new TimeSpan(0, 0, 0, 0, timeout), out response);
 
             if (!res) throw new CommunicationException("Timeout. Backend unresponsive.");

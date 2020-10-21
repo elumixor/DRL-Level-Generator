@@ -3,12 +3,10 @@ from typing import Tuple
 
 import torch
 
-from .data_types_size import DataTypesSize
-from .endianness import Endianness
-from .simple_types_serialization import int_to_bytes, string_to_bytes, list_to_bytes, to_int, to_string, to_list_int, to_list_float
+from .general import Endianness, DataTypesSize, int_to_bytes, string_to_bytes, list_to_bytes, to_int, to_string, to_list_int, to_list_float
 
 
-def to_bytes(state_dict: OrderedDict, endianness: Endianness = Endianness.Native):
+def state_dict_to_bytes(state_dict: OrderedDict, endianness: Endianness = Endianness.Native):
     result = int_to_bytes(len(state_dict), endianness)
     for key in state_dict:
         result += string_to_bytes(key, endianness)

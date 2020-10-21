@@ -168,7 +168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 1604179787}
   environment: {fileID: 1050423151}
-  episodesPerEpoch: 20
+  episodesPerEpoch: 5
   epochs: 1000000
   maximumEpisodeLength: 100
   timeSpeed: 2.5
@@ -1508,7 +1508,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e21f00c74ebd42aab4f1e35ae8bfb824, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  memorySize: 10
 --- !u!50 &1604179788
 Rigidbody2D:
   serializedVersion: 4
