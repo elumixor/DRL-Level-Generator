@@ -14,10 +14,9 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
     using Episode = List<Transition>;
 
     public class Agent : Agent<Action, State>, INNAgent {
+        Module actor;
         Episode currentEpisode = new Episode();
         List<Episode> episodesInEpoch = new List<Episode>();
-
-        Module actor;
 
         public void InitializeNN(Layout layout, StateDict stateDict) {
             actor = new Sequential(layout.modules.Select(m => m.ToModule()).ToArray());

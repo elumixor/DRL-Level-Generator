@@ -6,7 +6,7 @@ using static Configuration.Algorithm;
 namespace Configuration {
     public partial class TrainingSetupConfiguration {
         [CustomEditor(typeof(TrainingSetupConfiguration))]
-        public class ConfigurationEditor : Editor {
+        public class ConfigurationEditor : UnityEditor.Editor {
             ConfigurationA2C.Editor editorA2C;
 
             ConfigurationVPG.Editor editorVPG;

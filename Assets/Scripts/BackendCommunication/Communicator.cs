@@ -17,12 +17,11 @@ namespace BackendCommunication {
             var bytes = requestMessage.ToBytes().Concat(requestData ?? EmptyBytes).ToArray();
             client.SendFrame(bytes);
 
-            bool res = true;
+            bool res;
             byte[] response;
-            // res = timeout <= 0
-            // ? client.TryReceiveFrameBytes(new TimeSpan(0, 0, 10), out response)
-            // : client.TryReceiveFrameBytes(new TimeSpan(0, 0, 0, 0, timeout), out response);
-            response = client.ReceiveFrameBytes();
+            res = timeout <= 0
+                      ? client.TryReceiveFrameBytes(new TimeSpan(0, 0, 10), out response)
+                      : client.TryReceiveFrameBytes(new TimeSpan(0, 0, 0, 0, timeout), out response);
 
             if (!res) throw new CommunicationException("Timeout. Backend unresponsive.");
 

@@ -171,7 +171,7 @@ MonoBehaviour:
   episodesPerEpoch: 10
   epochs: 1000000
   maximumEpisodeLength: 150
-  timeSpeed: 2.5
+  timeSpeed: 2
 --- !u!1 &344981988
 GameObject:
   m_ObjectHideFlags: 0
@@ -1067,13 +1067,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1041720694}
-  m_LocalRotation: {x: -0, y: -0, z: 0.38268268, w: -0.92387986}
-  m_LocalPosition: {x: 0.76, y: 2.34, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: 0.11930109, w: -0.9928581}
+  m_LocalPosition: {x: 1.177, y: 2.495, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 762497622}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -373.704}
 --- !u!61 &1041720696
 BoxCollider2D:
   m_ObjectHideFlags: 0
