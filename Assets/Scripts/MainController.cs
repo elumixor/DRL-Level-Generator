@@ -81,7 +81,7 @@ public class MainController<TAction, TState, TEnvironment, TAgent> : SingletonBe
             configuration.stateSize = stateSize;
 
             // Communicator should return the initial nn learnable parameters
-            var (nnData, startIndex) = Communicator.Send(RequestType.SendConfiguration, configuration.ToBytes());
+            var (nnData, startIndex) = Communicator.Send(RequestType.SendConfiguration, configuration.ToBytes(), 5000);
             var stateDict = nnData.Get<StateDict>(startIndex).result;
 
             Debug.Log($"Received state dict: {stateDict}");

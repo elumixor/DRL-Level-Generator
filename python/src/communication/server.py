@@ -12,7 +12,7 @@ from serialization import Endianness
 from utilities import log
 from .request_type import RequestType
 from .response_type import ResponseType
-from .server_exception import ServerException
+from exceptions import ServerException
 
 
 # print(f"Current libzmq version is {zmq.zmq_version()}")

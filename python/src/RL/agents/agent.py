@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import List
 
 import torch
-from DRL.agent import Episode
+from RL import Episode
 
 
 class Agent:

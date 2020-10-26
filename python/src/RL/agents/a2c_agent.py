@@ -1,4 +1,4 @@
-from DRL.utils import nn_from_layout
+from RL.utils import nn_from_layout
 
 from configuration.layout_configuration import LayoutConfiguration
 from .vpg_agent import VPGAgent

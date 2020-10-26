@@ -1,7 +1,8 @@
 from struct import pack, unpack
 from typing import Callable, Tuple, Union, List, TypeVar
 
-from . import SerializationException, ByteConvertible
+from exceptions import SerializationException
+from . import ByteConvertible
 from .data_types import DataTypes
 from .data_types_size import DataTypesSize
 from .endianness import Endianness

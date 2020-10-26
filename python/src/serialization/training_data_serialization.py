@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 import torch
 
-from DRL import Episode
+from RL import Episode
 from .general import to_list, to_list_float_fixed, DataTypesSize, to_int
 
 

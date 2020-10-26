@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import serialization
 from communication import Server, RequestType, ResponseType
-from communication.server_exception import ServerException
+from exceptions import ServerException
 
 ADDRESS = "tcp://*:5555"
 

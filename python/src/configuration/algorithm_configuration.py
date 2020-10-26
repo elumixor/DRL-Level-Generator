@@ -2,7 +2,7 @@ from enum import Enum
 
 import serialization
 from .algorithm_type import AlgorithmType
-from .configuration_exception import ConfigurationException
+from exceptions import ConfigurationException
 from .layout_configuration import LayoutConfiguration
 
 

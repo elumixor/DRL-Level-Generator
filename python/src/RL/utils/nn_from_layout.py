@@ -1,6 +1,6 @@
 import torch
 
-from configuration.configuration_exception import ConfigurationException
+from exceptions import ConfigurationException
 from configuration.layout_configuration import LayoutConfiguration, LayerName, IntParameter
 
 

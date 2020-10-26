@@ -1,4 +1,4 @@
-from backend_exception import BackendException
+from .backend_exception import BackendException
 
 
 class SerializationException(BackendException):

@@ -1,5 +1,3 @@
-from communication.server_exception import ServerException
-
 try:
     import argparse
     import sys
@@ -25,6 +23,7 @@ try:
     from configuration import TrainingConfiguration
     import serialization
     from training_controller import TrainingController
+    from exceptions import ServerException
 
     training_controller = None
 
