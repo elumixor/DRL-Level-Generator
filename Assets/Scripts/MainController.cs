@@ -6,9 +6,10 @@ using BackendCommunication;
 using Common;
 using Common.ByteConversions;
 using Configuration;
-using DRL;
-using DRL.Behaviours;
+using NaughtyAttributes;
 using NN;
+using RL;
+using RL.Behaviours;
 using Serialization;
 using UnityEditor;
 using UnityEngine;
@@ -18,17 +19,39 @@ using Debug = UnityEngine.Debug;
 ///     Reads and stores global training configurations (<see cref="TrainingSetupConfiguration" />)
 ///     Should be unique per every training setup
 /// </summary>
-public class MasterController<TAction, TState, TEnvironment, TAgent> : SingletonBehaviour<
-    MasterController<TAction, TState, TEnvironment, TAgent>>
+public class MainController<TAction, TState, TEnvironment, TAgent> : SingletonBehaviour<
+    MainController<TAction, TState, TEnvironment, TAgent>>
     where TEnvironment : Environment<TAction, TState> where TAgent : Agent<TAction, TState> {
     const string SERVER_MAIN_PATH = "src/main.py";
     const string TCP_ADDRESS = "tcp://localhost:5555";
     const string TCP_ADDRESS_SERVER = "tcp://*:5555";
 
-    [SerializeField] Trainer<TAction, TState, TEnvironment, TAgent> trainer;
-    [SerializeField] TrainingSetupConfiguration trainingSetupConfiguration;
+    [BoxGroup("Configuration"), SerializeField] TrainingSetupConfiguration trainingSetupConfiguration;
 
+    [BoxGroup("Environments"), SerializeField] protected TAgent agent;
+    [BoxGroup("Environments"), SerializeField] protected TEnvironment environment;
+
+    [BoxGroup("Epochs and Episode lengths"), SerializeField] bool trainUnlimited;
+
+    [BoxGroup("Epochs and Episode lengths"), SerializeField, MinValue(1), HideIf("trainUnlimited")]
+    int epochs;
+
+    [BoxGroup("Epochs and Episode lengths"), SerializeField, MinValue(1)] int episodesPerEpoch;
+    [BoxGroup("Epochs and Episode lengths"), SerializeField, MinValue(1)] int maximumEpisodeLength;
+
+    [BoxGroup("Training speed"), SerializeField, Range(0, 500)] float speed;
+
+    // on every Update() adds `speed` to itself and performs trainer steps for the number of time, rounded down to the closes integer
+    float elapsed;
+
+    // flag if Update() should run
+    bool isTraining;
+
+    // Python backend process
     Process serverProcess;
+
+    // Controls the general RL logic 
+    Trainer<TAction, TState> trainer;
 
     static TrainingSetupConfiguration TrainingSetupConfiguration => instance.trainingSetupConfiguration;
 
@@ -67,15 +90,34 @@ public class MasterController<TAction, TState, TEnvironment, TAgent> : Singleton
             foreach (var nnAgent in FindObjectsOfType<Agent<TAction, TState>>().OfType<INNAgent>())
                 nnAgent.InitializeNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout, stateDict);
 
-            // Start training
+            // Create trainer and start training
+            trainer = new Trainer<TAction, TState>(environment, agent, trainUnlimited ? -1 : epochs, episodesPerEpoch,
+                                                   maximumEpisodeLength);
             trainer.StartTraining();
-            trainer.trainer.TrainingFinished += () => EditorApplication.isPlaying = false;
+            trainer.TrainingFinished += () => {
+                Debug.Log("Training finished!");
+                EditorApplication.isPlaying = false;
+            };
+            isTraining = true;
         } catch (CommunicationException e) {
             Debug.LogException(e);
             EditorApplication.isPlaying = false;
         }
     }
 
+    // Updates trainer given the speed
+    void Update() {
+        if (!isTraining) return;
+
+        elapsed += speed;
+
+        while (elapsed >= 1f) {
+            trainer.Step();
+            elapsed -= 1f;
+        }
+    }
+
+    // Shuts down server and process when exiting
     void OnDestroy() {
         try {
             Communicator.Send(RequestType.ShutDown);
