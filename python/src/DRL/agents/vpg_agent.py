@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from DRL import Episode
-from DRL.utils import nn_from_layout, rewards_to_go
+from DRL.utils import nn_from_layout, rewards_to_go, normalize
 from configuration.layout_configuration import LayoutConfiguration
 from utilities import log
 from .agent import Agent
@@ -34,50 +34,30 @@ class VPGAgent(Agent):
         total_rewards = []
 
         for states, actions, rewards, next_states in training_data:
-            print("rewards")
-            print(rewards)
             weights = rewards_to_go(rewards, discounting).flatten()
-            print("w1")
-            print(weights)
-            # weights = normalize(weights)
-            print("w2")
-            print(weights)
+            weights = normalize(weights)
 
             probabilities = self._actor(states).softmax(-1)
-            # print("Probabilities:")
-            # print(probabilities)
-
             probabilities = probabilities[range(states.shape[0]), actions.flatten()]
-            # print("Selected:")
-            # print(probabilities)
             loss_actor -= (probabilities.log() * weights).sum()
 
             total_len += states.shape[0]
 
             total_rewards.append(rewards.sum())
 
-        print(loss_actor)
         loss_actor = loss_actor / total_len
-        print(total_len)
 
         self.optim_actor.zero_grad()
         loss_actor.backward()
-        for p in self._actor.parameters():
-            print(p.grad)
         self.optim_actor.step()
 
         log(f'[Epoch:\t{self.epoch}]:\t{torch.tensor(total_rewards).mean()}')
         self.epoch += 1
 
         plt.clf()
-        for p in self._actor.parameters():
-            print(p)
-
-        probs = self._actor(torch.from_numpy(np.linspace(-1, 1, 10)).float().cuda().unsqueeze(-1)).softmax(-1)[:, 0].cpu().detach().numpy()
-        print(probs)
-        plt.plot(np.linspace(-1, 1, 10), probs)
+        p_left_x = self._actor(torch.from_numpy(np.linspace(-1, 1, 10)).float().cuda().unsqueeze(-1)) \
+                       .softmax(-1)[:, 0].cpu().detach().numpy()
+        plt.plot(np.linspace(-1, 1, 10), p_left_x)
         plt.ylim([0, 1])
         plt.draw()
         plt.pause(0.001)
-        # plt.draw()
-        # plt.pause(0.0001)

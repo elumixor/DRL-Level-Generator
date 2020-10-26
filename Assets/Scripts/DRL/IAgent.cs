@@ -1,5 +1,5 @@
 ﻿namespace DRL {
-    public interface IAgent<TAction, in TState> {
+    public interface IAgent<TAction, TState> {
         void OnEnvironmentCreated(IEnvironment<TAction, TState> environment);
         void OnEpisodeStarted();
         TAction GetAction(TState state);

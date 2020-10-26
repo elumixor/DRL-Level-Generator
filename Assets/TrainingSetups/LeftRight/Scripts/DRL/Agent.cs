@@ -29,8 +29,10 @@ namespace TrainingSetups.LeftRight.Scripts.DRL {
             // probabilities
             Gizmos.color = new Color(0.64f, 0.9f, 0.73f);
             const float step = .1f;
+
             for (var x = -bigRewardPosition; x < smallRewardPosition; x += step) {
                 var pLeft = actor.Forward(x.Yield()).Softmax().First();
+                // Debug.Log($"P(Left|{x}) = {pLeft}");
                 Gizmos.DrawCube(new Vector3(x, 0, pLeft * .5f), new Vector3(step, 0, pLeft));
             }
         }
@@ -43,8 +45,10 @@ namespace TrainingSetups.LeftRight.Scripts.DRL {
 
         public override Action GetAction(State state) => new Action(actor.Forward(state.AsEnumerable()).Softmax().Sample());
 
-        public override void OnTransition(State previousState, Action action, float reward, State nextState) =>
+        public override void OnTransition(State previousState, Action action, float reward, State nextState) {
+            Debug.Log($"Adding {reward}");   
             currentEpisode.Add(new Transition(previousState, action, reward, nextState));
+        }
 
         public override void OnEpisodeFinished() {
             episodesInEpoch.Add(currentEpisode);

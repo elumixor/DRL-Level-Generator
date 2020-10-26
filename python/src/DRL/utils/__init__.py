@@ -11,7 +11,11 @@ def bootstrap(rewards, last, discounting=0.99):
 
 
 def normalize(tensor):
-    return (tensor - tensor.mean()) / tensor.std()
+    std = tensor.std()
+    if torch.isnan(std) or std == 0:
+        return tensor
+
+    return (tensor - tensor.mean()) / std
 
 
 def rewards_to_go(rewards, discounting=0.99):

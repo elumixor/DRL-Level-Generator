@@ -27,4 +27,12 @@ MonoBehaviour:
     networksType: 0
   configurationVPG:
     actor:
-      modules: []
+      modules:
+      - floatParameters:
+          keys: 00000000
+          values:
+          - 0
+        intParameters:
+          keys: 000000000100000002000000
+          values: 000000000100000002000000
+        layerName: 0

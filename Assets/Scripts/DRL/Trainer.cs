@@ -1,4 +1,4 @@
-﻿using System;
+﻿using UnityEngine;
 
 namespace DRL {
     /// <summary>
@@ -16,10 +16,12 @@ namespace DRL {
         int epochIndex;
         int episodeIndex;
         int stateIndex;
-        
+
         TAction previousAction;
         float previousReward;
-        TState previousState;
+        TState currentState;
+        
+        public event System.Action TrainingFinished = delegate { };
 
         /// <summary>
         ///     Create a new trainer instance
@@ -48,32 +50,25 @@ namespace DRL {
             episodeIndex = 0;
             stateIndex = 0;
 
-            environment.Stepped += OnEnvironmentStepped;
-            environment.IsActive = true;
             StartNewEpisode();
         }
 
-        void OnEnvironmentStepped(TState newState) {
-            if (stateIndex != 0)
-                agent.OnTransition(previousState, previousAction, previousReward, newState);
-
-            var action = agent.GetAction(newState);
-
-            var (reward, isDone) = environment.Step(action);
-
-            previousAction = action;
-            previousState = newState;
-            previousReward = reward;
+        // Perform a step in the environment
+        public void Step() {
+            var action = agent.GetAction(currentState);
+            var (newState, reward, isDone) = environment.Step(action);
+            agent.OnTransition(currentState, action, reward, newState);
+            currentState = newState;
 
             stateIndex++;
-
+            
             if (isDone || stateIndex >= maximumEpisodeLength) OnEpisodeFinished();
         }
 
         void StartNewEpisode() {
             stateIndex = 0;
 
-            environment.ResetEnvironment();
+            currentState = environment.ResetEnvironment();
             agent.OnEpisodeStarted();
         }
 
@@ -91,9 +86,6 @@ namespace DRL {
             else OnTrainingFinished();
         }
 
-        void OnTrainingFinished() {
-            environment.IsActive = false;
-            environment.Stepped -= OnEnvironmentStepped;
-        }
+        void OnTrainingFinished() => TrainingFinished();
     }
 }

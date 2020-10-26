@@ -69,6 +69,7 @@ public class MasterController<TAction, TState, TEnvironment, TAgent> : Singleton
 
             // Start training
             trainer.StartTraining();
+            trainer.trainer.TrainingFinished += () => EditorApplication.isPlaying = false;
         } catch (CommunicationException e) {
             Debug.LogException(e);
             EditorApplication.isPlaying = false;

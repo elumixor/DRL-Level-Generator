@@ -10,16 +10,20 @@ namespace TrainingSetups.LeftRight.Scripts.DRL {
         public float timeStepReward;
 
         [SerializeField] Transform agent;
-        protected override State CurrentState => new State(agent.position.x);
+        protected State CurrentState => new State(agent.position.x);
 
-        public override void ResetEnvironment() {
-            agent.transform.position = Random.Range(-bigRewardPosition, smallRewardPosition) * Vector3.left;
+        public override State ResetEnvironment() {
+            // var x = Random.Range(-bigRewardPosition, smallRewardPosition);
+            var x = 0;
+            agent.transform.position = x * Vector3.left;
+            return new State(x);
         }
 
-        public override (float reward, bool isDone) Step(Action action) {
+        public override (State newState, float reward, bool isDone) Step(Action action) {
             var t = agent.transform;
+            print(action.X);
             var p = t.position;
-            p += (action.X - 1) * 2 * Vector3.left;
+            p += (action.X * 2 - 1) * Vector3.right;
             t.position = p;
             var x = p.x;
 
@@ -29,7 +33,9 @@ namespace TrainingSetups.LeftRight.Scripts.DRL {
             var reward = reachedBig ? bigRewardValue : reachedSmall ? smallRewardValue : timeStepReward;
             var done = reachedBig || reachedSmall;
 
-            return (reward, done);
+            Debug.Log($"Reward={reward}");
+            
+            return (CurrentState, reward, done);
         }
     }
 }

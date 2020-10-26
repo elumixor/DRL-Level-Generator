@@ -12,7 +12,7 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
 
         bool isDone;
 
-        protected override State CurrentState {
+        protected State CurrentState {
             get {
                 var playerPosition = GameObject.FindWithTag("Player").transform.position.x;
                 var enemiesPositions = FindObjectsOfType<Enemy>().Select(e => (Vector2) e.transform.position).ToArray();
@@ -23,22 +23,23 @@ namespace TrainingSetups.Pendulum.Scripts.DRL {
 
         void Start() => player.Collided += () => isDone = true;
 
-        protected override void FixedUpdate() {
-            base.FixedUpdate();
+        // protected override void Update() {
+            // base.Update();
 
-            if (player.transform.position.y >= 9f) isDone = true;
-        }
+            // if (player.transform.position.y >= 9f) isDone = true;
+        // }
 
-        public override void ResetEnvironment() {
+        public override State ResetEnvironment() {
             player.ResetState();
             isDone = false;
             foreach (var followTransform in FindObjectsOfType<FollowTransform>()) followTransform.Synchronize();
+            return CurrentState;
         }
 
-        public override (float reward, bool isDone) Step(Action action) {
+        public override (State newState, float reward, bool isDone) Step(Action action) {
             if (action.tap) playerInputHandler.OnTap();
 
-            return (1f, isDone);
+            return (CurrentState, 1f, isDone);
         }
     }
 }

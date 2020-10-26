@@ -6,6 +6,9 @@ namespace Common {
     public static class MathExtensions {
         public static IEnumerable<float> Softmax(this IEnumerable<float> x) {
             var input = x.ToArray();
+            var max = input.Max();
+            for (var i = 0; i < input.Length; i++) input[i] -= max;
+            // Debug.Log(input.FormString());
             var length = input.Length;
 
             var sum = 0f;
