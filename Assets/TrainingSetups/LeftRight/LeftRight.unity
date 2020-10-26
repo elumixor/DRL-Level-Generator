@@ -244,14 +244,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 792972461}
   environment: {fileID: 1484207675}
-  episodesPerEpoch: 2
-  epochs: 100
+  episodesPerEpoch: 5
+  epochs: 400
   maximumEpisodeLength: 20
-  framesForStep: 20
+  framesForStep: 1
   bigRewardValue: 10
-  smallRewardValue: 1
-  bigRewardPosition: 1
-  smallRewardPosition: 1
+  smallRewardValue: 0
+  bigRewardPosition: 5
+  smallRewardPosition: 5
+  spawnLeft: 3
+  spawnRight: 3
   timeStepReward: -1
 --- !u!4 &1257522297
 Transform:
@@ -296,11 +298,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aec931739868f284a88f10a5f71a139b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bigRewardValue: 0
-  smallRewardValue: 0
-  bigRewardPosition: 0
-  smallRewardPosition: 0
-  timeStepReward: 0
   agent: {fileID: 792972462}
 --- !u!4 &1484207676
 Transform:

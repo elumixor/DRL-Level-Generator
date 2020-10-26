@@ -36,3 +36,19 @@ MonoBehaviour:
           keys: 000000000100000002000000
           values: 000000000100000002000000
         layerName: 0
+      - floatParameters:
+          keys: 00000000
+          values:
+          - 0
+        intParameters:
+          keys: 00000000
+          values: 00000000
+        layerName: 1
+      - floatParameters:
+          keys: 00000000
+          values:
+          - 0
+        intParameters:
+          keys: 000000000100000002000000
+          values: 000000000200000002000000
+        layerName: 0
