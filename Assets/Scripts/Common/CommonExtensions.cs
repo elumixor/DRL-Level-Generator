@@ -7,5 +7,9 @@ namespace Common {
         public static string FormString<T>(this IEnumerable<T> array, string separator = ", ", string openingBracket = "[",
                                            string closingBracket = "]") =>
             openingBracket + string.Join(separator, array) + closingBracket;
+
+
+        // Yields a single item as enumerable
+        public static IEnumerable<T> Yield<T>(this T item) { yield return item; }
     }
 }

@@ -1,5 +1,5 @@
-﻿using TrainingSetups.Boilerplate.Scripts.DRL;
+﻿using TrainingSetups._Boilerplate.Scripts.DRL;
 
-namespace TrainingSetups.Boilerplate.Scripts {
-    public class MasterController : MasterController<Action, State> { }
+namespace TrainingSetups._Boilerplate.Scripts {
+    public class MasterController : MasterController<Action, State, Environment, Agent> { }
 }

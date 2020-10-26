@@ -2,17 +2,18 @@
 using UnityEngine;
 
 namespace DRL.Behaviours {
-    public class Trainer<TAction, TState> : MonoBehaviour {
-        [SerializeField] Agent<TAction, TState> agent;
-        [SerializeField] Environment<TAction, TState> environment;
+    public class Trainer<TAction, TState, TEnvironment, TAgent> : MonoBehaviour
+        where TEnvironment : Environment<TAction, TState> where TAgent : Agent<TAction, TState> {
+        [SerializeField] protected TAgent agent;
+        [SerializeField] protected TEnvironment environment;
         [SerializeField, MinValue(1)] int episodesPerEpoch;
         [SerializeField, MinValue(1)] int epochs;
         [SerializeField, MinValue(1)] int maximumEpisodeLength;
 
-        DRL.Trainer<TAction, TState> trainer;
+        Trainer<TAction, TState> trainer;
 
         public void StartTraining() {
-            trainer = new DRL.Trainer<TAction, TState>(environment, agent, epochs, episodesPerEpoch, maximumEpisodeLength);
+            trainer = new Trainer<TAction, TState>(environment, agent, epochs, episodesPerEpoch, maximumEpisodeLength);
             trainer.StartTraining();
         }
     }

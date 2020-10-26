@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using BackendCommunication;
 using Common;
 using Common.ByteConversions;
@@ -19,15 +18,17 @@ using Debug = UnityEngine.Debug;
 ///     Reads and stores global training configurations (<see cref="TrainingSetupConfiguration" />)
 ///     Should be unique per every training setup
 /// </summary>
-public class MasterController<TAction, TState> : SingletonBehaviour<MasterController<TAction, TState>> {
+public class MasterController<TAction, TState, TEnvironment, TAgent> : SingletonBehaviour<
+    MasterController<TAction, TState, TEnvironment, TAgent>>
+    where TEnvironment : Environment<TAction, TState> where TAgent : Agent<TAction, TState> {
     const string SERVER_MAIN_PATH = "src/main.py";
     const string TCP_ADDRESS = "tcp://localhost:5555";
     const string TCP_ADDRESS_SERVER = "tcp://*:5555";
 
-    Process serverProcess;
-    [SerializeField] DRL.Behaviours.Trainer<TAction, TState> trainer;
-
+    [SerializeField] Trainer<TAction, TState, TEnvironment, TAgent> trainer;
     [SerializeField] TrainingSetupConfiguration trainingSetupConfiguration;
+
+    Process serverProcess;
 
     static TrainingSetupConfiguration TrainingSetupConfiguration => instance.trainingSetupConfiguration;
 
@@ -61,7 +62,7 @@ public class MasterController<TAction, TState> : SingletonBehaviour<MasterContro
             var stateDict = nnData.Get<StateDict>(startIndex).result;
 
             Debug.Log($"Received state dict: {stateDict}");
-            
+
             // Initialize agents with current parameters and configuration
             foreach (var nnAgent in FindObjectsOfType<Agent<TAction, TState>>().OfType<INNAgent>())
                 nnAgent.InitializeNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout, stateDict);
