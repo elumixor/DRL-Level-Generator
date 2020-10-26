@@ -22,7 +22,8 @@ class TrainingController:
         log(f"Received configuration: Algorithm {configuration.algorithm}. State size: {self.state_size}. Action size: {self.action_size}")
 
     def train(self, training_data_bytes: bytes, start_index: int):
-        training_data, _ = serialization.to_training_data(training_data_bytes, start_index, self.state_size, self.action_size, 'cpu')
+        training_data, _ = serialization.to_training_data(training_data_bytes, start_index, self.state_size, self.action_size,
+                                                          device=device)
         self.agent.train(training_data)
 
     @property

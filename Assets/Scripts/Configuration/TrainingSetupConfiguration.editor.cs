@@ -36,6 +36,7 @@ namespace Configuration {
                 }
 
                 serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(target);
             }
         }
     }
