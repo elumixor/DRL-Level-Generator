@@ -32,7 +32,6 @@ namespace TrainingSetups.LeftRight.Scripts.DRL {
 
             for (var x = -bigRewardPosition; x < smallRewardPosition; x += step) {
                 var pLeft = actor.Forward(x.Yield()).Softmax().First();
-                // Debug.Log($"P(Left|{x}) = {pLeft}");
                 Gizmos.DrawCube(new Vector3(x, 0, pLeft * .5f), new Vector3(step, 0, pLeft));
             }
         }
@@ -46,8 +45,8 @@ namespace TrainingSetups.LeftRight.Scripts.DRL {
         public override Action GetAction(State state) => new Action(actor.Forward(state.AsEnumerable()).Softmax().Sample());
 
         public override void OnTransition(State previousState, Action action, float reward, State nextState) {
-            Debug.Log($"Adding {reward}");   
             currentEpisode.Add(new Transition(previousState, action, reward, nextState));
+            // return Action.Left;
         }
 
         public override void OnEpisodeFinished() {
@@ -59,7 +58,6 @@ namespace TrainingSetups.LeftRight.Scripts.DRL {
             var trainingData = episodesInEpoch.MapToBytes(episode => episode.MapToBytes(e => e.ToBytes()));
             var (data, startIndex) = Communicator.Send(RequestType.SendTrainingData, trainingData, 10000);
             var (stateDict, _) = data.Get<StateDict>(startIndex);
-            Debug.Log($"Received a state dict {stateDict}");
             actor.LoadStateDict(stateDict);
             episodesInEpoch = new List<Episode>();
         }
