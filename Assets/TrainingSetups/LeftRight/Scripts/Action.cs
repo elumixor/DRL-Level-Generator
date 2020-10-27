@@ -1,6 +1,6 @@
 ﻿using Serialization;
 
-namespace TrainingSetups.LeftRight.Scripts.RL
+namespace TrainingSetups.LeftRight.Scripts
 {
     public class Action
     {

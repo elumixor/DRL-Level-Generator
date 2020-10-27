@@ -1,11 +1,11 @@
 ﻿using System;
 using RLBehaviours;
-using TrainingSetups.Pendulum.Scripts.RL;
-using Action = TrainingSetups.Pendulum.Scripts.RL.Action;
+using TrainingSetups._Boilerplate.Scripts.RL;
+using Action = TrainingSetups._Boilerplate.Scripts.RL.Action;
 
-namespace TrainingSetups.Pendulum.Scripts
+namespace TrainingSetups._Boilerplate.Scripts
 {
-    public class TrainingInstance : TrainingInstance<State, Action, Agent>
+    public class EnvironmentInstance : EnvironmentInstance<State, Action, Agent>
     {
         /// <inheritdoc/>
         public override State ResetEnvironment() => throw new NotImplementedException();

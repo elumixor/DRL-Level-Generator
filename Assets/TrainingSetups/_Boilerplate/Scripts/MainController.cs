@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace TrainingSetups._Boilerplate.Scripts
 {
-    public class MainController : MainController<State, Action, TrainingInstance, Agent, TrainingInstance>
+    public class MainController : MainController<State, Action, EnvironmentInstance, Agent, EnvironmentInstance>
     {
         /// <inheritdoc/>
         protected override void Train(List<List<(State state, Action action, float reward, State nextState)>> epoch)

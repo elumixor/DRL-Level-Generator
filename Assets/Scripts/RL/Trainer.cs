@@ -6,19 +6,21 @@ namespace RL
     public class Trainer<TState, TAction>
     {
         public event Action Finished = delegate { };
-
         public event Action<List<List<(TState state, TAction action, float reward, TState nextState)>>> EpochTrainingDataCollected =
                 delegate { };
 
         readonly int episodesInEpoch;
         readonly int epochs;
-        readonly List<TrainingInstance<TState, TAction>> trainingInstances;
+        readonly List<EnvironmentInstance<TState, TAction>> trainingInstances;
 
         List<List<(TState state, TAction action, float reward, TState nextState)>> epochTrainingData;
 
         int epochIndex;
 
-        public Trainer(List<TrainingInstance<TState, TAction>> trainingInstances, int maxEpisodeLength, int episodesInEpoch, int epochs = 0)
+        public Trainer(List<EnvironmentInstance<TState, TAction>> trainingInstances,
+                       int maxEpisodeLength,
+                       int episodesInEpoch,
+                       int epochs = 0)
         {
             this.trainingInstances = trainingInstances;
             this.epochs            = epochs;

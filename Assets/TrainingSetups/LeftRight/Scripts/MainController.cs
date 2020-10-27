@@ -4,19 +4,21 @@ using Common;
 using Common.ByteConversions;
 using NN;
 using RLBehaviours;
-using TrainingSetups.LeftRight.Scripts.RL;
 using UnityEngine;
 
 namespace TrainingSetups.LeftRight.Scripts
 {
-    [RequireComponent(typeof(EnvironmentDataProvider))]
-    public class MainController : MainController<State, Action, TrainingInstance, Agent, TrainingInstance>
+    [RequireComponent(typeof(EnvironmentSettings))]
+    public class MainController : MainController<State, Action, EnvironmentInstance, Agent, EnvironmentInstance>
     {
         /// <inheritdoc/>
         protected override void Awake()
         {
             base.Awake();
-            foreach (var trainingInstance in trainingInstances) trainingInstance.data = GetComponent<EnvironmentDataProvider>();
+
+            var settings = GetComponent<EnvironmentSettings>();
+
+            foreach (var trainingInstance in trainingInstances) trainingInstance.settings = settings;
         }
 
         protected override void Train(List<List<(State state, Action action, float reward, State nextState)>> epoch)

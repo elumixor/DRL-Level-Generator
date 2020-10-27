@@ -38,7 +38,24 @@ class VPGAgent(Agent):
 
         total_rewards = []
 
+        log(f'[Epoch:\t{self.epoch}]:\tTRAINING DATA START')
+        i = 0
         for states, actions, rewards, next_states in training_data:
+            print(i)
+            print("states")
+            print(states)
+            print()
+            print("actions")
+            print(actions)
+            print()
+            print("rewards")
+            print(rewards)
+            print()
+            print("next_states")
+            print(next_states)
+            print()
+            i += 1
+
             weights = rewards_to_go(rewards, discounting).flatten()
             # weights = normalize(weights)  # does not work correctly when normalization is applied. Why?
 
@@ -62,7 +79,7 @@ class VPGAgent(Agent):
         log(f'[Epoch:\t{self.epoch}]:\t{mean_total_reward}')
         self.epoch += 1
 
-        x = np.linspace(-3, 3, 10)
+        x = np.linspace(-3, 4, 10)
         p_left_x = self._actor(torch.from_numpy(x).float().cuda().unsqueeze(-1)) \
                        .softmax(-1)[:, 0].cpu().detach().numpy()
 

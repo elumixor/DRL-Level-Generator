@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace TrainingSetups.LeftRight.Scripts
 {
-    public class EnvironmentDataProvider : MonoBehaviour
+    public class EnvironmentSettings : MonoBehaviour
     {
         [BoxGroup("Reward Value")] public float bigRewardValue;
         [BoxGroup("Reward Value")] public float smallRewardValue;

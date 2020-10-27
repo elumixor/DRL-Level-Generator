@@ -6,7 +6,7 @@ using RL;
 using Serialization;
 using UnityEngine;
 
-namespace TrainingSetups.LeftRight.Scripts.RL
+namespace TrainingSetups.LeftRight.Scripts
 {
     public class Agent : MonoBehaviour, IAgent<State, Action>, INNAgent
     {

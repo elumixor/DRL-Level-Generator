@@ -23,7 +23,7 @@ namespace RLBehaviours
             : SingletonBehaviour<MainController<TState, TAction, TEnvironment, TAgent, TTrainingInstance>>
             where TEnvironment : MonoBehaviour, IEnvironment<TState, TAction>
             where TAgent : MonoBehaviour, IAgent<TState, TAction>
-            where TTrainingInstance : TrainingInstance<TState, TAction, TAgent>
+            where TTrainingInstance : EnvironmentInstance<TState, TAction, TAgent>
     {
         const string SERVER_MAIN_PATH = "src/main.py";
         const string TCP_ADDRESS = "tcp://localhost:5555";
@@ -55,7 +55,7 @@ namespace RLBehaviours
         static TrainingSetupConfiguration TrainingSetupConfiguration => instance.trainingSetupConfiguration;
 
         /// <summary> The main entry point for each Training Setup </summary>
-        /// 
+        ///
         /// Initializes NNs in all the agents in the scene
         /// Initializes serializers, given the state size and action size
         /// Sends initial data via communicator to initialize backend

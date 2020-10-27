@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Serialization;
 
-namespace TrainingSetups.LeftRight.Scripts.RL
+namespace TrainingSetups.LeftRight.Scripts
 {
     public readonly struct State : IEnumerable<float>
     {
