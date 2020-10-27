@@ -1,7 +1,9 @@
 ﻿using Serialization;
 
-namespace TrainingSetups.LeftRight.Scripts.RL {
-    public class Action {
+namespace TrainingSetups.LeftRight.Scripts.RL
+{
+    public class Action
+    {
         public static readonly Action Left = new Action(0);
         public static readonly Action Right = new Action(1);
 
@@ -9,7 +11,6 @@ namespace TrainingSetups.LeftRight.Scripts.RL {
 
         public Action(int value) : this(value == 0 ? 0f : 1f) { }
 
-        [Structural]
-        public float X { get; }
+        [Structural] public float X { get; }
     }
 }

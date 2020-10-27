@@ -1,8 +1,12 @@
 ﻿using System;
-using RL.Behaviours;
+using RL;
+using UnityEngine;
 
-namespace TrainingSetups._Boilerplate.Scripts.RL {
-    public class Agent : Agent<Action, State> {
-        public override Action GetAction(State observation) => throw new NotImplementedException();
+namespace TrainingSetups._Boilerplate.Scripts.RL
+{
+    public class Agent : MonoBehaviour, IAgent<State, Action>
+    {
+        /// <inheritdoc/>
+        public Action GetAction(State state) => throw new NotImplementedException();
     }
 }

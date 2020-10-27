@@ -6,37 +6,41 @@ using Common.ByteConversions;
 using Configuration.NN;
 using NN;
 using RL;
-using RL.Behaviours;
 using Serialization;
 using UnityEngine;
 
-namespace TrainingSetups.Pendulum.Scripts.RL {
+namespace TrainingSetups.Pendulum.Scripts.RL
+{
     using Episode = List<Transition>;
 
-    public class Agent : Agent<Action, State>, INNAgent {
+    public class Agent : MonoBehaviour, IAgent<State, Action>, INNAgent
+    {
         Module actor;
         Episode currentEpisode = new Episode();
         List<Episode> episodesInEpoch = new List<Episode>();
 
-        public void InitializeNN(Layout layout, StateDict stateDict) {
-            actor = new Sequential(layout.modules.Select(m => m.ToModule()).ToArray());
-            actor.LoadStateDict(stateDict);
-        }
+        public Action GetAction(State state) => new Action(actor.Forward(state.AsEnumerable()).Softmax().Sample());
 
-        public override Action GetAction(State state) => new Action(actor.Forward(state.AsEnumerable()).Softmax().Sample());
+        /// <inheritdoc/>
+        public void ConstructNN(Layout layout) { actor = new Sequential(layout.modules.Select(m => m.ToModule()).ToArray()); }
 
-        public override void OnTransition(State previousState, Action action, float reward, State nextState) =>
-            currentEpisode.Add(new Transition(previousState, action, reward, nextState));
+        /// <inheritdoc/>
+        public void SetParameters(StateDict stateDict) { actor.LoadStateDict(stateDict); }
 
-        public override void OnEpisodeFinished() {
+        public void OnTransition(State previousState, Action action, float reward, State nextState) =>
+                currentEpisode.Add(new Transition(previousState, action, reward, nextState));
+
+        public void OnEpisodeFinished()
+        {
             episodesInEpoch.Add(currentEpisode);
             currentEpisode = new Episode();
         }
 
-        public override void OnEpochFinished() {
+        public void OnEpochFinished()
+        {
             var trainingData = episodesInEpoch.MapToBytes(episode => episode.MapToBytes(e => e.ToBytes()));
             var (data, startIndex) = Communicator.Send(RequestType.SendTrainingData, trainingData, 10000);
-            var (stateDict, _) = data.Get<StateDict>(startIndex);
+            var (stateDict, _)     = data.Get<StateDict>(startIndex);
             Debug.Log($"Received a state dict {stateDict}");
             actor.LoadStateDict(stateDict);
             episodesInEpoch = new List<Episode>();

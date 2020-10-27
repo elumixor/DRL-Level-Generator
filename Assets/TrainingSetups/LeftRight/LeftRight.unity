@@ -159,12 +159,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 792972460}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_Father: {fileID: 1484207676}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1140598629
 GameObject:
@@ -175,9 +175,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1140598631}
+  - component: {fileID: 1140598632}
   - component: {fileID: 1140598630}
   m_Layer: 0
-  m_Name: MAIN CONTROLLER
+  m_Name: Training Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -192,25 +193,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1140598629}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48b50b641936645489f01da4c05ef4e8, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c85cdbcb2404e44813a36334d083f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trainingSetupConfiguration: {fileID: 11400000, guid: c38d7913486101440a0e0d15b7348451, type: 2}
-  agent: {fileID: 792972461}
-  environment: {fileID: 1484207675}
-  trainUnlimited: 1
-  epochs: 200
-  episodesPerEpoch: 5
-  maximumEpisodeLength: 50
-  speed: 10
-  bigRewardValue: 5
-  smallRewardValue: 2
-  timeStepReward: -1
-  bigRewardPosition: 5
-  smallRewardPosition: 3
-  spawnLeft: 3
-  spawnRight: 3
-  agentMovementDistance: 0.1
+  bigRewardValue: 2
+  smallRewardValue: 1
+  timeStepReward: 0
+  bigRewardPosition: 1
+  smallRewardPosition: 1
+  spawnLeft: 0
+  spawnRight: 0
+  agentStepSize: 1
 --- !u!4 &1140598631
 Transform:
   m_ObjectHideFlags: 0
@@ -225,6 +218,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1140598632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140598629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 006153ab11874e33a17e3810974a7015, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trainingSetupConfiguration: {fileID: 11400000, guid: c38d7913486101440a0e0d15b7348451, type: 2}
+  trainUnlimited: 1
+  epochs: 1
+  episodesPerEpoch: 5
+  maximumEpisodeLength: 20
+  speed: 1
+  trainingInstances:
+  - {fileID: 1484207675}
 --- !u!1 &1484207674
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,10 +264,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1484207674}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aec931739868f284a88f10a5f71a139b, type: 3}
+  m_Script: {fileID: 11500000, guid: 6285493f0de741c3bcc05e11f4740556, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 792972462}
+  agent: {fileID: 792972461}
 --- !u!4 &1484207676
 Transform:
   m_ObjectHideFlags: 0
@@ -265,7 +278,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 792972462}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

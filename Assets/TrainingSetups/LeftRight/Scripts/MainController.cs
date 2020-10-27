@@ -1,45 +1,37 @@
-﻿using NaughtyAttributes;
+﻿using System.Collections.Generic;
+using BackendCommunication;
+using Common;
+using Common.ByteConversions;
+using NN;
+using RLBehaviours;
 using TrainingSetups.LeftRight.Scripts.RL;
 using UnityEngine;
 
-namespace TrainingSetups.LeftRight.Scripts {
-    public class MainController : MainController<Action, State, Environment, Agent> {
-        [BoxGroup("Reward Value"), SerializeField] float bigRewardValue;
-        [BoxGroup("Reward Value"), SerializeField] float smallRewardValue;
-        [BoxGroup("Reward Value"), SerializeField] float timeStepReward;
-
-        [BoxGroup("Reward Position"), SerializeField] float bigRewardPosition;
-        [BoxGroup("Reward Position"), SerializeField] float smallRewardPosition;
-
-        [BoxGroup("Spawn"), SerializeField] float spawnLeft;
-        [BoxGroup("Spawn"), SerializeField] float spawnRight;
-
-        [BoxGroup("Movement"), SerializeField, Range(1e-7f, 5f)] float agentMovementDistance;
-
-        protected override void Awake() {
+namespace TrainingSetups.LeftRight.Scripts
+{
+    [RequireComponent(typeof(EnvironmentDataProvider))]
+    public class MainController : MainController<State, Action, TrainingInstance, Agent, TrainingInstance>
+    {
+        /// <inheritdoc/>
+        protected override void Awake()
+        {
             base.Awake();
-
-            environment.bigRewardValue = bigRewardValue;
-            environment.smallRewardValue = smallRewardValue;
-            environment.bigRewardPosition = bigRewardPosition;
-            environment.smallRewardPosition = smallRewardPosition;
-            environment.spawnLeft = spawnLeft;
-            environment.spawnRight = spawnRight;
-            environment.timeStepReward = timeStepReward;
-            environment.movementDistance = agentMovementDistance;
+            foreach (var trainingInstance in trainingInstances) trainingInstance.data = GetComponent<EnvironmentDataProvider>();
         }
 
-        void OnDrawGizmos() {
-            Gizmos.color = new Color(0.35f, 0.64f, 1f);
+        protected override void Train(List<List<(State state, Action action, float reward, State nextState)>> epoch)
+        {
+            var trainingData = epoch.MapToBytes(episode => episode.MapToBytes(TransitionToBytes));
+            var (data, startIndex) = Communicator.Send(RequestType.SendTrainingData, trainingData, 10000);
+            var (stateDict, _)     = data.Get<StateDict>(startIndex);
 
-            // Rewards
-            Gizmos.DrawCube(Vector3.left * bigRewardPosition + Vector3.up * bigRewardValue / 2, new Vector3(1, bigRewardValue, .25f));
-            Gizmos.DrawCube(Vector3.right * smallRewardPosition + Vector3.up * smallRewardValue / 2,
-                            new Vector3(1, smallRewardValue, .25f));
+            foreach (var trainingInstance in trainingInstances) trainingInstance.Agent.SetParameters(stateDict);
+        }
 
-            // position
-            Gizmos.color = new Color(1f, 0.59f, 0.37f);
-            Gizmos.DrawSphere(agent.transform.position, .5f);
+        static IEnumerable<byte> TransitionToBytes((State state, Action action, float reward, State nextState) transition)
+        {
+            var (state, action, reward, nextState) = transition;
+            return state.ToBytes().ConcatMany(action.X.ToBytes(), reward.ToBytes(), nextState.ToBytes());
         }
     }
 }

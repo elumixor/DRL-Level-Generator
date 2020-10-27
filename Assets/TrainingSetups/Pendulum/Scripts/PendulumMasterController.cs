@@ -1,13 +1,7 @@
-﻿using TrainingSetups.Pendulum.Scripts.RL;
-using UnityEngine;
+﻿using RLBehaviours;
+using TrainingSetups.Pendulum.Scripts.RL;
 
-namespace TrainingSetups.Pendulum.Scripts {
-    public class PendulumMainController : MainController<Action, State, Environment, Agent> {
-        [SerializeField, Range(0, 15)] float timeSpeed;
-
-        void OnValidate() {
-            Time.timeScale = timeSpeed;
-            Time.fixedDeltaTime = 0.02f * timeSpeed;
-        }
-    }
+namespace TrainingSetups.Pendulum.Scripts
+{
+    public class PendulumMainController : MainController<State, Action, Environment, Agent, TrainingInstance> { }
 }

@@ -1,12 +1,14 @@
 ﻿using System.Linq;
 using Common;
 using NaughtyAttributes;
-using RL.Behaviours;
+using RL;
 using TrainingSetups.Pendulum.Scripts.Player;
 using UnityEngine;
 
-namespace TrainingSetups.Pendulum.Scripts.RL {
-    public class Environment : Environment<Action, State> {
+namespace TrainingSetups.Pendulum.Scripts.RL
+{
+    public class Environment : MonoBehaviour, IEnvironment<State, Action>
+    {
         [SerializeField, Required] PlayerBehaviouralController player;
         [SerializeField, Required] PlayerInputHandler playerInputHandler;
 
@@ -29,14 +31,16 @@ namespace TrainingSetups.Pendulum.Scripts.RL {
         // if (player.transform.position.y >= 9f) isDone = true;
         // }
 
-        public override State ResetEnvironment() {
+        public State ResetEnvironment()
+        {
             player.ResetState();
             isDone = false;
             foreach (var followTransform in FindObjectsOfType<FollowTransform>()) followTransform.Synchronize();
             return CurrentState;
         }
 
-        public override (State newState, float reward, bool isDone) Step(Action action) {
+        public (State newState, float reward, bool isDone) Step(Action action)
+        {
             if (action.tap) playerInputHandler.OnTap();
 
             return (CurrentState, 1f, isDone);

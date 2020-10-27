@@ -1,91 +1,85 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace RL {
-    /// <summary>
-    ///     Connects training environment and an agent to control the general training.
-    ///     Designed asynchronously around Unity's update. Listens to <see cref="IEnvironment{TAction,TObservation}.Stepped" /> event to control
-    ///     training.
-    /// </summary>
-    public class Trainer<TAction, TState> {
-        readonly IAgent<TAction, TState> agent;
-        readonly IEnvironment<TAction, TState> environment;
-        readonly int episodesPerEpoch;
+namespace RL
+{
+    public class Trainer<TState, TAction>
+    {
+        public event Action Finished = delegate { };
+
+        public event Action<List<List<(TState state, TAction action, float reward, TState nextState)>>> EpochTrainingDataCollected =
+                delegate { };
+
+        readonly int episodesInEpoch;
         readonly int epochs;
-        readonly int maximumEpisodeLength;
-        TState currentState;
-        int episodeIndex;
+        readonly List<TrainingInstance<TState, TAction>> trainingInstances;
+
+        List<List<(TState state, TAction action, float reward, TState nextState)>> epochTrainingData;
 
         int epochIndex;
 
-        TAction previousAction;
-        float previousReward;
-        int stateIndex;
+        public Trainer(List<TrainingInstance<TState, TAction>> trainingInstances, int maxEpisodeLength, int episodesInEpoch, int epochs = 0)
+        {
+            this.trainingInstances = trainingInstances;
+            this.epochs            = epochs;
+            this.episodesInEpoch   = episodesInEpoch;
+
+            foreach (var trainingInstance in trainingInstances) trainingInstance.maximumEpisodeLength = maxEpisodeLength;
+        }
 
         /// <summary>
-        ///     Create a new trainer instance
+        ///     Initializes te first epoch's samples buffer and wakes up all the training instances
         /// </summary>
-        /// <param name="environment">Training environment</param>
-        /// <param name="agent">Agent to be used while training</param>
-        /// <param name="epochs">Number of epochs to train. Each epoch consists of several episodes</param>
-        /// <param name="episodesPerEpoch">Number of episodes within an epoch</param>
-        /// <param name="maximumEpisodeLength">Maximum number of steps in an episode. Used to cutoff the long (possibly infinite) episodes</param>
-        public Trainer(IEnvironment<TAction, TState> environment, IAgent<TAction, TState> agent, int epochs = 100, int episodesPerEpoch = 1,
-                       int maximumEpisodeLength = -1) {
-            this.environment = environment;
-            this.agent = agent;
-            this.epochs = epochs;
-            this.episodesPerEpoch = episodesPerEpoch;
-            this.maximumEpisodeLength = maximumEpisodeLength;
+        public void StartTraining()
+        {
+            epochTrainingData = new List<List<(TState state, TAction action, float reward, TState nextState)>>();
 
-            agent.OnEnvironmentCreated(environment);
+            foreach (var trainingInstance in trainingInstances) trainingInstance.StartNewEpisode();
         }
 
-        public event Action TrainingFinished = delegate { };
+        // Delegates a training step to all training instances
+        public void Step()
+        {
+            foreach (var trainingInstance in trainingInstances) {
+                // Debug.Log(trainingInstance.IsDone);
+                // First, check if we can collect a finished episode
+                if (!trainingInstance.IsDone) { // not ready yet, so just step and continue to the next instance
+                    trainingInstance.Step();
+                    continue;
+                }
 
-        /// <summary>
-        ///     Starts the training for the specified number of epochs, episodes and steps
-        /// </summary>
-        public void StartTraining() {
-            epochIndex = 0;
-            episodeIndex = 0;
-            stateIndex = 0;
+                // We have a finished episode to collect. Add it to our training data
+                var episode = trainingInstance.Episode;
+                epochTrainingData.Add(episode);
 
-            StartNewEpisode();
+                // Debug.Log(epochTrainingData.Count >= episodesInEpoch);
+                if (epochTrainingData.Count >= episodesInEpoch) { // We have enough data to train, finish the current epoch
+                    OnEpochFinished();
+                    return;
+                }
+
+                trainingInstance.StartNewEpisode();
+            }
         }
 
-        // Perform a step in the environment
-        public void Step() {
-            var action = agent.GetAction(currentState);
-            var (newState, reward, isDone) = environment.Step(action);
-            agent.OnTransition(currentState, action, reward, newState);
-            currentState = newState;
-
-            stateIndex++;
-
-            if (isDone || stateIndex >= maximumEpisodeLength) OnEpisodeFinished();
-        }
-
-        void StartNewEpisode() {
-            stateIndex = 0;
-
-            currentState = environment.ResetEnvironment();
-            agent.OnEpisodeStarted();
-        }
-
-        void OnEpisodeFinished() {
-            episodeIndex++;
-            agent.OnEpisodeFinished();
-
-            if (episodeIndex >= episodesPerEpoch) {
-                epochIndex++;
-                episodeIndex = 0;
-                agent.OnEpochFinished();
+        void OnEpochFinished()
+        {
+            // Emit an event with collected training data.
+            // It will be a responsibility of the handler to implement correct training
+            // Debug.Log($"len(data)={epochTrainingData.Count}");
+            EpochTrainingDataCollected(epochTrainingData);
+            // Debug.Log($"epochs={epochs}. epochIndex={epochIndex}");
+            epochIndex++;
+            if (epochs > 0 && epochIndex >= epochs) {
+                Finished();
+                return;
             }
 
-            if (epochs < 1 || epochIndex < epochs) StartNewEpisode();
-            else OnTrainingFinished();
-        }
+            // After the training is complete, start new episodes for all the instances
+            foreach (var trainingInstance in trainingInstances) trainingInstance.StartNewEpisode();
 
-        void OnTrainingFinished() => TrainingFinished();
+            // Also it's important clear the buffer to avoid using outdated samples
+            epochTrainingData.Clear();
+        }
     }
 }

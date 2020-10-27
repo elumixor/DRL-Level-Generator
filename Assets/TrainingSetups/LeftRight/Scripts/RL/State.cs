@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using Serialization;
 
-namespace TrainingSetups.LeftRight.Scripts.RL {
-    public class State : IEnumerable<float> {
+namespace TrainingSetups.LeftRight.Scripts.RL
+{
+    public readonly struct State : IEnumerable<float>
+    {
         [Structural] readonly float x;
 
         public State(float x) => this.x = x;
