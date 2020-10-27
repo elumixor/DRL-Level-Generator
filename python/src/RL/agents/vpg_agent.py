@@ -18,7 +18,7 @@ discounting = 0.99
 class VPGAgent(Agent):
     def __init__(self, actor_layout: LayoutConfiguration):
         self._actor: torch.nn.Module = nn_from_layout(actor_layout).cuda()
-        self.optim_actor = torch.optim.Adam(self._actor.parameters(), lr=0.05)
+        self.optim_actor = torch.optim.Adam(self._actor.parameters(), lr=0.01)
         self.epoch = 0
         self.mean_total_rewards = Buffer(100)
 
@@ -38,23 +38,23 @@ class VPGAgent(Agent):
 
         total_rewards = []
 
-        log(f'[Epoch:\t{self.epoch}]:\tTRAINING DATA START')
-        i = 0
+        # log(f'[Epoch:\t{self.epoch}]:\tTRAINING DATA START')
+        # i = 0
         for states, actions, rewards, next_states in training_data:
-            print(i)
-            print("states")
-            print(states)
-            print()
-            print("actions")
-            print(actions)
-            print()
-            print("rewards")
-            print(rewards)
-            print()
-            print("next_states")
-            print(next_states)
-            print()
-            i += 1
+            # print(i)
+            # print("states")
+            # print(states)
+            # print()
+            # print("actions")
+            # print(actions)
+            # print()
+            # print("rewards")
+            # print(rewards)
+            # print()
+            # print("next_states")
+            # print(next_states)
+            # print()
+            # i += 1
 
             weights = rewards_to_go(rewards, discounting).flatten()
             # weights = normalize(weights)  # does not work correctly when normalization is applied. Why?

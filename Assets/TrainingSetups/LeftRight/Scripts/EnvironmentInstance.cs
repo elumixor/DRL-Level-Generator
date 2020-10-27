@@ -12,6 +12,8 @@ namespace TrainingSetups.LeftRight.Scripts
         void OnDrawGizmos()
 
         {
+            Gizmos.matrix = transform.localToWorldMatrix;
+
             if (settings == null || Agent == null) return;
 
             Gizmos.color = new Color(0.35f, 0.64f, 1f);
@@ -50,7 +52,6 @@ namespace TrainingSetups.LeftRight.Scripts
 
             var doneString = done ? "done" : "not done";
 
-            Debug.Log($"Environment instance is: {doneString} (x={x})");
             return (new State(x), reward, done);
         }
     }
