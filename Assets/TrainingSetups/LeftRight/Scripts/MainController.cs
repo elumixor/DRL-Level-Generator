@@ -18,7 +18,7 @@ namespace TrainingSetups.LeftRight.Scripts
 
             var settings = GetComponent<EnvironmentSettings>();
 
-            foreach (var trainingInstance in trainingInstances) trainingInstance.settings = settings;
+            foreach (var environmentInstance in environmentInstances) environmentInstance.settings = settings;
         }
 
         protected override void Train(List<List<(State state, Action action, float reward, State nextState)>> epoch)
@@ -27,7 +27,7 @@ namespace TrainingSetups.LeftRight.Scripts
             var (data, startIndex) = Communicator.Send(RequestType.SendTrainingData, trainingData, 10000);
             var (stateDict, _)     = data.Get<StateDict>(startIndex);
 
-            foreach (var trainingInstance in trainingInstances) trainingInstance.Agent.SetParameters(stateDict);
+            foreach (var environmentInstance in environmentInstances) environmentInstance.Agent.SetParameters(stateDict);
         }
 
         static IEnumerable<byte> TransitionToBytes((State state, Action action, float reward, State nextState) transition)

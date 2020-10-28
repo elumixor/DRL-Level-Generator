@@ -19,11 +19,11 @@ namespace RLBehaviours
     /// <summary>
     ///     Reads and stores global training configurations (<see cref="TrainingSetupConfiguration"/>) Should be unique per every training setup
     /// </summary>
-    public class MainController<TState, TAction, TEnvironment, TAgent, TTrainingInstance>
-            : SingletonBehaviour<MainController<TState, TAction, TEnvironment, TAgent, TTrainingInstance>>
+    public class MainController<TState, TAction, TEnvironment, TAgent, TEnvironmentInstance>
+            : SingletonBehaviour<MainController<TState, TAction, TEnvironment, TAgent, TEnvironmentInstance>>
             where TEnvironment : MonoBehaviour, IEnvironment<TState, TAction>
             where TAgent : MonoBehaviour, IAgent<TState, TAction>
-            where TTrainingInstance : EnvironmentInstance<TState, TAction, TAgent>
+            where TEnvironmentInstance : EnvironmentInstance<TState, TAction, TAgent>
     {
         const string SERVER_MAIN_PATH = "src/main.py";
         const string TCP_ADDRESS = "tcp://localhost:5555";
@@ -38,14 +38,15 @@ namespace RLBehaviours
 
         [BoxGroup("Training speed"), SerializeField, Range(0, 500)] float speed;
 
-        [BoxGroup("Instances"), SerializeField] protected List<TTrainingInstance> trainingInstances;
+        [SerializeField] protected InstanceSpawner instanceSpawner;
+        protected List<TEnvironmentInstance> environmentInstances;
 
         // On every Update() adds `speed` to itself and performs trainer steps for the number of time, rounded down to the closes integer
         float elapsed;
 
+
         // Flag if Update() should run
         bool isTraining;
-
         // Python backend process
         Process serverProcess;
 
@@ -54,8 +55,16 @@ namespace RLBehaviours
 
         static TrainingSetupConfiguration TrainingSetupConfiguration => instance.trainingSetupConfiguration;
 
+        /// <inheritdoc/>
+        protected override void Awake()
+        {
+            base.Awake();
+
+            environmentInstances = instanceSpawner.Spawn<TEnvironmentInstance>().ToList();
+        }
+
         /// <summary> The main entry point for each Training Setup </summary>
-        ///
+        /// 
         /// Initializes NNs in all the agents in the scene
         /// Initializes serializers, given the state size and action size
         /// Sends initial data via communicator to initialize backend
@@ -86,14 +95,13 @@ namespace RLBehaviours
                 Debug.Log($"Received state dict: {stateDict}");
 
                 // Initialize agents with current parameters and configuration
-                foreach (var nnAgent in trainingInstances.Select(i => i.Agent).OfType<INNAgent>()) {
+                foreach (var nnAgent in environmentInstances.Select(i => i.Agent).OfType<INNAgent>()) {
                     nnAgent.ConstructNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout);
                     nnAgent.SetParameters(stateDict);
                 }
 
-                // todo: remember to change this as well
                 // Create trainer and start training
-                trainer = new Trainer<TState, TAction>(trainingInstances.Select(ti => ti.GetTrainingInstance()).ToList(),
+                trainer = new Trainer<TState, TAction>(environmentInstances.Select(ti => ti.GetTrainingInstance()).ToList(),
                                                        maximumEpisodeLength, episodesPerEpoch, trainUnlimited ? -1 : epochs);
                 trainer.Finished += () => {
                     Debug.Log("Training finished!");

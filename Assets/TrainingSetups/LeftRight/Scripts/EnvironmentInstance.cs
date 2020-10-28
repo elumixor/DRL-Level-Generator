@@ -50,8 +50,6 @@ namespace TrainingSetups.LeftRight.Scripts
             var reward = reachedBig ? settings.bigRewardValue : reachedSmall ? settings.smallRewardValue : settings.timeStepReward;
             var done = reachedBig || reachedSmall;
 
-            var doneString = done ? "done" : "not done";
-
             return (new State(x), reward, done);
         }
     }

@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from RL import Episode
-from RL.utils import nn_from_layout, rewards_to_go, running_average
+from RL.utils import nn_from_layout, rewards_to_go, running_average, normalize
 from configuration.layout_configuration import LayoutConfiguration
 from utilities import log, Buffer
 from .agent import Agent
@@ -41,23 +41,8 @@ class VPGAgent(Agent):
         # log(f'[Epoch:\t{self.epoch}]:\tTRAINING DATA START')
         # i = 0
         for states, actions, rewards, next_states in training_data:
-            # print(i)
-            # print("states")
-            # print(states)
-            # print()
-            # print("actions")
-            # print(actions)
-            # print()
-            # print("rewards")
-            # print(rewards)
-            # print()
-            # print("next_states")
-            # print(next_states)
-            # print()
-            # i += 1
-
             weights = rewards_to_go(rewards, discounting).flatten()
-            # weights = normalize(weights)  # does not work correctly when normalization is applied. Why?
+            weights = normalize(weights)  # does not work correctly when normalization is applied. Why?
 
             probabilities = self._actor(states).softmax(-1)
             probabilities = probabilities[range(states.shape[0]), actions.flatten()]
