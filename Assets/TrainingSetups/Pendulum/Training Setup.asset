@@ -13,35 +13,34 @@ MonoBehaviour:
   m_Name: Training Setup
   m_EditorClassIdentifier: 
   algorithm: 1
-  configurationVPG:
-    actor:
-      modules: []
   configurationA2C:
-    networksType: 0
     actor:
-      modules: []
-    critic:
-      modules: []
-    base:
-      modules:
-      - layerName: 0
-        floatParameters:
-          keys: 00000000
-          values:
-          - 0
-        intParameters:
-          keys: 000000000100000002000000
-          values: 00000000050000007b000000
-    criticHead:
       modules: []
     actorHead:
       modules:
-      - layerName: 0
-        floatParameters:
+      - floatParameters:
           keys: 00000000
           values:
           - 0
         intParameters:
           keys: 000000000100000002000000
           values: 000000000000000003000000
-  discounting: 0
+        layerName: 0
+    base:
+      modules:
+      - floatParameters:
+          keys: 00000000
+          values:
+          - 0
+        intParameters:
+          keys: 000000000100000002000000
+          values: 00000000050000007b000000
+        layerName: 0
+    critic:
+      modules: []
+    criticHead:
+      modules: []
+    networksType: 0
+  configurationVPG:
+    actor:
+      modules: []

@@ -26,8 +26,6 @@ class VPGAgent(Agent):
 
         plt.show()
 
-        super().__init__()
-
     @property
     def actor(self) -> torch.nn.Module:
         return self._actor

@@ -1,7 +1,7 @@
 import torch
 
 import serialization
-from RL.agents import VPGAgent, A2CAgent
+from RL.agents import VPGAgent, A2CAgentSeparate
 from configuration import TrainingConfiguration, AlgorithmType
 from utilities import log
 
@@ -17,8 +17,8 @@ class TrainingController:
         if configuration.algorithm == AlgorithmType.VPG:
             self.agent = VPGAgent(configuration.algorithm_configuration.actor_layout)
         elif configuration.algorithm == AlgorithmType.A2C:
-            self.agent = A2CAgent(configuration.algorithm_configuration.actor_layout,
-                                             configuration.algorithm_configuration.critic_layout)
+            self.agent = A2CAgentSeparate(configuration.algorithm_configuration.actor_layout,
+                                          configuration.algorithm_configuration.critic_layout)
         log(f"Received configuration: Algorithm {configuration.algorithm}. State size: {self.state_size}. Action size: {self.action_size}")
 
     def train(self, training_data_bytes: bytes, start_index: int):
