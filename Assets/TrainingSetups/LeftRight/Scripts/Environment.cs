@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 namespace TrainingSetups.LeftRight.Scripts
 {
-    public class EnvironmentInstance : EnvironmentInstance<State, Action, Agent>
+    public class Environment : EnvironmentInstance<State, int, Agent>
     {
         [NonSerialized] public EnvironmentSettings settings;
 
@@ -27,6 +27,11 @@ namespace TrainingSetups.LeftRight.Scripts
             // position
             Gizmos.color = new Color(1f, 0.59f, 0.37f);
             Gizmos.DrawSphere(Agent.transform.position, .5f);
+
+            // Spawn position
+            Gizmos.color = new Color(0.35f, 0.5f, 0.37f);
+            Gizmos.DrawCube(Vector3.right * (settings.spawnRight - settings.spawnLeft) / 2,
+                            Vector3.left  * (settings.spawnRight + settings.spawnLeft) + Vector3.forward);
         }
 
         /// <inheritdoc/>
@@ -38,9 +43,9 @@ namespace TrainingSetups.LeftRight.Scripts
         }
 
         /// <inheritdoc/>
-        public override (State newState, float reward, bool isDone) Step(Action action)
+        public override (State newState, float reward, bool isDone) Step(int action)
         {
-            var movement = (action.X * 2 - 1) * settings.agentStepSize;
+            var movement = (action * 2 - 1) * settings.agentStepSize;
             var t = Agent.transform;
             var x = t.position.x + movement;
             t.position = new Vector3(x, 0, 0);

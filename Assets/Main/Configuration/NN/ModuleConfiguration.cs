@@ -8,7 +8,7 @@ using NN;
 namespace Configuration.NN
 {
     [Serializable]
-    public class ModuleConfiguration : ICopyable<ModuleConfiguration>, IByteConvertible
+    public class ModuleConfiguration : IByteConvertible
     {
         [Serializable]
         public enum ModuleConfigurationParameterFloat
@@ -24,20 +24,22 @@ namespace Configuration.NN
             OutputSize,
         }
 
-        public FloatParametersDict floatParameters = new FloatParametersDict();
+        public FloatParametersDict floatParameters;
 
-        public IntParametersDict intParameters = new IntParametersDict();
+        public readonly IntParametersDict intParameters;
 
-        public ModuleLayerName layerName;
+        public readonly ModuleLayerName layerName;
+
+        public ModuleConfiguration(ModuleLayerName layerName, IntParametersDict intParameters, FloatParametersDict floatParameters)
+        {
+            this.layerName       = layerName;
+            this.intParameters   = intParameters;
+            this.floatParameters = floatParameters;
+        }
+
+        public ModuleConfiguration(ModuleConfiguration other) : this(other.layerName, other.intParameters, other.floatParameters) { }
 
         public IEnumerable<byte> ToBytes() => layerName.ToString().ToBytes().ConcatMany(intParameters.ToBytes(), floatParameters.ToBytes());
-
-        public ModuleConfiguration Copy() =>
-                new ModuleConfiguration {
-                        layerName       = layerName,
-                        floatParameters = floatParameters,
-                        intParameters   = intParameters,
-                };
 
         public void Deconstruct(out ModuleLayerName layerName, out FloatParametersDict floatParameters, out IntParametersDict intParameters)
         {
@@ -66,6 +68,8 @@ namespace Configuration.NN
 
                 return selected.Length.ToBytes().Concat(selected.SelectMany(kvp => kvp.Key.ToString().ToBytes().Concat(kvp.Value.ToBytes())));
             }
+
+            public static readonly FloatParametersDict Empty = new FloatParametersDict();
         }
     }
 }

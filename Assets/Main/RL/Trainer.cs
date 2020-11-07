@@ -64,9 +64,8 @@ namespace RL
         {
             // Emit an event with collected training data.
             // It will be a responsibility of the handler to implement correct training
-            // Debug.Log($"len(data)={epochTrainingData.Count}");
             EpochTrainingDataCollected(epochTrainingData);
-            // Debug.Log($"epochs={epochs}. epochIndex={epochIndex}");
+
             epochIndex++;
 
             if (epochs > 0 && epochIndex >= epochs) {

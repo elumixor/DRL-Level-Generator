@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Common.ByteConversions;
 using Configuration.NN;
 
 namespace Configuration.AlgorithmConfigurations
 {
     [Serializable]
-    public abstract class AlgorithmConfiguration : IByteConvertible
+    public abstract class AlgorithmConfiguration
     {
-        public abstract Layout ActorLayout { get; }
-        public abstract IEnumerable<byte> ToBytes();
+        public abstract IEnumerable<ModuleConfiguration> ActorLayout(int stateSize, int actionSize);
+        public abstract IEnumerable<byte> ToBytes(int stateSize, int actionSize);
     }
 }

@@ -9,7 +9,7 @@ using UnityEngine;
 namespace TrainingSetups.LeftRight.Scripts
 {
     [RequireComponent(typeof(EnvironmentSettings))]
-    public class MainController : MainController<State, Action, EnvironmentInstance, Agent, EnvironmentInstance>
+    public class Trainer : Trainer<State, int, Environment, Agent, Environment>
     {
         /// <inheritdoc/>
         protected override void Awake()
@@ -21,7 +21,7 @@ namespace TrainingSetups.LeftRight.Scripts
             foreach (var environmentInstance in environmentInstances) environmentInstance.settings = settings;
         }
 
-        protected override void Train(List<List<(State state, Action action, float reward, State nextState)>> epoch)
+        protected override void Train(List<List<(State state, int action, float reward, State nextState)>> epoch)
         {
             var trainingData = epoch.MapToBytes(episode => episode.MapToBytes(TransitionToBytes));
             var (data, startIndex) = Communicator.Send(RequestType.SendTrainingData, trainingData, 10000);
@@ -30,10 +30,10 @@ namespace TrainingSetups.LeftRight.Scripts
             foreach (var environmentInstance in environmentInstances) environmentInstance.Agent.SetParameters(stateDict);
         }
 
-        static IEnumerable<byte> TransitionToBytes((State state, Action action, float reward, State nextState) transition)
+        static IEnumerable<byte> TransitionToBytes((State state, int action, float reward, State nextState) transition)
         {
             var (state, action, reward, nextState) = transition;
-            return state.ToBytes().ConcatMany(action.X.ToBytes(), reward.ToBytes(), nextState.ToBytes());
+            return state.ToBytes().ConcatMany(((float) action).ToBytes(), reward.ToBytes(), nextState.ToBytes());
         }
     }
 }

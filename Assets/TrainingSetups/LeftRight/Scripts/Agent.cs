@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Common;
 using Configuration.NN;
 using NN;
@@ -8,14 +9,14 @@ using UnityEngine;
 
 namespace TrainingSetups.LeftRight.Scripts
 {
-    public class Agent : MonoBehaviour, IAgent<State, Action>, INNAgent
+    public class Agent : MonoBehaviour, IAgent<State, int>, INNAgent
     {
         Module actor;
 
-        public Action GetAction(State state) => new Action(actor.Forward(state.AsEnumerable()).Softmax().Sample());
+        public int GetAction(State state) => actor.Forward(state.AsEnumerable()).Softmax().Sample();
 
         /// <inheritdoc/>
-        public void ConstructNN(Layout layout) { actor = new Sequential(layout.modules.Select(m => m.ToModule()).ToArray()); }
+        public void ConstructNN(IEnumerable<ModuleConfiguration> modules) { actor = new Sequential(modules.Select(m => m.ToModule()).ToArray()); }
 
         /// <inheritdoc/>
         public void SetParameters(StateDict stateDict) { actor.LoadStateDict(stateDict); }

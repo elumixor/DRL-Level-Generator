@@ -11,8 +11,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class TrainingController:
     def __init__(self, configuration: TrainingConfiguration):
         self.state_size = configuration.state_size
-        self.action_size = configuration.action_size
-        self.transition_size = 2 * self.state_size + self.action_size + 1
+        self.action_size = 1
 
         if configuration.algorithm == AlgorithmType.VPG:
             self.agent = VPGAgent(configuration.algorithm_configuration.actor_layout)
@@ -22,8 +21,7 @@ class TrainingController:
         log(f"Received configuration: Algorithm {configuration.algorithm}. State size: {self.state_size}. Action size: {self.action_size}")
 
     def train(self, training_data_bytes: bytes, start_index: int):
-        training_data, _ = serialization.to_training_data(training_data_bytes, start_index, self.state_size, self.action_size,
-                                                          device=device)
+        training_data, _ = serialization.to_training_data(training_data_bytes, start_index, self.state_size, 1, device=device)
         self.agent.train(training_data)
 
     @property

@@ -3,5 +3,5 @@ using TrainingSetups.Pendulum.Scripts.RL;
 
 namespace TrainingSetups.Pendulum.Scripts
 {
-    public class PendulumMainController : MainController<State, Action, Environment, Agent, EnvironmentInstance> { }
+    public class PendulumTrainer : Trainer<State, Action, Environment, Agent, EnvironmentInstance> { }
 }

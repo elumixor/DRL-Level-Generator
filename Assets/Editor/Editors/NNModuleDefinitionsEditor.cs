@@ -10,11 +10,11 @@ using UnityEngine;
 
 namespace Editor.Editors
 {
-    [CustomEditor(typeof(LayoutSO))]
-    public class LayoutSOEditor : RichEditor
+    [CustomEditor(typeof(NNModuleDefinitions))]
+    public class NNModuleDefinitionsEditor : RichEditor
     {
-        LayoutSO layoutSO;
-        List<Definition> Definitions => layoutSO.definitions;
+        NNModuleDefinitions nnModuleDefinitions;
+        List<Definition> Definitions => nnModuleDefinitions.definitions;
 
         static GUIStyle basicModuleStyle;
         static GUIStyle customModuleStyle;
@@ -29,7 +29,7 @@ namespace Editor.Editors
         {
             if (initialized && definitionsList != null) return true;
 
-            layoutSO = (LayoutSO) target;
+            nnModuleDefinitions = (NNModuleDefinitions) target;
 
             try {
                 basicModuleStyle   = new GUIStyle(EditorStyles.boldLabel) {normal = {textColor = new Color(0.07f, 0.16f, 0.36f)}};
@@ -43,8 +43,11 @@ namespace Editor.Editors
                         drawElementCallback   = DefinitionGUI,
                         elementHeightCallback = DefinitionHeight,
                         drawHeaderCallback    = DefinitionHeaderGUI,
-                        onRemoveCallback =
-                                _ => UpdateModulesLists(),
+                        onRemoveCallback = list => {
+                            Definitions.RemoveAt(list.index);
+                            EditorUtility.SetDirty(target);
+                            UpdateModulesLists();
+                        },
                 };
 
                 return initialized = true;
@@ -97,7 +100,7 @@ namespace Editor.Editors
             definitionsList.DoLayoutList();
             serializedObject.ApplyModifiedProperties();
 
-            EditorUtility.SetDirty(layoutSO);
+            EditorUtility.SetDirty(nnModuleDefinitions);
         }
 
         #region Definition
@@ -185,9 +188,11 @@ namespace Editor.Editors
                                                                                inputsRect.x + inputsWidth + Spacing,
                                                                },
                                                                module.inputSizeFixed);
-            } else if (mustInferInput)
+            } else if (mustInferInput) {
+                module.inputSizeInferred = true;
                 GUI.Label(new Rect(inputsRect), "Input size inferred", centeredLabelStyle);
-            else {
+            } else {
+                module.inputSizeInferred = false;
                 var inputsWidth = (inputsRect.width - Spacing) / 2;
                 EditorGUI.LabelField(new Rect(inputsRect) {width = inputsWidth},
                                      "Input size:",
@@ -215,9 +220,11 @@ namespace Editor.Editors
                                                                         x     = outputsRect.x + outputsWidth + Spacing,
                                                                 },
                                                                 module.outputSizeFixed);
-            } else if (mustInferOutput)
+            } else if (mustInferOutput) {
+                module.outputSizeInferred = true;
                 GUI.Label(new Rect(outputsRect), "Output size inferred", centeredLabelStyle);
-            else {
+            } else {
+                module.outputSizeInferred = false;
                 var outputsWidth = (outputsRect.width - Spacing) / 2;
                 EditorGUI.LabelField(new Rect(outputsRect) {width = outputsWidth},
                                      "Output size:",

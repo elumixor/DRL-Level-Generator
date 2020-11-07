@@ -24,6 +24,10 @@ class VPGAgent(Agent):
 
         self.fig, self.axs = plt.subplots(2)
 
+        print("Actor NN initialized")
+        for p in self._actor.parameters():
+            print(p)
+
         plt.show()
 
     @property
@@ -62,7 +66,7 @@ class VPGAgent(Agent):
         log(f'[Epoch:\t{self.epoch}]:\t{mean_total_reward}')
         self.epoch += 1
 
-        x = np.linspace(-3, 4, 10)
+        x = np.linspace(-5, 5, 10)
         p_left_x = self._actor(torch.from_numpy(x).float().cuda().unsqueeze(-1)) \
                        .softmax(-1)[:, 0].cpu().detach().numpy()
 

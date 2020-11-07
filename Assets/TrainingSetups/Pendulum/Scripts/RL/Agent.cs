@@ -22,7 +22,7 @@ namespace TrainingSetups.Pendulum.Scripts.RL
         public Action GetAction(State state) => new Action(actor.Forward(state.AsEnumerable()).Softmax().Sample());
 
         /// <inheritdoc/>
-        public void ConstructNN(Layout layout) { actor = new Sequential(layout.modules.Select(m => m.ToModule()).ToArray()); }
+        public void ConstructNN(IEnumerable<ModuleConfiguration> modules) { actor = new Sequential(modules.Select(m => m.ToModule()).ToArray()); }
 
         /// <inheritdoc/>
         public void SetParameters(StateDict stateDict) { actor.LoadStateDict(stateDict); }

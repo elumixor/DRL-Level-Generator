@@ -32,10 +32,10 @@ namespace RLBehaviours
             var created = 1;
 
             for (var i = 0; i < columns; i++)
-            for (var j = 1; j < rows; j++) {
-                if (created > count) yield break;
+            for (var j = i == 0 ? 1 : 0; j < rows; j++) {
+                if (created >= count) yield break;
 
-                var offset = basePosition + new Vector3(rowSpacing * j, 0, columnSpacing * i);
+                var offset = basePosition + new Vector3(columnSpacing * j, 0, rowSpacing * i);
 
                 yield return Object.Instantiate(environmentInstance, basePosition + offset, Quaternion.identity);
 

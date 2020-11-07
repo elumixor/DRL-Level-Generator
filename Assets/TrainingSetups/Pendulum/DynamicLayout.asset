@@ -13,47 +13,20 @@ MonoBehaviour:
   m_Name: DynamicLayout
   m_EditorClassIdentifier: 
   definitions:
-  - name: Hello world
+  - name: Actor
     submodules:
     - definitionName: Linear
       inputSizeInferred: 1
-      inputSizeFixed: 412
-      outputSizeFixed: 5
       outputSizeInferred: 0
+      inputSizeFixed: 0
+      outputSizeFixed: 3
     - definitionName: ReLU
-      inputSizeInferred: 0
-      inputSizeFixed: 0
-      outputSizeFixed: 0
-      outputSizeInferred: 0
-    - definitionName: Softmax
-      inputSizeInferred: 0
-      inputSizeFixed: 0
-      outputSizeFixed: 0
-      outputSizeInferred: 0
-    - definitionName: Linear
-      inputSizeInferred: 0
-      inputSizeFixed: 0
-      outputSizeFixed: 5
-      outputSizeInferred: 0
-    - definitionName: Linear
-      inputSizeInferred: 0
-      inputSizeFixed: 0
-      outputSizeFixed: 5
-      outputSizeInferred: 0
-    - definitionName: Softmax
-      inputSizeInferred: 0
-      inputSizeFixed: 0
-      outputSizeFixed: 0
+      inputSizeInferred: 1
       outputSizeInferred: 1
-  - name: ADS
-    submodules:
-    - definitionName: Linear
-      inputSizeInferred: 1
-      inputSizeFixed: 0
-      outputSizeFixed: 6343
-      outputSizeInferred: 0
-    - definitionName: Hello world
-      inputSizeInferred: 1
       inputSizeFixed: 0
       outputSizeFixed: 0
-      outputSizeInferred: 0
+    - definitionName: Linear
+      inputSizeInferred: 1
+      outputSizeInferred: 1
+      inputSizeFixed: 0
+      outputSizeFixed: 0

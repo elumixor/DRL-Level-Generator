@@ -21,8 +21,7 @@ public static class ProcessRunner
                                         bool separateWindow = false)
     {
         var dir = useTestDir ? BASE_TESTS_DIR : BASE_SOURCES_DIR;
-        var argumentsString =
-                $"-m cProfile -o \"{BACKEND_BASE_DIRECTORY}data/profile.txt\" \"{BACKEND_BASE_DIRECTORY}{path}\" {ParseArguments(arguments, dir)}";
+        var argumentsString = $"\"{BACKEND_BASE_DIRECTORY}{path}\" {ParseArguments(arguments, dir)}";
 
 #if UNITY_EDITOR
         Debug.Log($"Running command: {PYTHON_COMMAND} {argumentsString}");

@@ -17,10 +17,10 @@ using Debug = UnityEngine.Debug;
 namespace RLBehaviours
 {
     /// <summary>
-    ///     Reads and stores global training configurations (<see cref="TrainingSetupConfiguration"/>) Should be unique per every training setup
+    ///     Reads and stores global training configurations (<see cref="TrainingConfiguration"/>) Should be unique per every training setup
     /// </summary>
-    public class MainController<TState, TAction, TEnvironment, TAgent, TEnvironmentInstance>
-            : SingletonBehaviour<MainController<TState, TAction, TEnvironment, TAgent, TEnvironmentInstance>>
+    public class Trainer<TState, TAction, TEnvironment, TAgent, TEnvironmentInstance>
+            : SingletonBehaviour<Trainer<TState, TAction, TEnvironment, TAgent, TEnvironmentInstance>>
             where TEnvironment : MonoBehaviour, IEnvironment<TState, TAction>
             where TAgent : MonoBehaviour, IAgent<TState, TAction>
             where TEnvironmentInstance : EnvironmentInstance<TState, TAction, TAgent>
@@ -29,7 +29,7 @@ namespace RLBehaviours
         const string TCP_ADDRESS = "tcp://localhost:5555";
         const string TCP_ADDRESS_SERVER = "tcp://*:5555";
 
-        [BoxGroup("Configuration"), SerializeField] TrainingSetupConfiguration trainingSetupConfiguration;
+        [BoxGroup("Configuration"), SerializeField] TrainingConfiguration trainingConfiguration;
 
         [BoxGroup("Epochs and Episode lengths"), SerializeField] bool trainUnlimited;
         [BoxGroup("Epochs and Episode lengths"), SerializeField, MinValue(1), HideIf("trainUnlimited")] int epochs;
@@ -52,7 +52,7 @@ namespace RLBehaviours
         // Controls the general RL logic
         Trainer<TState, TAction> trainer;
 
-        static TrainingSetupConfiguration TrainingSetupConfiguration => instance.trainingSetupConfiguration;
+        static TrainingConfiguration TrainingConfiguration => instance.trainingConfiguration;
 
         /// <inheritdoc/>
         protected override void Awake()
@@ -63,7 +63,7 @@ namespace RLBehaviours
         }
 
         /// <summary> The main entry point for each Training Setup </summary>
-        /// 
+        ///
         /// Initializes NNs in all the agents in the scene
         /// Initializes serializers, given the state size and action size
         /// Sends initial data via communicator to initialize backend
@@ -80,22 +80,20 @@ namespace RLBehaviours
                 Communicator.Send(RequestType.WakeUp, timeout: -1);
 
                 // If everything is ok, send initial configuration data
-                var actionSize = StructuralAttribute.GetSize(typeof(TAction));
                 var stateSize = StructuralAttribute.GetSize(typeof(TState));
 
-                var configuration = TrainingSetupConfiguration;
-                configuration.actionSize = actionSize;
-                configuration.stateSize  = stateSize;
+                var configuration = TrainingConfiguration;
+                configuration.stateSize = stateSize;
 
                 // Communicator should return the initial nn learnable parameters
                 var (nnData, startIndex) = Communicator.Send(RequestType.SendConfiguration, configuration.ToBytes(), 5000);
                 var stateDict = nnData.Get<StateDict>(startIndex).result;
 
-                Debug.Log($"Received state dict: {stateDict}");
+                Debug.Log($"Received initial state dict: {stateDict}");
 
                 // Initialize agents with current parameters and configuration
                 foreach (var nnAgent in environmentInstances.Select(i => i.Agent).OfType<INNAgent>()) {
-                    nnAgent.ConstructNN(TrainingSetupConfiguration.AlgorithmConfiguration.ActorLayout);
+                    nnAgent.ConstructNN(TrainingConfiguration.AlgorithmConfiguration.ActorLayout(stateSize, configuration.actionSize));
                     nnAgent.SetParameters(stateDict);
                 }
 
