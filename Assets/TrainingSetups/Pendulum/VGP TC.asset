@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d7ec39b0209463c8a852f8d3aa27815, type: 3}
-  m_Name: Training Configuration
+  m_Name: VGP TC
   m_EditorClassIdentifier: 
   algorithm: 0
   configurationA2C:
     actor:
-      moduleDefinitions: {fileID: 0}
-      selectedDefinition: 
+      moduleDefinitions: {fileID: 11400000, guid: 94436426e47e7464b8aaa3951cf6a31f, type: 2}
+      selectedDefinition: Actor
     critic:
-      moduleDefinitions: {fileID: 0}
-      selectedDefinition: 
+      moduleDefinitions: {fileID: 11400000, guid: 94436426e47e7464b8aaa3951cf6a31f, type: 2}
+      selectedDefinition: Critic
     base:
       moduleDefinitions: {fileID: 11400000, guid: 0bf58c2b980a9c74fbd4da63765467d3, type: 2}
       selectedDefinition: ADS

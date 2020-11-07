@@ -19,11 +19,6 @@ namespace TrainingSetups.LeftRight.Scripts
         public void ConstructNN(IEnumerable<ModuleConfiguration> modules) { actor = new Sequential(modules.Select(m => m.ToModule()).ToArray()); }
 
         /// <inheritdoc/>
-        public void SetParameters(StateDict stateDict)
-        {
-            actor.LoadStateDict(stateDict);
-            Debug.Log("Agent updated");
-            Debug.Log(actor.Forward(1f.Yield()).ToArray().MakeString());
-        }
+        public void SetParameters(StateDict stateDict) => actor.LoadStateDict(stateDict);
     }
 }

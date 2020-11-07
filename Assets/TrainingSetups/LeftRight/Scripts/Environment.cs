@@ -16,10 +16,13 @@ namespace TrainingSetups.LeftRight.Scripts
 
             if (settings == null || Agent == null) return;
 
-            Gizmos.color = new Color(0.35f, 0.64f, 1f);
-
+            // Spawn position
+            Gizmos.color = new Color(0.35f, 0.5f, 0.37f);
+            Gizmos.DrawCube(Vector3.right * (settings.spawnRight + settings.spawnLeft) / 2,
+                            Vector3.right * (settings.spawnRight - settings.spawnLeft) + Vector3.forward);
             // Rewards
-            Gizmos.DrawCube(Vector3.left * settings.bigRewardPosition + Vector3.up * settings.bigRewardValue / 2,
+            Gizmos.color = new Color(0.35f, 0.64f, 1f);
+            Gizmos.DrawCube(Vector3.right * settings.bigRewardPosition + Vector3.up * settings.bigRewardValue / 2,
                             new Vector3(1, settings.bigRewardValue, .25f));
             Gizmos.DrawCube(Vector3.right * settings.smallRewardPosition + Vector3.up * settings.smallRewardValue / 2,
                             new Vector3(1, settings.smallRewardValue, .25f));
@@ -27,17 +30,12 @@ namespace TrainingSetups.LeftRight.Scripts
             // position
             Gizmos.color = new Color(1f, 0.59f, 0.37f);
             Gizmos.DrawSphere(Agent.transform.position, .5f);
-
-            // Spawn position
-            Gizmos.color = new Color(0.35f, 0.5f, 0.37f);
-            Gizmos.DrawCube(Vector3.right * (settings.spawnRight - settings.spawnLeft) / 2,
-                            Vector3.left  * (settings.spawnRight + settings.spawnLeft) + Vector3.forward);
         }
 
         /// <inheritdoc/>
         public override State ResetEnvironment()
         {
-            var x = Random.Range(-settings.spawnLeft, settings.spawnRight);
+            var x = Random.Range(settings.spawnLeft, settings.spawnRight);
             Agent.transform.position = x * Vector3.right;
             return new State(x);
         }
@@ -50,7 +48,7 @@ namespace TrainingSetups.LeftRight.Scripts
             var x = t.position.x + movement;
             t.position = new Vector3(x, 0, 0);
 
-            var reachedBig = x   <= -settings.bigRewardPosition;
+            var reachedBig = x   <= settings.bigRewardPosition;
             var reachedSmall = x >= settings.smallRewardPosition;
             var reward = reachedBig ? settings.bigRewardValue : reachedSmall ? settings.smallRewardValue : settings.timeStepReward;
             var done = reachedBig || reachedSmall;

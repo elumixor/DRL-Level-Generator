@@ -9,7 +9,7 @@ class Buffer:
             self.elements.pop(0)
 
     def __len__(self):
-        len(self.elements)
+        return len(self.elements)
 
     def __iter__(self):
         return iter(self.elements)

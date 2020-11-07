@@ -31,7 +31,17 @@ class AlgorithmConfiguration:
                 total_bytes_read += self.critic_layout.bytes_read
 
             elif self.network_type == NetworkType.TwoHeaded:
-                raise ConfigurationException("Two headed network is not supported yet")
+                self.base_layout = LayoutConfiguration(bytes_data, start_index + total_bytes_read)
+                total_bytes_read += self.base_layout.bytes_read
+
+                self.actor_head_layout = LayoutConfiguration(bytes_data, start_index + total_bytes_read)
+                total_bytes_read += self.actor_head_layout.bytes_read
+
+                self.critic_head_layout = LayoutConfiguration(bytes_data, start_index + total_bytes_read)
+                total_bytes_read += self.critic_head_layout.bytes_read
+
+            else:
+                raise ConfigurationException(f"Unsupported network type: {self.network_type}")
         else:
             raise ConfigurationException("Unsupported algorithm")
 

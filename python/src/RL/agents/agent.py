@@ -7,7 +7,7 @@ from RL import Episode
 
 class Agent:
     @abstractmethod
-    def train(self, training_data: List[Episode]):
+    def train(self, training_data: List[Episode]) -> None:
         pass
 
     @property

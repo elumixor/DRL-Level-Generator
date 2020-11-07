@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Configuration.Dynamic
 {
-    [CreateAssetMenu(fileName = "DynamicLayout", menuName = "Dynamic Layout", order = 0)]
+    [CreateAssetMenu(fileName = "Layout", menuName = "NN Layout", order = 0)]
     public class NNModuleDefinitions : ScriptableObject
     {
         public List<Definition> definitions = new List<Definition>();

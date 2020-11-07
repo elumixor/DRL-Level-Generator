@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23d00f23193840039e2826cff3f6f49e, type: 3}
-  m_Name: DynamicLayout
+  m_Name: VPG
   m_EditorClassIdentifier: 
   definitions:
   - name: Actor
@@ -19,7 +19,7 @@ MonoBehaviour:
       inputSizeInferred: 1
       outputSizeInferred: 0
       inputSizeFixed: 0
-      outputSizeFixed: 3
+      outputSizeFixed: 6
     - definitionName: ReLU
       inputSizeInferred: 1
       outputSizeInferred: 1

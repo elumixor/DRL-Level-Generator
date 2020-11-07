@@ -196,13 +196,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c85cdbcb2404e44813a36334d083f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bigRewardValue: 10
+  bigRewardValue: 20
   smallRewardValue: 5
   timeStepReward: -1
-  bigRewardPosition: 5
+  bigRewardPosition: -5
   smallRewardPosition: 5
-  spawnLeft: 3
-  spawnRight: 3
+  spawnLeft: -5
+  spawnRight: 5
   agentStepSize: 1
 --- !u!4 &1140598631
 Transform:
@@ -233,12 +233,12 @@ MonoBehaviour:
   trainingConfiguration: {fileID: 11400000, guid: 99973a57c7dfe734f906ec99069be964, type: 2}
   trainUnlimited: 1
   epochs: 1
-  episodesPerEpoch: 10
-  maximumEpisodeLength: 10
+  episodesPerEpoch: 1
+  maximumEpisodeLength: 20
   speed: 15
   instanceSpawner:
     environment: {fileID: 1484207675}
-    count: 10
+    count: 1
     rows: 3
     columnSpacing: 12
     rowSpacing: 4
