@@ -6,9 +6,13 @@ using Common.ByteConversions;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace Testing.EditorTests {
-    public class SerializationTests {
-        [Test] public void CanConvertSimpleTypes() {
+namespace Testing.EditorTests
+{
+    public class SerializationTests
+    {
+        [Test]
+        public void CanConvertSimpleTypes()
+        {
             Assert.AreEqual(5.0f, 5.0f.ToBytes().ToArray().ToFloat());
             Assert.AreEqual(5, 5.ToBytes().ToArray().ToInt());
             Assert.AreEqual(true, true.ToBytes().ToArray().ToBool());
@@ -18,7 +22,9 @@ namespace Testing.EditorTests {
             Assert.AreEqual(str, result);
         }
 
-        [Test] public void CanConvertEnum() {
+        [Test]
+        public void CanConvertEnum()
+        {
             Assert.AreEqual(MyEnum.HelloWorld.ToString(), nameof(MyEnum.HelloWorld));
             var success = Enum.TryParse("GoodbyeWorld", out MyEnum result);
             Assert.IsTrue(success);
@@ -28,33 +34,46 @@ namespace Testing.EditorTests {
             Assert.AreNotEqual(result, MyEnum.GoodbyeWorld);
         }
 
-        [Test] public void CanConvertUnityTypes() {
+        [Test]
+        public void CanConvertUnityTypes()
+        {
             Assert.AreEqual(new Vector2(5, 6), new Vector2(5, 6).ToBytes().ToArray().ToVector2());
             Assert.AreEqual(new Vector3(5, 6, 7), new Vector3(5, 6, 7).ToBytes().ToArray().ToVector3());
         }
 
-        [Test] public void CanConvertWithOffset() {
-            var bytes = 5.ToBytes().ConcatMany(6.ToBytes(), new Vector2(7, 8).ToBytes(), 9.ToBytes(), new Vector3(1, 2, 3).ToBytes())
-                         .ToArray();
+        [Test]
+        public void CanConvertWithOffset()
+        {
+            var bytes = 5.ToBytes().ConcatMany(6.ToBytes(), new Vector2(7, 8).ToBytes(), 9.ToBytes(), new Vector3(1, 2, 3).ToBytes()).ToArray();
 
-            var v2 = bytes.ToVector2(sizeof(int)                                   + sizeof(int));
+            var v2 = bytes.ToVector2(sizeof(int) + sizeof(int));
             var v3 = bytes.ToVector3(sizeof(int) + sizeof(int) + 2 * sizeof(float) + sizeof(int));
 
             Assert.AreEqual(new Vector2(7, 8), v2);
             Assert.AreEqual(new Vector3(1, 2, 3), v3);
         }
 
-        [Test] public void CanConvertCustomType() {
-            var c = new C {f1 = 5, v2 = new Vector2(6, 7), v3 = new Vector3(8, 9)};
+        [Test]
+        public void CanConvertCustomType()
+        {
+            var c = new C {
+                    f1 = 5,
+                    v2 = new Vector2(6, 7),
+                    v3 = new Vector3(8, 9),
+            };
             var c2 = new C();
             var size = c2.AssignFromBytes(c.ToBytes().ToArray());
             Assert.AreEqual(c, c2);
             Assert.AreEqual(size, sizeof(float) * (1 + 2 + 3));
         }
 
-
-        [Test] public void CanConvertArray() {
-            var floatList = new float[] {1, 2, 3, 4, 5};
+        [Test]
+        public void CanConvertArray()
+        {
+            var floatList = new float[] {
+                    1, 2, 3, 4,
+                    5,
+            };
             var serialized = floatList.ToBytes(floatList.Length).ToArray();
             var length = serialized.ToInt();
             Assert.AreEqual(length, floatList.Length);
@@ -65,11 +84,25 @@ namespace Testing.EditorTests {
             }
         }
 
-        [Test] public void CanConvertCustomClassList() {
+        [Test]
+        public void CanConvertCustomClassList()
+        {
             var list = new List<C> {
-                new C {f1 = 1, v2 = new Vector2(2, 3), v3 = new Vector3(4, 5, 6)},
-                new C {f1 = 2, v2 = new Vector2(3, 4), v3 = new Vector3(5, 6, 8)},
-                new C {f1 = 3, v2 = new Vector2(4, 5), v3 = new Vector3(6, 7, 9)},
+                    new C {
+                            f1 = 1,
+                            v2 = new Vector2(2, 3),
+                            v3 = new Vector3(4, 5, 6),
+                    },
+                    new C {
+                            f1 = 2,
+                            v2 = new Vector2(3, 4),
+                            v3 = new Vector3(5, 6, 8),
+                    },
+                    new C {
+                            f1 = 3,
+                            v2 = new Vector2(4, 5),
+                            v3 = new Vector3(6, 7, 9),
+                    },
             };
             var serialized = list.Count.ToBytes().Concat(list.SelectMany(c => c.ToBytes())).ToArray();
             var length = serialized.ToInt();
@@ -82,42 +115,54 @@ namespace Testing.EditorTests {
             Assert.AreEqual(newOffset, sizeof(int) + sizeof(float) * 3 * (1 + 2 + 3));
         }
 
-        [Test] public void CanSerializeTensor() {
-            var tensor = new Tensor(new float[] {1, 2, 3, 4, 5, 6}, new[] {2, 3});
+        [Test]
+        public void CanSerializeTensor()
+        {
+            var tensor = new Tensor(new float[] {
+                                            1, 2, 3, 4,
+                                            5, 6,
+                                    },
+                                    new[] {2, 3});
             var serialized = tensor.ToBytes().ToArray();
-            Console.WriteLine(serialized.FormString());
+            Console.WriteLine(serialized.MakeString());
             var (reconstructed, bytes_read) = serialized.Get<Tensor>();
             Assert.AreEqual(tensor, reconstructed);
         }
 
-        enum MyEnum {
+        enum MyEnum
+        {
             HelloWorld,
             GoodbyeWorld,
         }
 
-        class C : IByteSerializable {
+        class C : IByteSerializable
+        {
             public float f1;
             public Vector2 v2;
             public Vector3 v3;
 
             public IEnumerable<byte> ToBytes() => f1.ToBytes().ConcatMany(v2.ToBytes(), v3.ToBytes());
 
-            public int AssignFromBytes(byte[] bytes, int startIndex = 0) {
+            public int AssignFromBytes(byte[] bytes, int startIndex = 0)
+            {
                 f1 = bytes.ToFloat(startIndex);
-                v2 = bytes.ToVector2(startIndex                                 + sizeof(float));
+                v2 = bytes.ToVector2(startIndex + sizeof(float));
                 v3 = bytes.ToVector3(startIndex + sizeof(float) + sizeof(float) + sizeof(float));
                 return sizeof(float) * (1 + 2 + 3);
             }
 
             bool Equals(C other) => f1.Equals(other.f1) && v2 == other.v2 && v3 == other.v3;
 
-            public override bool Equals(object obj) {
+            public override bool Equals(object obj)
+            {
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
+
                 return obj.GetType() == GetType() && Equals((C) obj);
             }
 
-            public override int GetHashCode() {
+            public override int GetHashCode()
+            {
                 unchecked {
                     var hashCode = f1.GetHashCode();
                     hashCode = (hashCode * 397) ^ v2.GetHashCode();

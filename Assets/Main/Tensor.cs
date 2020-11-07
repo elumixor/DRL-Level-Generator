@@ -28,7 +28,7 @@ public struct Tensor : IByteSerializable
         return bytesRead + bytesRead2;
     }
 
-    public override string ToString() => $"Tensor: {shape.FormString()} {data.FormString()}";
+    public override string ToString() => $"Tensor: {shape.MakeString()} {data.MakeString()}";
 
     bool Equals(Tensor other) => shape.SequenceEqual(other.shape) && data.SequenceEqual(other.data);
 

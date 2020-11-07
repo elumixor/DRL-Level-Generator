@@ -58,7 +58,7 @@ class Server:
                     except KeyError:
                         raise ServerException(f"Invalid request type: {request_type}")
 
-                    log(f"Request received: [{request_type}] {len(data)} bytes")
+                    # log(f"Request received: [{request_type}] {len(data)} bytes")
                     self.__handle_message(self, RequestType[request_type], data)
                 except zmq.Again:
                     pass

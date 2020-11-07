@@ -35,7 +35,8 @@ namespace Common
             }
 
             // Choose from CDF:
-            var cdf_value = Random.Range(0.0f, cdf[p.Length - 1]);
+            var max = cdf[p.Length - 1];
+            var cdf_value = Random.Range(0.0f, max);
             var index = Array.BinarySearch(cdf, cdf_value);
 
             if (index < 0) index = ~index; // if not found (probably won't be) BinarySearch returns bitwise complement of next-highest index.
