@@ -230,15 +230,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 006153ab11874e33a17e3810974a7015, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trainingConfiguration: {fileID: 11400000, guid: 99973a57c7dfe734f906ec99069be964, type: 2}
+  trainingConfiguration: {fileID: 11400000, guid: 98ba2455ba27b1949a67ba4b959fc928, type: 2}
   trainUnlimited: 1
   epochs: 1
-  episodesPerEpoch: 1
+  episodesPerEpoch: 5
   maximumEpisodeLength: 20
   speed: 15
   instanceSpawner:
     environment: {fileID: 1484207675}
-    count: 1
+    count: 5
     rows: 3
     columnSpacing: 12
     rowSpacing: 4

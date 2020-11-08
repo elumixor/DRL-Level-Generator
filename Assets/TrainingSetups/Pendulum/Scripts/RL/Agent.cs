@@ -3,10 +3,8 @@ using System.Linq;
 using BackendCommunication;
 using Common;
 using Common.ByteConversions;
-using Configuration.NN;
 using NN;
 using RL;
-using Serialization;
 using UnityEngine;
 
 namespace TrainingSetups.Pendulum.Scripts.RL
@@ -22,7 +20,7 @@ namespace TrainingSetups.Pendulum.Scripts.RL
         public Action GetAction(State state) => new Action(actor.Forward(state.AsEnumerable()).Softmax().Sample());
 
         /// <inheritdoc/>
-        public void ConstructNN(IEnumerable<ModuleConfiguration> modules) { actor = new Sequential(modules.Select(m => m.ToModule()).ToArray()); }
+        public void InitializeNN(Module nn) { actor = nn; }
 
         /// <inheritdoc/>
         public void SetParameters(StateDict stateDict) { actor.LoadStateDict(stateDict); }

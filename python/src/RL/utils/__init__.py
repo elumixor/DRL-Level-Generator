@@ -12,11 +12,12 @@ def bootstrap(rewards, last, discounting=0.99):
 
 
 def normalize(tensor):
-    std = tensor.std()
-    if torch.isnan(std) or std == 0:
-        return tensor
+    # std = tensor.std()
+    # if torch.isnan(std) or std == 0:
+    #     print("nan)))")
+    #     return tensor
 
-    return (tensor - tensor.mean()) / std
+    return tensor - tensor.mean()
 
 
 def discounded_rewards(rewards, discounting=0.99):

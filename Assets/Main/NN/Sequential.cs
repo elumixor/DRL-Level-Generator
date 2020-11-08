@@ -10,6 +10,7 @@ namespace NN
     {
         readonly Module[] layers;
         public Sequential(params Module[] layers) => this.layers = layers;
+        public Sequential(IEnumerable<Module> layers) => this.layers = layers.ToArray();
 
         public override StateDict StateDict => GetStateDict(new int[0]);
 

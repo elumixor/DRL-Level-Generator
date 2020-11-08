@@ -5,6 +5,9 @@ using Common;
 using Common.ByteConversions;
 using Configuration.Dynamic;
 using Configuration.NN;
+using NN;
+using Serialization;
+using Module = NN.Module;
 
 namespace Configuration.AlgorithmConfigurations
 {
@@ -26,10 +29,11 @@ namespace Configuration.AlgorithmConfigurations
 
         public A2CNetworksType networksType;
 
-        public override IEnumerable<ModuleConfiguration> ActorLayout(int stateSize, int actionSize) =>
+        public override Module ConstructActorNN(int stateSize, int actionSize) =>
                 networksType == A2CNetworksType.Separate
-                        ? actor.Modules(stateSize, actionSize)
-                        : @base.Modules(stateSize, NNModuleDefinitions.INFER).Concat(actorHead.Modules(NNModuleDefinitions.INFER, actionSize));
+                        ? new Sequential(actor.Modules(stateSize, actionSize).Select(m => m.ToModule()))
+                        : new Sequential(new Sequential(@base.Modules(stateSize, NNModuleDefinitions.INFER).Select(m => m.ToModule())),
+                                         new Sequential(actorHead.Modules(NNModuleDefinitions.INFER, actionSize).Select(m => m.ToModule())));
 
         public override IEnumerable<byte> ToBytes(int stateSize, int actionSize)
         {

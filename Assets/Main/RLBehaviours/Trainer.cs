@@ -92,8 +92,10 @@ namespace RLBehaviours
                 Debug.Log($"Received initial state dict: {stateDict}");
 
                 // Initialize agents with current parameters and configuration
+                var actorNN = TrainingConfiguration.AlgorithmConfiguration.ConstructActorNN(stateSize, configuration.actionSize);
+
                 foreach (var nnAgent in environmentInstances.Select(i => i.Agent).OfType<INNAgent>()) {
-                    nnAgent.ConstructNN(TrainingConfiguration.AlgorithmConfiguration.ActorLayout(stateSize, configuration.actionSize));
+                    nnAgent.InitializeNN(actorNN);
                     nnAgent.SetParameters(stateDict);
                 }
 

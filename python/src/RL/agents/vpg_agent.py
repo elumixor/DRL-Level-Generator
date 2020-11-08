@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from RL import Episode
-from RL.utils import nn_from_layout, discounded_rewards, running_average
+from RL.utils import nn_from_layout, discounded_rewards, running_average, normalize
 from configuration.layout_configuration import LayoutConfiguration
 from utilities import Buffer
 from .agent import Agent
@@ -21,7 +21,7 @@ class VPGAgent(Agent):
 
     def __init__(self, actor_layout: LayoutConfiguration):
         self._actor: torch.nn.Module = nn_from_layout(actor_layout).cuda()
-        self.optim_actor = torch.optim.Adam(self._actor.parameters(), lr=0.025)
+        self.optim_actor = torch.optim.Adam(self._actor.parameters(), lr=0.1)
         self.epoch = 0
         self.mean_total_rewards = Buffer(100)
 
@@ -50,12 +50,12 @@ class VPGAgent(Agent):
         total_rewards = []
 
         for states, actions, rewards, next_states in training_data:
-            print(rewards.shape)
             # print(states.flatten().cpu().tolist())
             # print(actions.flatten().cpu().tolist())
             # print(rewards.flatten().cpu().tolist())
 
             weights = discounded_rewards(rewards, discounting).flatten()
+            # weights = normalize(weights)
             # print(weights.flatten().cpu().tolist())
 
             probabilities = self._actor(states).softmax(-1)

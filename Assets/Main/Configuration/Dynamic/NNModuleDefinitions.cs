@@ -47,7 +47,7 @@ namespace Configuration.Dynamic
         IEnumerable<(Module, ModuleLayerName)> GetAllModules(string definitionName)
         {
             var definition = this[definitionName];
-            if (definition == null) throw new BaseException("Definition not found");
+            if (definition == null) throw new ConfigurationException($"Definition {definitionName} was not found");
 
             foreach (var module in definition.submodules)
                 if (Enum.TryParse(module.definitionName, out ModuleLayerName layerName))
