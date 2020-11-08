@@ -145,3 +145,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 Recordings
+__pycache__/

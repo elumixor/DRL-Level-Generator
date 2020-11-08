@@ -3,7 +3,8 @@ import numpy as np
 import torch
 from torch.optim import Adam
 
-from RL.utils import nn_from_layout, bootstrap, running_average
+from RL.utils import nn_from_layout, bootstrap
+from utilities import running_average
 from configuration.layout_configuration import LayoutConfiguration
 from .vpg_agent import VPGAgent
 
