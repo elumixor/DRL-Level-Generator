@@ -3,10 +3,6 @@ import math
 import time
 from typing import Optional
 
-from numpy import mean
-
-from utilities import Plotter
-
 
 def train(env,
           agent_class,
@@ -61,9 +57,6 @@ def train(env,
     if seed is not None:
         env.seed(seed)
 
-    plotter = Plotter()
-    plotter['reward'].name = "Mean total epoch reward"
-
     total_time = 0.
     epochs_time = 0.
 
@@ -102,8 +95,6 @@ def train(env,
 
         agent.update()
 
-        plotter['reward'] += mean(rollout_rewards)
-
         end_time = time.time()
         epochs_time += end_time - start_time
         start_time = end_time
@@ -111,14 +102,14 @@ def train(env,
         if epoch % print_frequency == 0:
             total_time += epochs_time
 
-            print(f'Epoch\t{epoch} \t| '
-                  f'{total_time:.02f}s \t| '
-                  f'Mean total reward\t{mean(plotter["reward"].y[-print_frequency:]):.4f}')
+            # print(f'Epoch\t{epoch} \t| '
+            #       f'{total_time:.02f}s \t| '
+            #       f'Mean total reward\t{mean(plotter["reward"].y[-print_frequency:]):.4f}')
 
             epochs_time = 0.
 
-        if plot_frequency is not None and epoch % plot_frequency == 0:
-            plotter.show("reward", running_average=True)
+        # if plot_frequency is not None and epoch % plot_frequency == 0:
+        #     plotter.show("reward", running_average=True)
 
     # Display the performance of the trained model for several times
     if tests is not None:

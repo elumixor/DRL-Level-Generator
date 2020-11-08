@@ -1,82 +1,81 @@
-from collections import Iterable
+import warnings
 
 import matplotlib.pyplot as plt
 
-import utilities
+from utilities.buffer import Buffer
+from utilities.math_utilities import running_average
+
+plt.ion()
+
+
+def log(message):
+    print(f"[P]: {message}")
 
 
 class Plotter:
-    class PlotterEntry:
 
-        def __init__(self, name):
-            self.name = name
-            self.y = []
-            self.__x = None
+    def __init__(self, num_plots=1, plot_width=6, plot_height=3, last_epochs_to_plot_count=100, titles=None, frequency=1):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.fig, self.axs = plt.subplots(num_plots, figsize=(plot_width, plot_height * num_plots))
 
-        def data_(self, y, x=None):
-            self.y = y
-            self.__x = x
+        if num_plots == 1:
+            self.axs = [self.axs]
 
-        def name_(self, name):
-            self.name = name
+        self.titles = [] if titles is None else titles
+        self.plot_frequency = frequency
+        self.epoch = 0
 
-        @property
-        def x(self):
-            return list(range(len(self.y))) if self.__x is None else self.__x
+        self.mean_total_rewards = Buffer(last_epochs_to_plot_count)
+        self.min_total_rewards = Buffer(last_epochs_to_plot_count)
+        self.max_total_rewards = Buffer(last_epochs_to_plot_count)
 
-        def __iadd__(self, value):
-            if isinstance(value, Iterable):
-                self.y += list(value)
-            else:
-                self.y.append(value)
+        self.epoch_mean_total_reward = 0
 
-        def clear(self):
-            self.y = []
+    def update(self, epoch_training_data, **additional_data):
+        self._update(epoch_training_data, **additional_data)
 
-        def __iter__(self):
-            return self.y.__iter__()
+        if self.epoch % self.plot_frequency == 0:
+            for i, axs in enumerate(self.axs):
+                # Clear already plotted data
+                axs.clear()
 
-        def __str__(self):
-            return str(self.y)
+                axs.set_title(self.titles[i] if i < len(self.titles) else f"Data {i}")
 
-    def __init__(self):
-        self.entries = dict()
+            self._plot_data(epoch_training_data, **additional_data)
 
-    def __getitem__(self, name):
-        entry = self.entries.get(name)
-        if entry is None:
-            entry = self.entries[name] = self.PlotterEntry(name)
-        return entry
+        plt.draw()
+        plt.tight_layout()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            plt.pause(0.001)
 
-    def __setitem__(self, key, value):
-        pass
+        self.epoch += 1
 
-    def __len__(self):
-        return len(self.entries)
+    def _plot_data(self, epoch_training_data, **additional_data):
 
-    def show(self, name=None, sharex=False, sharey=False, running_average=False):
-        if name is None:
-            if len(self) > 1:
-                fig, axs = plt.subplots(len(self), sharex=sharex, sharey=sharey)
-                # Plot all graphs
-                for i, (name, entry) in enumerate(self.entries.items()):
-                    axs[i].plot(entry.x, entry.y)
-                    if running_average:
-                        axs[i].plot(entry.x, utilities.running_average(entry.y))
-                    axs[i].set_title(entry.name)
-            else:
-                for name, entry in self.entries.items():
-                    plt.plot(entry.y)
-                    if running_average:
-                        plt.plot(entry.x, utilities.running_average(entry.y))
-                    plt.title(entry.name)
+        # Plot mean total reward for all episodes in an epoch, and the running average
+        mean_total_rewards_count = len(self.mean_total_rewards)
+        epochs = [x + max(self.epoch - mean_total_rewards_count, 0) for x in range(mean_total_rewards_count)]
 
-            plt.show()
-        else:
-            entry = self.entries[name]
-            data = entry.y
-            plt.plot(data)
-            if running_average:
-                plt.plot(utilities.running_average(data))
-            plt.title(entry.name)
-            plt.show()
+        self.axs[0].plot(epochs, self.mean_total_rewards)
+        self.axs[0].plot(epochs, running_average(self.mean_total_rewards))
+        self.axs[0].plot(epochs, running_average(self.min_total_rewards))
+        self.axs[0].plot(epochs, running_average(self.max_total_rewards))
+        self.axs[0].grid(color='black', linestyle='-', linewidth=.1)
+
+        log(f"Epoch: {self.epoch:6}:\t"
+            f"{self.epoch_min_total_reward:10.2f} "
+            f"{self.epoch_mean_total_reward:10.2f} "
+            f"{self.epoch_max_total_reward:10.2f}")
+
+    def _update(self, epoch_training_data, **additional_data):
+        total_rewards = [rewards.sum() for _, _, rewards, _ in epoch_training_data]
+
+        self.epoch_mean_total_reward = sum(total_rewards) / len(total_rewards)
+        self.epoch_min_total_reward = min(total_rewards)
+        self.epoch_max_total_reward = max(total_rewards)
+
+        self.mean_total_rewards.push(self.epoch_mean_total_reward)
+        self.min_total_rewards.push(self.epoch_min_total_reward)
+        self.max_total_rewards.push(self.epoch_max_total_reward)
