@@ -3,8 +3,10 @@ import math
 import time
 from typing import Optional
 
+from .environments import BaseEnvironment
 
-def train(env,
+
+def train(env: BaseEnvironment,
           agent_class,
           epochs: int = 100,
           num_rollouts: int = 1,

@@ -16,7 +16,7 @@ test_input = torch.tensor([1], dtype=torch.float, device='cuda')
 
 class VPGAgent(Agent):
 
-    def __init__(self, actor_layout: LayoutConfiguration):
+    def __init__(self, actor_layout: LayoutConfiguration, plotter_class=LeftRightPlotter):
         self._actor: torch.nn.Module = nn_from_layout(actor_layout).cuda()
         self.optim_actor = torch.optim.Adam(self._actor.parameters(), lr=0.1)
         self.epoch = 0
@@ -26,7 +26,7 @@ class VPGAgent(Agent):
         self.spawns = []
         self.positions = []
 
-        self.plotter = LeftRightPlotter(frequency=20)
+        self.plotter = plotter_class(frequency=20)
 
     @property
     def actor(self) -> torch.nn.Module:
@@ -51,7 +51,10 @@ class VPGAgent(Agent):
         self.optim_actor.step()
 
         # Also plot the probability of going left
-        x = np.linspace(-5, 5, 100)
-        p_left_x = self._actor(torch.from_numpy(x).float().cuda().unsqueeze(-1)) \
-                       .softmax(-1)[:, 0].cpu().detach().numpy()
-        self.plotter.update(training_data, p_left_x=(x, p_left_x))
+        if self.plotter is LeftRightPlotter:
+            x = np.linspace(-5, 5, 100)
+            p_left_x = self._actor(torch.from_numpy(x).float().unsqueeze(-1)) \
+                           .softmax(-1)[:, 0].detach().numpy()
+            self.plotter.update(training_data, p_left_x=(x, p_left_x))
+        else:
+            self.plotter.update(training_data)

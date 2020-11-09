@@ -58,11 +58,12 @@ class Plotter:
         mean_total_rewards_count = len(self.mean_total_rewards)
         epochs = [x + max(self.epoch - mean_total_rewards_count, 0) for x in range(mean_total_rewards_count)]
 
-        self.axs[0].plot(epochs, self.mean_total_rewards)
-        self.axs[0].plot(epochs, running_average(self.mean_total_rewards))
-        self.axs[0].plot(epochs, running_average(self.min_total_rewards))
-        self.axs[0].plot(epochs, running_average(self.max_total_rewards))
+        self.axs[0].plot(epochs, self.mean_total_rewards, label="Mean")
+        self.axs[0].plot(epochs, running_average(self.mean_total_rewards), label="Running mean")
+        self.axs[0].plot(epochs, self.min_total_rewards, label="Min")
+        self.axs[0].plot(epochs, self.max_total_rewards, label="Max")
         self.axs[0].grid(color='black', linestyle='-', linewidth=.1)
+        self.axs[0].legend()
 
         log(f"Epoch: {self.epoch:6}:\t"
             f"{self.epoch_min_total_reward:10.2f} "

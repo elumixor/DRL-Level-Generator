@@ -1,11 +1,11 @@
-import gym
 import torch
 from torch.distributions import Categorical
 
 from RL.agents import VPGAgent
 from configuration.nn import LayerName, IntParameter
 from fake_frontend.base_framework import train
-from utilities import DotDict, Plotter
+from fake_frontend.environments import LeftRightEnvironment
+from utilities import DotDict
 
 torch_device = "cuda"
 
@@ -23,7 +23,7 @@ class VPGAgentWrapper:
                 (LayerName.Linear, {IntParameter.InputSize: hidden_size, IntParameter.OutputSize: action_size}, dict()),
         ])
 
-        self.vpg = VPGAgent(config, plotter_class=Plotter)
+        self.vpg = VPGAgent(config)
         self.vpg.actor.cpu()
 
         self.rollouts = []
@@ -31,7 +31,7 @@ class VPGAgentWrapper:
         self.previous_state = None
 
     def on_trajectory_started(self, state):
-        self.previous_state = state
+        pass
 
     def on_trajectory_finished(self) -> None:
         states, actions, rewards, next_states = zip(*self.rollout_samples)
@@ -46,9 +46,9 @@ class VPGAgentWrapper:
 
     def save_step(self, action: int, reward: float, next_state) -> None:
         self.rollout_samples.append((self.previous_state, action, reward, next_state))
-        self.previous_state = next_state
 
     def get_action(self, state) -> int:
+        self.previous_state = state
         state = torch.from_numpy(state).float().unsqueeze(0)
         logits = self.vpg.actor(state)
         action = Categorical(logits=logits).sample()
@@ -60,5 +60,5 @@ class VPGAgentWrapper:
 
 
 # Train, provide an env, function to get an action from state, and training function that accepts rollouts
-train(gym.make('CartPole-v0'), VPGAgentWrapper,
-      epochs=2000, num_rollouts=5, render_frequency=None)
+train(LeftRightEnvironment(), VPGAgentWrapper,
+      epochs=2000, num_rollouts=5, print_frequency=10, render_frequency=False, max_timesteps=20)
