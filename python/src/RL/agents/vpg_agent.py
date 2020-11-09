@@ -17,7 +17,6 @@ class VPGAgent(Agent):
     def __init__(self, actor_layout: LayoutConfiguration, lr=0.01):
         self._actor = nn_from_layout(actor_layout).cuda()
         self.optimizer = torch.optim.Adam(self._actor.parameters(), lr=lr)
-        self.epoch = 0
 
     @property
     def actor(self) -> torch.nn.Module:

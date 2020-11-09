@@ -36,20 +36,28 @@ class AgentWrapper(ABC):
         self.rollout_samples.append((self.previous_state, action, reward, next_state))
 
     def get_action(self, state) -> int:
-        self.previous_state = state
-        state = torch.from_numpy(state).float().unsqueeze(0)
-        logits = self._actor.actor(state)
-        action = Categorical(logits=logits).sample()
-        return action.item()
+        with torch.no_grad():
+            self.previous_state = state
+            state = torch.from_numpy(state).float().unsqueeze(0)
+            logits = self.agent.actor(state)
+            try:
+                action = Categorical(logits=logits).sample()
+            except RuntimeError as e:
+                for p in self.agent.actor.parameters():
+                    print(p)
+
+                print(logits)
+                raise e
+            return action.item()
 
     def update(self) -> None:
         self.plot()
-        self._actor.train(self.rollouts)
+        self.agent.train(self.rollouts)
         self.rollouts = []
 
     @property
     @abstractmethod
-    def _actor(self) -> Agent:
+    def agent(self) -> Agent:
         pass
 
     def plot(self):
