@@ -34,12 +34,15 @@ class LeftRightEnvironment(BaseEnvironment):
         :param action: Either 0 go left, 1 go right
         """
         direction = np.array([-1 if action < .5 else 1])
+
         self.position += self.step_distance * direction
+
         big_position, small_position = self.positions
         reached_big = self.position <= big_position
-        reached_small = self.position >= big_position
+        reached_small = self.position >= small_position
+        done = reached_big or reached_small
+
         big_reward, small_reward, step_reward = self.rewards
-        return self.position, \
-               (big_reward if reached_big else small_reward if reached_small else step_reward), \
-               (reached_big or reached_small), \
-               None
+        reward = (big_reward if reached_big else small_reward if reached_small else step_reward)
+
+        return self.position, reward, done, None

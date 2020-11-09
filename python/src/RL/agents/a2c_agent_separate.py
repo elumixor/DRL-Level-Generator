@@ -4,8 +4,8 @@ import torch
 from torch.optim import Adam
 
 from RL.utils import nn_from_layout, bootstrap
-from utilities import running_average
 from configuration.layout_configuration import LayoutConfiguration
+from utilities import running_average
 from .vpg_agent import VPGAgent
 
 discounting = 1
@@ -54,9 +54,9 @@ class A2CAgentSeparate(VPGAgent):
         loss_actor = loss_actor / total_len
         loss_critic = loss_critic / total_len
 
-        self.optim_actor.zero_grad()
+        self.optimizer.zero_grad()
         loss_actor.backward()
-        self.optim_actor.step()
+        self.optimizer.step()
 
         self.optim_critic.zero_grad()
         loss_critic.backward()
