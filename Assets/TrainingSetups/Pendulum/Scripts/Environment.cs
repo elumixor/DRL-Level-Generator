@@ -1,5 +1,4 @@
 ﻿using Common;
-using Editor.PropertyDrawers;
 using NaughtyAttributes;
 using RL.RLBehaviours;
 using UnityEditor;
@@ -16,15 +15,17 @@ namespace TrainingSetups.Pendulum.Scripts
         [SerializeField, BoxGroup("References")] Circle playerBob;           // used to set according to radius
 
         // Parameters to set
-        [SerializeField, BoxGroup("Parameters"), Range(-10, 10)] float startPosition;
-        [SerializeField, BoxGroup("Parameters"), Range(0, 10)] float connectorLength;
-        [SerializeField, BoxGroup("Parameters"), Range(0, 10)] float bobRadius;
-        [SerializeField, BoxGroup("Parameters"), Range(0, 10)] float enemyRadius;
-        [SerializeField, BoxGroup("Parameters"), Range(0, 90)] float maxAngle;
-        [SerializeField, BoxGroup("Parameters"), AbsRangeDependant(nameof(maxAngle))] float startingAngle;
-        [SerializeField, BoxGroup("Parameters"), PlusMinus(PositiveLabel = "To Right", NegativeLabel = "To Left")] float startAngularDirection;
-        [SerializeField, BoxGroup("Parameters"), Range(0, 10)] float verticalSpeed;
-        [SerializeField, BoxGroup("Parameters"), Range(0, 10)] float angularSpeed;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter startPositionY;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter enemyPositionX;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter enemyPositionY;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter connectorLength;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter bobRadius;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter enemyRadius;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter maxAngle;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter startingAngle;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter startAngularDirection;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter verticalSpeed;
+        [SerializeField, BoxGroup("Parameters")] EnvironmentParameter angularSpeed;
 
         // Rewards
         [SerializeField, BoxGroup("Rewards")] float stepReward;
@@ -35,6 +36,10 @@ namespace TrainingSetups.Pendulum.Scripts
         [SerializeField, BoxGroup("Background")] Transform inner;
         [SerializeField, BoxGroup("Background"), Range(0, 1)] float borderSize = 1f;
         [SerializeField, BoxGroup("Background"), Range(0, 2)] float padding = 1f;
+
+        float angularSpeedSampled;
+        float verticalSpeedSampled;
+        float maxAngleSampled;
 
         float angularVelocity;
         float passedY;
@@ -53,16 +58,24 @@ namespace TrainingSetups.Pendulum.Scripts
         /// <inheritdoc/>
         public override State ResetEnvironment()
         {
+            angularSpeedSampled  = angularSpeed;
+            verticalSpeedSampled = verticalSpeed;
+            maxAngleSampled      = maxAngle;
+
             // Set local position as we will have several instances at once, each will be offset
-            playerAttachment.localPosition    = Vector3.up      * startPosition;
+            playerAttachment.localPosition    = Vector3.up      * startPositionY;
             playerAttachment.localEulerAngles = Vector3.forward * (angle = startingAngle);
             playerBob.LocalPosition           = Vector3.down    * connectorLength;
-            playerBob.Radius                  = bobRadius;
-            enemy.Radius                      = enemyRadius;
+            enemy.LocalPosition               = new Vector2(enemyPositionX, enemyPositionY);
 
-            angularVelocity = angularSpeed * startAngularDirection;
+            playerBob.Radius = bobRadius;
+            enemy.Radius     = enemyRadius;
 
-            passedY = enemy.Position.y + enemy.Radius + playerBob.Radius;
+            angularVelocity = angularSpeedSampled * startAngularDirection;
+
+            passedY = enemy.LocalPosition.y + enemy.Radius + playerBob.Radius;
+
+            ResizeBackground();
 
             return CurrentState;
         }
@@ -71,15 +84,15 @@ namespace TrainingSetups.Pendulum.Scripts
         public override (State newState, float reward, bool isDone) Step(int action)
         {
             // Update vertically
-            playerAttachment.localPosition += Vector3.up * verticalSpeed;
+            playerAttachment.localPosition += Vector3.up * verticalSpeedSampled;
 
             if (action > 0) angularVelocity *= -1f;
 
             // Updated swing stuff
             angle += angularVelocity;
 
-            if (Mathf.Abs(angle) >= maxAngle) {
-                angle           =  2 * Mathf.Sign(angle) * maxAngle - angle;
+            if (Mathf.Abs(angle) >= maxAngleSampled) {
+                angle           =  2 * Mathf.Sign(angle) * maxAngleSampled - angle;
                 angularVelocity *= -1f;
             }
 
@@ -97,29 +110,34 @@ namespace TrainingSetups.Pendulum.Scripts
         {
             if (EditorApplication.isPlaying) return;
 
-            startPosition = Mathf.Min(startPosition, enemy.Position.y - enemy.Radius);
+            startPositionY.Max = Mathf.Min(startPositionY.Max, enemy.Position.y - enemy.Radius);
 
             ResetEnvironment();
 
-            if (outer != null && inner != null) {
-                var playerY = playerAttachment.localPosition.y;
-                var height = enemy.LocalPosition.y + enemyRadius + 2 * bobRadius + 2 * connectorLength - playerY;
-                var width = Mathf.Max(Mathf.Sin(maxAngle * Mathf.Deg2Rad) * connectorLength + bobRadius, Mathf.Abs(enemy.LocalPosition.x) + enemyRadius) * 2;
+            ResizeBackground();
+        }
 
-                var center = height * .5f - (-playerY + connectorLength + bobRadius);
+        void ResizeBackground()
+        {
+            if (outer == null || inner == null) return;
 
-                var outerPosition = outer.localPosition;
-                var innerPosition = inner.localPosition;
+            var playerY = playerAttachment.localPosition.y;
+            var height = enemy.LocalPosition.y + enemyRadius + 2 * bobRadius + 2 * connectorLength - playerY;
+            var width = Mathf.Max(Mathf.Sin(maxAngle * Mathf.Deg2Rad) * connectorLength + bobRadius, Mathf.Abs(enemy.LocalPosition.x) + enemyRadius) * 2;
 
-                outerPosition.y = center;
-                innerPosition.y = center;
+            var center = height * .5f - (-playerY + connectorLength + bobRadius);
 
-                outer.localPosition = outerPosition;
-                inner.localPosition = innerPosition;
+            var outerPosition = outer.localPosition;
+            var innerPosition = inner.localPosition;
 
-                outer.localScale = new Vector3(width + padding         + borderSize, height + padding + borderSize);
-                inner.localScale = new Vector3(width + padding, height + padding);
-            }
+            outerPosition.y = center;
+            innerPosition.y = center;
+
+            outer.localPosition = outerPosition;
+            inner.localPosition = innerPosition;
+
+            outer.localScale = new Vector3(width + padding         + borderSize, height + padding + borderSize);
+            inner.localScale = new Vector3(width + padding, height + padding);
         }
     }
 }

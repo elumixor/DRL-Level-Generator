@@ -150,8 +150,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 83970015}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.3349998, z: 0}
-  m_LocalScale: {x: 6.0649605, y: 15.47, z: 0}
+  m_LocalPosition: {x: 0, y: -2.9593444, z: 0}
+  m_LocalScale: {x: 5.6749, y: 10.182992, z: 0}
   m_Children: []
   m_Father: {fileID: 494107651}
   m_RootOrder: 1
@@ -267,7 +267,7 @@ MonoBehaviour:
   epochs: 1
   episodesPerEpoch: 5
   maximumEpisodeLength: 200
-  speed: 44
+  speed: 0.05
   instanceSpawner:
     environment: {fileID: 140582453}
     count: 5
@@ -307,17 +307,63 @@ MonoBehaviour:
   enemy: {fileID: 1475785212}
   playerAttachment: {fileID: 971242475}
   playerBob: {fileID: 769580130}
-  startPosition: -4
-  connectorLength: 3.7
-  bobRadius: 0.58
-  enemyRadius: 0.33
-  maxAngle: 26.7
-  startingAngle: 2.2
-  startAngularDirection: 1
-  verticalSpeed: 0.1
-  angularSpeed: 3
+  startPositionY:
+    isConstant: 0
+    constantValue: -5
+    rangeMin: -7
+    rangeMax: -5
+  enemyPositionX:
+    isConstant: 0
+    constantValue: 1
+    rangeMin: 0.5
+    rangeMax: 1
+  enemyPositionY:
+    isConstant: 0
+    constantValue: 0
+    rangeMin: -3
+    rangeMax: 3
+  connectorLength:
+    isConstant: 0
+    constantValue: 2
+    rangeMin: 1.5
+    rangeMax: 2.5
+  bobRadius:
+    isConstant: 0
+    constantValue: 0.5
+    rangeMin: 0.3
+    rangeMax: 1
+  enemyRadius:
+    isConstant: 0
+    constantValue: 0.2
+    rangeMin: 0.2
+    rangeMax: 0.5
+  maxAngle:
+    isConstant: 1
+    constantValue: 50
+    rangeMin: 30
+    rangeMax: 60
+  startingAngle:
+    isConstant: 0
+    constantValue: 50
+    rangeMin: -50
+    rangeMax: 50
+  startAngularDirection:
+    isConstant: 1
+    constantValue: 1
+    rangeMin: 0
+    rangeMax: 0
+  verticalSpeed:
+    isConstant: 0
+    constantValue: 1
+    rangeMin: 0.5
+    rangeMax: 1.5
+  angularSpeed:
+    isConstant: 0
+    constantValue: 1
+    rangeMin: 2
+    rangeMax: 4
   stepReward: 0.1
-  collidedReward: -19.91
+  collidedReward: -20
   passedReward: 10
   outer: {fileID: 1664874198}
   inner: {fileID: 83970016}
@@ -499,7 +545,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b80c9aca44794d3695bff270dca43240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.58
+  radius: 0.41302097
   color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!33 &769580131
 MeshFilter:
@@ -558,8 +604,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 769580129}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3.7, z: 0}
-  m_LocalScale: {x: 1.16, y: 1.16, z: 1.16}
+  m_LocalPosition: {x: 0, y: -2.3084626, z: 0}
+  m_LocalScale: {x: 0.82604194, y: 0.82604194, z: 0.82604194}
   m_Children: []
   m_Father: {fileID: 971242475}
   m_RootOrder: 0
@@ -684,8 +730,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 971242474}
-  m_LocalRotation: {x: 0, y: 0, z: 0.019197444, w: 0.9998157}
-  m_LocalPosition: {x: -0, y: -4, z: -0}
+  m_LocalRotation: {x: 0, y: 0, z: -0.32621077, w: 0.9452971}
+  m_LocalPosition: {x: -0, y: -5.0499263, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 769580133}
@@ -793,7 +839,7 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: -3.7, z: 0}
+  - {x: 0, y: -2.3084626, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -889,7 +935,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b80c9aca44794d3695bff270dca43240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.33
+  radius: 0.35688797
   color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!33 &1475785213
 MeshFilter:
@@ -948,8 +994,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1475785211}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.91, y: 1, z: 0}
-  m_LocalScale: {x: 0.66, y: 0.66, z: 0.66}
+  m_LocalPosition: {x: 0.6100394, y: -2.602808, z: 0}
+  m_LocalScale: {x: 0.71377593, y: 0.71377593, z: 0.71377593}
   m_Children: []
   m_Father: {fileID: 140582454}
   m_RootOrder: 0
@@ -981,8 +1027,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1664874197}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.3349998, z: 1}
-  m_LocalScale: {x: 6.5479608, y: 15.953, z: 0}
+  m_LocalPosition: {x: 0, y: -2.9593444, z: 1}
+  m_LocalScale: {x: 6.1579003, y: 10.665992, z: 0}
   m_Children: []
   m_Father: {fileID: 494107651}
   m_RootOrder: 0
