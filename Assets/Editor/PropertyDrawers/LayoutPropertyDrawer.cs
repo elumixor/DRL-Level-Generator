@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Configuration.Dynamic;
-using Configuration.NN;
+using RL.Configuration.Dynamic;
+using RL.Configuration.NN;
 using UnityEditor;
 using UnityEngine;
 

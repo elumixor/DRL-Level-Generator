@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using Common;
-using NN;
-using RL;
+using RL.Common;
+using RL.NN;
+using RL.RL;
 using UnityEngine;
 
 namespace TrainingSetups.LeftRight.Scripts
@@ -11,7 +11,7 @@ namespace TrainingSetups.LeftRight.Scripts
         Module actor;
         public int GetAction(State state) => actor.Forward(state.AsEnumerable()).Softmax().Sample();
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public void InitializeNN(Module nn) { actor = nn; }
 
         /// <inheritdoc/>

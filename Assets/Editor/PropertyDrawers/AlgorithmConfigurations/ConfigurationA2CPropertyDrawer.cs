@@ -1,4 +1,4 @@
-﻿using Configuration.AlgorithmConfigurations;
+﻿using RL.Configuration.AlgorithmConfigurations;
 using UnityEditor;
 using UnityEngine;
 

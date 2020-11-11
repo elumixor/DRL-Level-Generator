@@ -1,8 +1,10 @@
 {
     "name": "Pendulum",
     "references": [
-        "GUID:aa0490c95e36e484d91e2347678fd417",
-        "GUID:776d03a35f1b52c4a9aed9f56d7b4229"
+      "GUID:aa0490c95e36e484d91e2347678fd417",
+      "GUID:776d03a35f1b52c4a9aed9f56d7b4229",
+      "GUID:ef5f6c424c06905468a8583ff910261d",
+      "GUID:c4c8ed1ffe42e644eaaec1f6858c7458"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,4 +1,4 @@
-﻿using RLBehaviours;
+﻿using RL.RLBehaviours;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,7 +30,6 @@ namespace Editor.PropertyDrawers
             const int countFieldWidth = 50;
             const int totalShapeWidth = 100;
 
-
             var countProperty = property.FindPropertyRelative("count");
             var rowsProperty = property.FindPropertyRelative("rows");
             var columnSpacingProperty = property.FindPropertyRelative("columnSpacing");
@@ -55,7 +54,7 @@ namespace Editor.PropertyDrawers
             // Advanced parameters dropdown
             if (!isOpen) return;
 
-            r = new Rect(position.x, position.y + lineHeight + spacing, position.width - totalShapeWidth - spacing, lineHeight);
+            r                     = new Rect(position.x, position.y + lineHeight + spacing, position.width - totalShapeWidth - spacing, lineHeight);
             rowsProperty.intValue = EditorGUI.IntField(r, "Rows", rowsProperty.intValue);
 
             r.x     += r.width + spacing;
@@ -81,7 +80,6 @@ namespace Editor.PropertyDrawers
 
         /// <inheritdoc/>
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label) =>
-                EditorGUIUtility.singleLineHeight * (isOpen ? 4 : 1) + (isOpen ? EditorGUIUtility.standardVerticalSpacing * 3 : 0) +
-                boxPadding                        * 2;
+                EditorGUIUtility.singleLineHeight * (isOpen ? 4 : 1) + (isOpen ? EditorGUIUtility.standardVerticalSpacing * 3 : 0) + boxPadding * 2;
     }
 }

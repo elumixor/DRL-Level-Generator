@@ -1,0 +1,15 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace RL.Common
+{
+    public static class EnumerableExtensions
+    {
+        public static IEnumerable<T> ConcatMany<T>(this IEnumerable<T> enumerable, params IEnumerable<T>[] enumerables)
+        {
+            return enumerable.Concat(enumerables.Aggregate((a, b) => a.Concat(b)));
+        }
+
+        public static IEnumerable<T> ConcatMany<T>(params IEnumerable<T>[] enumerables) { return enumerables.Aggregate((a, b) => a.Concat(b)); }
+    }
+}

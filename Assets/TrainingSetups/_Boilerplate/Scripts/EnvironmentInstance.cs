@@ -1,5 +1,5 @@
 ﻿using System;
-using RLBehaviours;
+using RL.RLBehaviours;
 using TrainingSetups._Boilerplate.Scripts.RL;
 using Action = TrainingSetups._Boilerplate.Scripts.RL.Action;
 

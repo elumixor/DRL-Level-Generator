@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common;
-using Configuration.Dynamic;
 using JetBrains.Annotations;
+using RL.Common;
+using RL.Configuration.Dynamic;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;

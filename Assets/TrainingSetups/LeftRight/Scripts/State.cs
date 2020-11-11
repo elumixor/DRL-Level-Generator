@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Serialization;
+using RL.Serialization;
 
 namespace TrainingSetups.LeftRight.Scripts
 {

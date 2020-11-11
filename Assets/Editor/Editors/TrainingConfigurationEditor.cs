@@ -1,5 +1,5 @@
 ﻿using System;
-using Configuration;
+using RL.Configuration;
 using UnityEditor;
 
 namespace Editor.Editors

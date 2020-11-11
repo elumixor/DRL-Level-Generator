@@ -1,5 +1,5 @@
 ﻿using System;
-using RLBehaviours;
+using RL.RLBehaviours;
 using UnityEngine;
 using Random = UnityEngine.Random;
 

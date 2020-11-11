@@ -1,5 +1,5 @@
 ﻿using System;
-using RL;
+using RL.RL;
 using UnityEngine;
 
 namespace TrainingSetups._Boilerplate.Scripts.RL

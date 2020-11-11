@@ -1,6 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
-using Serialization;
+using RL.Serialization;
 using UnityEngine;
 
 namespace Testing.EditorTests
