@@ -14,7 +14,7 @@ def log(message):
 
 class Plotter:
 
-    def __init__(self, num_plots=1, plot_width=6, plot_height=3, last_epochs_to_plot_count=100, titles=None, frequency=1):
+    def __init__(self, num_plots=1, plot_width=6, plot_height=3, last_epochs_to_plot_count=100, titles=None, frequency=5):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self.fig, self.axs = plt.subplots(num_plots, figsize=(plot_width, plot_height * num_plots))
@@ -71,6 +71,8 @@ class Plotter:
             f"{self.epoch_max_total_reward:10.2f}")
 
     def _update(self, epoch_training_data, **additional_data):
+        # TODO: check if this is the first time we are plotting, and if so, then initialize the plots
+
         total_rewards = [rewards.sum() for _, _, rewards, _ in epoch_training_data]
 
         self.epoch_mean_total_reward = sum(total_rewards) / len(total_rewards)

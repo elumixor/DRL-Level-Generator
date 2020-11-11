@@ -1,4 +1,4 @@
-﻿namespace RL.Common.ByteConversions
+﻿namespace Common.ByteConversions
 {
     public interface IByteSerializable : IByteConvertible, IByteAssignable { }
 }

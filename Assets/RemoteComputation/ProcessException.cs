@@ -1,4 +1,6 @@
-﻿namespace RL.Exceptions
+﻿using RL.Exceptions;
+
+namespace RemoteComputation
 {
     public class ProcessException : BaseException
     {

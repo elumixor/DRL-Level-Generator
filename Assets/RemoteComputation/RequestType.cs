@@ -1,4 +1,4 @@
-﻿namespace RL.BackendCommunication
+﻿namespace RemoteComputation
 {
     /// <summary> Requests types (headers), supported by communication protocol </summary>
     public enum RequestType

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace RL.Common.ByteConversions
+namespace Common.ByteConversions
 {
     public interface IByteConvertible
     {

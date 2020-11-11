@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using RL.Common;
+using Common;
 
 namespace RL.NN
 {

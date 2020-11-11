@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace RL.Common
+namespace Common
 {
     public class SingletonBehaviour<T> : MonoBehaviour
             where T : MonoBehaviour

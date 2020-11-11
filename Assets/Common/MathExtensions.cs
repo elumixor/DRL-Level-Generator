@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace RL.Common
+namespace Common
 {
     public static class MathExtensions
     {

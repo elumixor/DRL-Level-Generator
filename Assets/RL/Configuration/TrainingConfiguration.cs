@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using RL.Common;
-using RL.Common.ByteConversions;
+using Common;
+using Common.ByteConversions;
 using RL.Configuration.AlgorithmConfigurations;
 using UnityEngine;
 

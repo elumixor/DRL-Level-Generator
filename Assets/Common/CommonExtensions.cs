@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RL.Common
+namespace Common
 {
     public static class CommonExtensions
     {

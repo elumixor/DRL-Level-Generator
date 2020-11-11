@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace RL.Common.ByteConversions
+namespace Common.ByteConversions
 {
     public static class ByteConverter
     {

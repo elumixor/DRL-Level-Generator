@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace RL.Common
+namespace Common
 {
     [Serializable]
     public class EnumDictionary<TEnum, TValue>

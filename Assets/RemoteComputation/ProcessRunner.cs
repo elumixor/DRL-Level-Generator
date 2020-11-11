@@ -4,7 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Debug = UnityEngine.Debug;
 
-namespace RL
+namespace RemoteComputation
 {
     public static class ProcessRunner
     {

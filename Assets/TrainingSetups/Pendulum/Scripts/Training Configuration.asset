@@ -21,14 +21,14 @@ MonoBehaviour:
       moduleDefinitions: {fileID: 0}
       selectedDefinition: 
     base:
-      moduleDefinitions: {fileID: 0}
-      selectedDefinition: 
+      moduleDefinitions: {fileID: 11400000, guid: 835cbc8804178dc478ca3edbe823d282, type: 2}
+      selectedDefinition: Base
     actorHead:
-      moduleDefinitions: {fileID: 0}
-      selectedDefinition: 
+      moduleDefinitions: {fileID: 11400000, guid: 835cbc8804178dc478ca3edbe823d282, type: 2}
+      selectedDefinition: Actor
     criticHead:
-      moduleDefinitions: {fileID: 0}
-      selectedDefinition: 
+      moduleDefinitions: {fileID: 11400000, guid: 835cbc8804178dc478ca3edbe823d282, type: 2}
+      selectedDefinition: Critic
     networksType: 0
   configurationVPG:
     actor:

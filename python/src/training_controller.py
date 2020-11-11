@@ -36,7 +36,7 @@ class TrainingController:
 
     def train(self, training_data_bytes: bytes, start_index: int):
         training_data, _ = serialization.to_training_data(training_data_bytes, start_index, self.state_size, 1, device=device)
-        self.plotter.update(training_data)
+        self.plotter.update(training_data, **self.agent.get_plotting_data())
         self.agent.train(training_data)
 
     @property

@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RL.Common
+namespace Common
 {
     [Serializable]
     public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
-        [SerializeField] List<TKey> keys = new List<TKey>();
-        [SerializeField] List<TValue> values = new List<TValue>();
+        List<TKey> keys = new List<TKey>();
+        List<TValue> values = new List<TValue>();
 
         public SerializableDictionary() { }
         public SerializableDictionary(int capacity) : base(capacity) { }

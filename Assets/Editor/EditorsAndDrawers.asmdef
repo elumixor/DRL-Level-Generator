@@ -1,15 +1,16 @@
 {
-  "name": "EditorsAndDrawers",
-  "references": [
-    "GUID:aa0490c95e36e484d91e2347678fd417"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": [],
-  "allowUnsafeCode": false,
-  "overrideReferences": false,
-  "precompiledReferences": [],
-  "autoReferenced": true,
-  "defineConstraints": [],
-  "versionDefines": [],
-  "noEngineReferences": false
+    "name": "EditorsAndDrawers",
+    "references": [
+        "GUID:aa0490c95e36e484d91e2347678fd417",
+        "GUID:ef5f6c424c06905468a8583ff910261d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

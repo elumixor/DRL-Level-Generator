@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using RL.Common.ByteConversions;
+using Common.ByteConversions;
 using RL.Serialization;
 
 namespace TrainingSetups.Pendulum.Scripts

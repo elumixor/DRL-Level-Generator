@@ -1,6 +1,6 @@
 ﻿using RL.Exceptions;
 
-namespace RL.BackendCommunication
+namespace RemoteComputation
 {
     public class CommunicationException : BaseException
     {

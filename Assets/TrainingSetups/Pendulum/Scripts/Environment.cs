@@ -84,24 +84,31 @@ namespace TrainingSetups.Pendulum.Scripts
         public override (State newState, float reward, bool isDone) Step(int action)
         {
             // Update vertically
-            playerAttachment.localPosition += Vector3.up * verticalSpeedSampled;
+            var newPosition = playerAttachment.localPosition + Vector3.up * verticalSpeedSampled;
 
-            if (action > 0) angularVelocity *= -1f;
+            var changed = false;
+
+            if (action > 0) {
+                angularVelocity *= -1f;
+                changed         =  true;
+            }
 
             // Updated swing stuff
             angle += angularVelocity;
 
             if (Mathf.Abs(angle) >= maxAngleSampled) {
-                angle           =  2 * Mathf.Sign(angle) * maxAngleSampled - angle;
-                angularVelocity *= -1f;
+                angle = 2 * Mathf.Sign(angle) * maxAngleSampled - angle;
+                if (!changed) angularVelocity *= -1f;
             }
 
             playerAttachment.localEulerAngles = Vector3.forward * angle;
 
             var collided = enemy.Intersects(playerBob);
-            var passed = playerBob.Position.y > passedY;
+            var passed = playerBob.Position.y < passedY && newPosition.y >= passedY;
             var done = collided || passed;
             var reward = collided ? collidedReward : passed ? passedReward : stepReward;
+
+            playerAttachment.localPosition = newPosition;
 
             return (CurrentState, reward, done);
         }

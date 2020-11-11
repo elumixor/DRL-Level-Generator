@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using RL.Common;
+using Common;
 using RL.NN;
 using RL.RL;
 using UnityEngine;

@@ -2,7 +2,7 @@
 using NaughtyAttributes;
 using UnityEngine;
 
-namespace RL.Common
+namespace Common
 {
     public class FollowTransform : MonoBehaviour
     {

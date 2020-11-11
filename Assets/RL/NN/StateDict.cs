@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common;
+using Common.ByteConversions;
 using JetBrains.Annotations;
-using RL.Common;
-using RL.Common.ByteConversions;
 
 namespace RL.NN
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common.ByteConversions;
 using JetBrains.Annotations;
-using RL.Common.ByteConversions;
 using RL.Configuration.Dynamic;
 
 namespace RL.Configuration.NN
