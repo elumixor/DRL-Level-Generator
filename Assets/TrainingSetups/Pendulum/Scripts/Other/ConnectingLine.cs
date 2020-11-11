@@ -18,8 +18,7 @@ namespace TrainingSetups.Pendulum.Scripts.Other
         {
             if (bob == null) return;
 
-            positions[0] = transform.parent.position;
-            positions[1] = bob.Position;
+            positions[1] = bob.LocalPosition;
 
             lineRenderer.SetPositions(positions);
             lineRenderer.positionCount = 2;

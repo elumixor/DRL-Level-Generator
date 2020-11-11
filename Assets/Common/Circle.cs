@@ -21,7 +21,7 @@ namespace Common
             set => transform.localScale = Vector3.one * (2 * (radius = value));
         }
 
-        public bool Intersects(Circle other) => (Position - other.Position).magnitude - radius - other.radius > 0;
+        public bool Intersects(Circle other) => (Position - other.Position).magnitude - radius - other.radius <= 0;
 
         void Reset()
         {

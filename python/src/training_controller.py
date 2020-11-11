@@ -4,7 +4,7 @@ import serialization
 from RL.agents import VPGAgent, A2CAgentSeparate, A2CAgentTwoHeaded
 from configuration import TrainingConfiguration, AlgorithmType, NetworkType
 from exceptions import ConfigurationException
-from utilities import log
+from utilities import log, Plotter
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -14,6 +14,7 @@ class TrainingController:
     def __init__(self, configuration: TrainingConfiguration):
         self.state_size = configuration.state_size
         self.action_size = 1
+        self.plotter = Plotter()
 
         algorithm_configuration = configuration.algorithm_configuration
         if configuration.algorithm == AlgorithmType.VPG:
@@ -35,6 +36,7 @@ class TrainingController:
 
     def train(self, training_data_bytes: bytes, start_index: int):
         training_data, _ = serialization.to_training_data(training_data_bytes, start_index, self.state_size, 1, device=device)
+        self.plotter.update(training_data)
         self.agent.train(training_data)
 
     @property

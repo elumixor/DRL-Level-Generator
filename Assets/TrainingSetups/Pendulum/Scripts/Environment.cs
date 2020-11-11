@@ -2,11 +2,12 @@
 using Editor.PropertyDrawers;
 using NaughtyAttributes;
 using RL.RLBehaviours;
+using UnityEditor;
 using UnityEngine;
 
 namespace TrainingSetups.Pendulum.Scripts
 {
-    [SelectionBase]
+    [SelectionBase, ExecuteInEditMode]
     public class Environment : EnvironmentInstance<State, int, Agent>
     {
         // Referenced components
@@ -15,6 +16,7 @@ namespace TrainingSetups.Pendulum.Scripts
         [SerializeField, BoxGroup("References")] Circle playerBob;           // used to set according to radius
 
         // Parameters to set
+        [SerializeField, BoxGroup("Parameters"), Range(-10, 10)] float startPosition;
         [SerializeField, BoxGroup("Parameters"), Range(0, 10)] float connectorLength;
         [SerializeField, BoxGroup("Parameters"), Range(0, 10)] float bobRadius;
         [SerializeField, BoxGroup("Parameters"), Range(0, 10)] float enemyRadius;
@@ -36,6 +38,7 @@ namespace TrainingSetups.Pendulum.Scripts
 
         float angularVelocity;
         float passedY;
+        float angle;
 
         Vector3 ClosestEnemyRelativePosition => enemy.Position - playerBob.Position;
 
@@ -51,8 +54,8 @@ namespace TrainingSetups.Pendulum.Scripts
         public override State ResetEnvironment()
         {
             // Set local position as we will have several instances at once, each will be offset
-            playerAttachment.localPosition    = Vector3.zero;
-            playerAttachment.localEulerAngles = Vector3.forward * startingAngle;
+            playerAttachment.localPosition    = Vector3.up      * startPosition;
+            playerAttachment.localEulerAngles = Vector3.forward * (angle = startingAngle);
             playerBob.LocalPosition           = Vector3.down    * connectorLength;
             playerBob.Radius                  = bobRadius;
             enemy.Radius                      = enemyRadius;
@@ -70,13 +73,17 @@ namespace TrainingSetups.Pendulum.Scripts
             // Update vertically
             playerAttachment.localPosition += Vector3.up * verticalSpeed;
 
+            if (action > 0) angularVelocity *= -1f;
+
             // Updated swing stuff
-            var currentAngle = playerAttachment.localEulerAngles.z;
-            currentAngle += angularVelocity;
+            angle += angularVelocity;
 
-            if (Mathf.Abs(currentAngle) > maxAngle) currentAngle = 2 * maxAngle - currentAngle;
+            if (Mathf.Abs(angle) >= maxAngle) {
+                angle           =  2 * Mathf.Sign(angle) * maxAngle - angle;
+                angularVelocity *= -1f;
+            }
 
-            playerAttachment.localEulerAngles = Vector3.forward * currentAngle;
+            playerAttachment.localEulerAngles = Vector3.forward * angle;
 
             var collided = enemy.Intersects(playerBob);
             var passed = playerBob.Position.y > passedY;
@@ -86,19 +93,33 @@ namespace TrainingSetups.Pendulum.Scripts
             return (CurrentState, reward, done);
         }
 
-        void OnValidate()
+        void Update()
         {
-            startingAngle = Mathf.Clamp(startingAngle, -maxAngle, maxAngle);
+            if (EditorApplication.isPlaying) return;
+
+            startPosition = Mathf.Min(startPosition, enemy.Position.y - enemy.Radius);
+
+            ResetEnvironment();
 
             if (outer != null && inner != null) {
-                var height = enemy.LocalPosition.y + enemyRadius + 2 * bobRadius + 2 * connectorLength - playerAttachment.localPosition.y;
+                var playerY = playerAttachment.localPosition.y;
+                var height = enemy.LocalPosition.y + enemyRadius + 2 * bobRadius + 2 * connectorLength - playerY;
                 var width = Mathf.Max(Mathf.Sin(maxAngle * Mathf.Deg2Rad) * connectorLength + bobRadius, Mathf.Abs(enemy.LocalPosition.x) + enemyRadius) * 2;
+
+                var center = height * .5f - (-playerY + connectorLength + bobRadius);
+
+                var outerPosition = outer.localPosition;
+                var innerPosition = inner.localPosition;
+
+                outerPosition.y = center;
+                innerPosition.y = center;
+
+                outer.localPosition = outerPosition;
+                inner.localPosition = innerPosition;
 
                 outer.localScale = new Vector3(width + padding         + borderSize, height + padding + borderSize);
                 inner.localScale = new Vector3(width + padding, height + padding);
             }
-
-            ResetEnvironment();
         }
     }
 }

@@ -36,7 +36,7 @@ namespace RL.RLBehaviours
         [BoxGroup("Epochs and Episode lengths"), SerializeField, MinValue(1)] int episodesPerEpoch;
         [BoxGroup("Epochs and Episode lengths"), SerializeField, MinValue(1)] int maximumEpisodeLength;
 
-        [BoxGroup("Training speed"), SerializeField, Range(0, 500)] float speed;
+        [BoxGroup("Training speed"), SerializeField, Range(0, 50)] float speed;
 
         [SerializeField] protected InstanceSpawner instanceSpawner;
         protected List<TEnvironmentInstance> environmentInstances;
