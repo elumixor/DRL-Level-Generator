@@ -25,7 +25,7 @@ namespace RemoteComputation
         const int PUSH_PORT = 5671;
         const int PULL_PORT = 5672;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override void Awake()
         {
             base.Awake();
@@ -69,6 +69,15 @@ namespace RemoteComputation
 
             Callbacks[currentId] = callback;
             push.SendFrame(currentId.ToBytes().ConcatMany(data.ToBytes()).ToArray());
+            currentId++;
+        }
+
+        public static void Send(Message message, Action<ByteReader> callback)
+        {
+            CheckInstance();
+
+            Callbacks[currentId] = callback;
+            push.SendFrame(currentId.ToBytes().ConcatMany(message.Bytes).ToArray());
             currentId++;
         }
 

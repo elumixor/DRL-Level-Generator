@@ -39,9 +39,32 @@ namespace Common
             var cdf_value = Random.Range(0.0f, max);
             var index = Array.BinarySearch(cdf, cdf_value);
 
-            if (index < 0) index = ~index; // if not found (probably won't be) BinarySearch returns bitwise complement of next-highest index.
+            if (index < 0)
+                index = ~index; // if not found (probably won't be) BinarySearch returns bitwise complement of next-highest index.
 
             return index;
         }
+
+        public static int ArgMax(this IEnumerable<float> values)
+        {
+            var index = 0;
+            var max = float.NegativeInfinity;
+
+            var i = 0;
+
+            foreach (var value in values) {
+                if (value > max) {
+                    max   = value;
+                    index = i;
+                }
+
+                i++;
+            }
+
+            return index;
+        }
+
+        public static int SampleEpsilonGreedy(this IEnumerable<float> qValues, float epsilon) =>
+                Random.value < epsilon ? qValues.ArgMax() : Random.Range(0, qValues.Count());
     }
 }
