@@ -6,9 +6,6 @@ using AsyncIO;
 using NetMQ;
 using NetMQ.Sockets;
 using NUnit.Framework;
-using RL;
-using RL.BackendCommunication;
-using RL.Common.ByteConversions;
 using UnityEngine;
 using Random = System.Random;
 
@@ -21,25 +18,25 @@ namespace Testing.EditorTests
         const string addressClient = "tcp://localhost:5555";
         const string filePath = "tests/child_process/server_communication_test.py";
 
-        [Test]
-        public void ServerInSeparateWindowWorks()
-        {
-            var args = new Dictionary<string, string> {{"address", addressServer}};
-
-            using (var p = ProcessRunner.CreateProcess(filePath, args, separateWindow: true)) {
-                p.Start();
-                Thread.Sleep(1000); // give some time to the process to launch
-                Assert.False(p.HasExited);
-                Communicator.OpenConnection(addressClient);
-                var (responseBytes, startIndex) = Communicator.Send(RequestType.Echo, "echo".ToBytes());
-                Assert.AreEqual("echo", responseBytes.GetString(startIndex).result);
-                Communicator.Send(RequestType.Echo, "stop".ToBytes());
-                Communicator.CloseConnection();
-                Thread.Sleep(1000); // give some time to the process to exit
-                Assert.True(p.HasExited);
-                p.Close();
-            }
-        }
+        // [Test]
+        // public void ServerInSeparateWindowWorks()
+        // {
+        //     var args = new Dictionary<string, string> {{"address", addressServer}};
+        //
+        //     using (var p = ProcessRunner.CreateProcess(filePath, args, separateWindow: true)) {
+        //         p.Start();
+        //         Thread.Sleep(1000); // give some time to the process to launch
+        //         Assert.False(p.HasExited);
+        //         Communicator.OpenConnection(addressClient);
+        //         var (responseBytes, startIndex) = Communicator.Send(RequestType.Echo, "echo".ToBytes());
+        //         Assert.AreEqual("echo", responseBytes.GetString(startIndex).result);
+        //         Communicator.Send(RequestType.Echo, "stop".ToBytes());
+        //         Communicator.CloseConnection();
+        //         Thread.Sleep(1000); // give some time to the process to exit
+        //         Assert.True(p.HasExited);
+        //         p.Close();
+        //     }
+        // }
 
         /// <summary>
         /// The tests shows how we do non-blocking receiving: on each update frame we can

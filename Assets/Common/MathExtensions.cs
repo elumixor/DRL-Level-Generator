@@ -66,5 +66,18 @@ namespace Common
 
         public static int SampleEpsilonGreedy(this IEnumerable<float> qValues, float epsilon) =>
                 Random.value < epsilon ? qValues.ArgMax() : Random.Range(0, qValues.Count());
+
+        public static float Mean(this IEnumerable<float> values)
+        {
+            var count = 0;
+            var sum = 0f;
+
+            foreach (var value in values) {
+                sum += value;
+                count++;
+            }
+
+            return sum / count;
+        }
     }
 }

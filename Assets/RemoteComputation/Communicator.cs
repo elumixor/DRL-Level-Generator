@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AsyncIO;
 using Common;
 using Common.ByteConversions;
@@ -10,14 +12,14 @@ using UnityEngine;
 
 namespace RemoteComputation
 {
-    public class Communicator : SingletonBehaviour<Communicator>
+    public static class Communicator
     {
         static bool isConnected;
 
         static PushSocket push;
         static PullSocket pull;
 
-        static readonly Dictionary<int, Action<ByteReader>> Callbacks = new Dictionary<int, Action<ByteReader>>();
+        static readonly Dictionary<int, (object, ByteReader)> Callbacks = new Dictionary<int, (object, ByteReader)>();
 
         static int currentId;
         static bool initialized;
@@ -25,10 +27,16 @@ namespace RemoteComputation
         const int PUSH_PORT = 5671;
         const int PULL_PORT = 5672;
 
-        /// <inheritdoc/>
-        protected override void Awake()
+        const int UPDATE_SLEEP_TIME = 50;
+
+        static Task UpdateTask;
+        static bool shouldExit;
+
+        static object _lock = new object();
+
+        static void CheckInstance()
         {
-            base.Awake();
+            if (initialized) return;
 
             ForceDotNet.Force();
 
@@ -37,16 +45,19 @@ namespace RemoteComputation
 
             pull = new PullSocket();
             pull.Bind($"tcp://*:{PULL_PORT}");
-        }
 
-        static void CheckInstance()
-        {
-            if (instance == null) new GameObject("Communicator", typeof(Communicator));
+            UpdateTask  = new Task(CheckForUpdates);
+            initialized = true;
+
+            UpdateTask.Start();
         }
 
         public static void Close()
         {
             CheckInstance();
+
+            shouldExit = true;
+            UpdateTask.Wait();
 
             push.Dispose();
             pull.Dispose();
@@ -54,42 +65,53 @@ namespace RemoteComputation
             NetMQConfig.Cleanup();
         }
 
-        public static void Send(IEnumerable<byte> data, Action<ByteReader> callback)
+        public static Task<ByteReader> Send(IEnumerable<byte> data)
         {
-            CheckInstance();
+            return Task.Run(() => {
+                var cond = new object();
 
-            Callbacks[currentId] = callback;
-            push.SendFrame(currentId.ToBytes().ConcatMany(data).ToArray());
-            currentId++;
+                lock (_lock) {
+                    CheckInstance();
+                    Callbacks[currentId] = (cond, null);
+                    push.SendFrame(currentId.ToBytes().ConcatMany(data).ToArray());
+                    currentId++;
+                }
+
+                Monitor.Wait(cond);
+
+                lock (_lock) {
+                    var (_, byteReader) = Callbacks[currentId];
+                    Callbacks.Remove(currentId);
+                    return byteReader;
+                }
+            });
         }
 
-        public static void Send(string data, Action<ByteReader> callback)
+        public static Task<ByteReader> Send(string data) => Send(data.ToBytes());
+        public static Task<ByteReader> Send(Message data) => Send(data.Bytes);
+
+        static void CheckForUpdates()
         {
-            CheckInstance();
+            while (true) {
+                lock (_lock) {
+                    if (shouldExit) return;
 
-            Callbacks[currentId] = callback;
-            push.SendFrame(currentId.ToBytes().ConcatMany(data.ToBytes()).ToArray());
-            currentId++;
-        }
+                    if (Callbacks.Count == 0) continue;
 
-        public static void Send(Message message, Action<ByteReader> callback)
-        {
-            CheckInstance();
+                    // Get all messages
+                    while (pull.TryReceiveFrameBytes(out var message)) {
+                        var reader = new ByteReader(message);
+                        var id = reader.ReadInt();
 
-            Callbacks[currentId] = callback;
-            push.SendFrame(currentId.ToBytes().ConcatMany(message.Bytes).ToArray());
-            currentId++;
-        }
+                        var (cond, _) = Callbacks[id];
+                        Callbacks[id] = (cond, reader);
 
-        void Update()
-        {
-            // Wait until the message comes
-            if (!pull.TryReceiveFrameBytes(out var message)) return;
+                        Monitor.Pulse(cond);
+                    }
+                }
 
-            var reader = new ByteReader(message);
-            var id = reader.ReadInt();
-            Callbacks[id](reader);
-            Callbacks.Remove(id);
+                Thread.Sleep(UPDATE_SLEEP_TIME);
+            }
         }
     }
 }

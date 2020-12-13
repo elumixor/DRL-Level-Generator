@@ -5,6 +5,7 @@ namespace Common.ByteConversions
 {
     public interface IByteConvertible
     {
-        [Pure] IEnumerable<byte> ToBytes();
+        /// Serializes an object to byte array
+        IEnumerable<byte> Bytes { get; }
     }
 }

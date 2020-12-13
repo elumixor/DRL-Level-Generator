@@ -3,6 +3,6 @@ namespace RemoteComputation {
         Initialize,
         Infer,
         Train,
-        EstimateDifficulty
+        EstimateDifficulty,
     }
 }
