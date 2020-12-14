@@ -9,17 +9,16 @@ namespace NN
     public class Linear : Module
     {
         static readonly Random r = new Random();
-
-        readonly int inputSize;
-        readonly int outputSize;
+        public int InputSize { get; }
+        public int OutputSize { get; }
 
         float[] bias;
         float[] weight;
 
         public Linear(int inputSize, int outputSize)
         {
-            this.inputSize  = inputSize;
-            this.outputSize = outputSize;
+            this.InputSize  = inputSize;
+            this.OutputSize = outputSize;
 
             weight = new float[outputSize * inputSize];
             bias   = new float[outputSize];
@@ -34,8 +33,8 @@ namespace NN
 
         public override StateDict StateDict {
             get {
-                var weightTensor = new Tensor(weight, new[] {outputSize, inputSize});
-                var biasTensor = new Tensor(bias, new[] {outputSize});
+                var weightTensor = new Tensor(weight, new[] {OutputSize, InputSize});
+                var biasTensor = new Tensor(bias, new[] {OutputSize});
 
                 var parameters = new Dictionary<ModuleParameterName, Tensor> {
                         {ModuleParameterName.weight, weightTensor},
@@ -52,9 +51,9 @@ namespace NN
             var x = input.ToArray();
 
             // This is probably the faster version
-            for (var i = 0; i < outputSize; i++) {
+            for (var i = 0; i < OutputSize; i++) {
                 var sum = bias[i];
-                for (var j = 0; j < inputSize; j++) sum += x[j] * weight[i * inputSize + j];
+                for (var j = 0; j < InputSize; j++) sum += x[j] * weight[i * InputSize + j];
                 yield return sum;
             }
         }
@@ -63,15 +62,16 @@ namespace NN
         {
             switch (parameterName) {
                 case ModuleParameterName.bias:
-                    if (value.shape[0] != outputSize)
-                        throw new SerializationException("Assigning to bias parameter with a different shape." + $"[{outputSize}] != [{value.shape[0]}]");
+                    if (value.shape[0] != OutputSize)
+                        throw new SerializationException("Assigning to bias parameter with a different shape."
+                                                       + $"[{OutputSize}] != [{value.shape[0]}]");
 
                     bias = value.data;
                     break;
                 case ModuleParameterName.weight:
-                    if (value.shape[0] != outputSize || value.shape[1] != inputSize)
+                    if (value.shape[0] != OutputSize || value.shape[1] != InputSize)
                         throw new SerializationException("Assigning to weight parameter with a different shape."
-                                                       + $" [{outputSize}, {inputSize}] != [{value.shape[0]}, {value.shape[1]}]");
+                                                       + $" [{OutputSize}, {InputSize}] != [{value.shape[0]}, {value.shape[1]}]");
 
                     weight = value.data;
                     break;
@@ -80,7 +80,8 @@ namespace NN
         }
 
         bool Equals(Linear other) =>
-                inputSize == other.inputSize && outputSize == other.outputSize && weight.SequenceEqual(other.weight) && bias.SequenceEqual(other.bias);
+                InputSize == other.InputSize && OutputSize == other.OutputSize && weight.SequenceEqual(other.weight)
+             && bias.SequenceEqual(other.bias);
 
         public override bool Equals(object obj)
         {

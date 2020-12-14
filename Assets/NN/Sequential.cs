@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
 using Common;
 using Common.ByteConversions;
 using Common.Exceptions;
 using NN.Configuration;
+using UnityEngine;
 
 namespace NN
 {
@@ -96,6 +98,21 @@ namespace NN
                     default:                         throw new ArgumentOutOfRangeException();
                 }
             }
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var builder = new StringBuilder($"Sequential ({layers.Length})\n");
+
+            foreach (var layer in layers) {
+                if (layer is Linear linear)
+                    builder.AppendLine($"\t{layer} ({linear.InputSize} -> {linear.OutputSize})");
+                else
+                    builder.AppendLine($"\t{layer}");
+            }
+
+            return builder.ToString();
         }
     }
 }

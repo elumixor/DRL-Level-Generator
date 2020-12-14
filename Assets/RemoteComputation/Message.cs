@@ -19,6 +19,7 @@ namespace RemoteComputation
         }
 
         public static Message ObtainModel() => new Message(MessageType.ObtainModel);
+
         public static Message ObtainModel(IEnumerable<byte> args) => new Message(MessageType.ObtainModel, args);
 
         public static Message LoadModel(string path) => new Message(MessageType.LoadModel, path.ToBytes());
