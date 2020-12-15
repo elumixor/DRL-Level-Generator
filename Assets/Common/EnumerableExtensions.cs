@@ -10,6 +10,9 @@ namespace Common
             return enumerable.Concat(enumerables.Aggregate((a, b) => a.Concat(b)));
         }
 
-        public static IEnumerable<T> ConcatMany<T>(params IEnumerable<T>[] enumerables) { return enumerables.Aggregate((a, b) => a.Concat(b)); }
+        public static IEnumerable<T> ConcatMany<T>(params IEnumerable<T>[] enumerables)
+        {
+            return enumerables.Aggregate((a, b) => a.Concat(b));
+        }
     }
 }

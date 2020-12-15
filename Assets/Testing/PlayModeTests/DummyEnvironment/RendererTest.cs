@@ -1,32 +1,32 @@
 using System.Collections;
-using System.Reflection;
 using Common;
-using NUnit.Framework;
 using RL;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
-using Assert = UnityEngine.Assertions.Assert;
 
-namespace Testing.PlayModeTests {
-    public class RendererTest {
-        class MyState : Vector {
+namespace Testing.PlayModeTests
+{
+    public class RendererTest
+    {
+        class MyState : Vector
+        {
             public MyState(float x) : base(x) { }
         }
 
-        class MyEnvironment : IEnvironment, IStateRenderer {
+        class MyEnvironment : IEnvironment, IStateRenderer
+        {
             readonly Transform actor;
 
-            public MyEnvironment(Transform actor) {
-                this.actor = actor;
-            }
+            public MyEnvironment(Transform actor) => this.actor = actor;
 
-            public Vector ResetEnvironment(Vector generatedData) {
-                // should return initial state
-                return new MyState(3f);
-            }
+            public Vector ResetEnvironment(Vector generatedData) =>
+                    // should return initial state
+                    new MyState(3f);
 
-            public (Vector nextState, float reward, bool done) Transition(Vector state, Vector action) {
+            public (Vector nextState, float reward, bool done) Transition(Vector state, Vector action)
+            {
                 // apply horizontal movement
                 // end when >= 5
                 // reward = 1 if in game, 0 if terminal
@@ -38,22 +38,21 @@ namespace Testing.PlayModeTests {
                 return (nextState, reward, done);
             }
 
-            public void RenderState(Vector state) {
-                actor.position = Vector3.right * state[0];
-            }
+            public void RenderState(Vector state) { actor.position = Vector3.right * state[0]; }
         }
 
-        class MyActor : IActor {
-            public Vector GetAction(Vector state) {
-                return new Vector(1);
-            }
+        class MyActor : IActor
+        {
+            public Vector GetAction(Vector state) => new Vector(1);
         }
 
         [UnityTest]
-        public IEnumerator EnvironmentSetupShouldWork() {
+        public IEnumerator EnvironmentSetupShouldWork()
+        {
             SceneManager.LoadScene("Testing/PlayModeTests/DummyEnvironment/StateRendererTestScene");
 
             yield return new WaitForSeconds(1);
+
             var actor = new GameObject("Actor");
             Debug.Log(actor);
 
@@ -78,14 +77,14 @@ namespace Testing.PlayModeTests {
             environment.RenderState(nextState);
             Assert.AreEqual(actor.transform.position, Vector3.right * (3f + 1f));
 
-            state = nextState;
+            state  = nextState;
             action = myActor.GetAction(state);
-            
+
             var (terminalState, reward1, done1) = environment.Transition(state, action);
             Assert.AreEqual(terminalState, new MyState(3f + 2f));
             Assert.AreEqual(reward1, 0f);
-            Assert.IsTrue(done1);            
-            
+            Assert.IsTrue(done1);
+
             environment.RenderState(terminalState);
             Assert.AreEqual(actor.transform.position, Vector3.right * (3f + 2f));
 

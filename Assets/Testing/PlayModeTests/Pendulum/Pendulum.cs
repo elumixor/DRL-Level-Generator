@@ -1,8 +1,10 @@
 using Common;
 using UnityEngine;
 
-namespace Testing.PlayModeTests.Pendulum {
-    public class Pendulum : MonoBehaviour {
+namespace Testing.PlayModeTests.Pendulum
+{
+    public class Pendulum : MonoBehaviour
+    {
         [SerializeField] Circle bob;
 
         public float ConnectorLength { get; set; }

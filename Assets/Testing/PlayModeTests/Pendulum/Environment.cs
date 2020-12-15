@@ -3,22 +3,25 @@ using Common;
 using RL;
 using UnityEngine;
 
-namespace Testing.PlayModeTests.Pendulum {
-    public class Environment : MonoBehaviour, IEnvironment<GeneratedData, State, Action>, IStateRenderer<State> {
+namespace Testing.PlayModeTests.Pendulum
+{
+    public class Environment : MonoBehaviour, IEnvironment<GeneratedData, State, Action>, IStateRenderer<State>
+    {
         [SerializeField] Pendulum pendulum;
         [SerializeField] float maxAngle = 60;
 
         Circle[] enemies;
-        
-        public State ResetEnvironment(GeneratedData generatedData) {
+
+        public State ResetEnvironment(GeneratedData generatedData)
+        {
             // Cleanup previously positioned enemies
             if (enemies != null)
                 foreach (var enemy in enemies)
                     Destroy(enemy.gameObject);
 
             pendulum.ConnectorLength = generatedData.ConnectorLength;
-            pendulum.BobRadius = generatedData.BobRadius;
-            pendulum.Angle = generatedData.Angle;
+            pendulum.BobRadius       = generatedData.BobRadius;
+            pendulum.Angle           = generatedData.Angle;
             var angularDirection = generatedData.AngularDirection;
             pendulum.transform.localPosition = Vector3.zero;
 
@@ -30,14 +33,15 @@ namespace Testing.PlayModeTests.Pendulum {
                 enemy.transform.SetParent(transform);
 
                 var (position, radius) = generatedData.GetEnemy(i);
-                enemy.LocalPosition = position;
-                enemy.Radius = radius;
+                enemy.LocalPosition    = position;
+                enemy.Radius           = radius;
             }
 
             return new State(0, pendulum.Angle, angularDirection);
         }
 
-        public (State nextState, float reward, bool done) Transition(State state, Action action) {
+        public (State nextState, float reward, bool done) Transition(State state, Action action)
+        {
             var (verticalPosition, angle, angularDirection) = state;
             var doSwitch = action.DoSwitch;
 
@@ -45,10 +49,10 @@ namespace Testing.PlayModeTests.Pendulum {
             angle += angularDirection;
 
             if (angle >= maxAngle) {
-                angle = 2 * maxAngle - angle;
+                angle            =  2 * maxAngle - angle;
                 angularDirection *= -1f;
             } else if (angle <= -maxAngle) {
-                angle = -2 * maxAngle - angle;
+                angle            =  -2 * maxAngle - angle;
                 angularDirection *= -1f;
             }
 
@@ -61,10 +65,11 @@ namespace Testing.PlayModeTests.Pendulum {
             return (nextState, reward, done);
         }
 
-        public void RenderState(State state) {
+        public void RenderState(State state)
+        {
             var (verticalPosition, angle, _) = state;
             pendulum.transform.localPosition = Vector3.up * verticalPosition;
-            pendulum.Angle = angle;
+            pendulum.Angle                   = angle;
         }
     }
 }

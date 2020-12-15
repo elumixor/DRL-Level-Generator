@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using Common.ByteConversions;
 
-namespace Common {
-    public class Vector : IEnumerable<float>, IByteConvertible {
+namespace Common
+{
+    public class Vector : IEnumerable<float>, IByteConvertible
+    {
         protected readonly float[] values;
 
-        public Vector(params float[] values) {
-            this.values = values;
-        }
+        public Vector(params float[] values) => this.values = values;
 
         public float this[int i] => values[i];
 
@@ -24,7 +24,8 @@ namespace Common {
 
         public static implicit operator Vector(float value) => new Vector(value);
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (obj is Vector v2) {
                 if (v2.values.Length != values.Length) return false;
 

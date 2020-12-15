@@ -1,5 +1,7 @@
-namespace NN {
-    public interface IFixedOutputLayer {
+namespace NN
+{
+    public interface IFixedOutputLayer
+    {
         int OutputSize { get; }
     }
 }

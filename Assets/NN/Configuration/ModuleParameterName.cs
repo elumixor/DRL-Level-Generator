@@ -1,4 +1,4 @@
-﻿﻿namespace NN.Configuration
+﻿namespace NN.Configuration
 {
     public enum ModuleParameterName
     {
