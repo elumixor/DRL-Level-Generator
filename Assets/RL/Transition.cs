@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Common;
 using Common.ByteConversions;
 
@@ -20,6 +19,6 @@ namespace RL
             this.nextState = nextState;
         }
 
-        public IEnumerable<byte> Bytes => state.Bytes.ConcatMany(action.ToBytes(), reward.ToBytes(), nextState.Bytes);
+        public IEnumerable<byte> Bytes => state.Bytes.ConcatMany(action.Bytes, reward.ToBytes(), nextState.Bytes);
     }
 }

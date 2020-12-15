@@ -108,6 +108,12 @@ public class MainController : SingletonBehaviour<MainController>
         }
     }
 
+    public static async Task<float> EstimateDifficulty(IRemoteModel estimator, Trajectory trajectory)
+    {
+        var reader = await RemoteTaskRunner.RunTask(estimator.Id, RemoteTask.EstimateDifficulty, trajectory.Bytes);
+        return reader.ReadFloat();
+    }
+
     public static async Task<float> EstimateDifficulty(IRemoteModel estimator, Trajectory[] trajectories)
     {
         var reader = await RemoteTaskRunner.RunTask(estimator.Id,

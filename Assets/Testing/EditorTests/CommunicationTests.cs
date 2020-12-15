@@ -4,17 +4,9 @@ using System.Threading.Tasks;
 using Common.ByteConversions;
 using NUnit.Framework;
 using RemoteComputation;
-using RemoteComputation.Models;
-using RL;
 
 namespace Testing.EditorTests
 {
-    class DQN : LocalInferenceNN
-    {
-        /// <inheritdoc/>
-        public override ModelType ModelType { get; } = ModelType.DQN;
-    }
-
     public class CommunicationTest
     {
         object _lock = new object();
@@ -59,7 +51,7 @@ namespace Testing.EditorTests
         }
 
         [Test]
-        public void ObtainDQN()
+        public void TestCommunication()
         {
             var task = Communicator.Send(Message.Test(5.ToBytes()));
             task.Wait();

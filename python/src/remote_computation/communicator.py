@@ -11,16 +11,14 @@ from remote_computation.message_type import MessageType
 from serialization import to_bytes
 
 
-def _process_message(message: bytes, result: List[bytes]):
+def _process_message(message: bytes, models_dict, result: List[bytes]):
     reader = ByteReader(message)
 
     request_id = reader.read_int()
     message_type = MessageType(reader.read_int())
 
     if message_type == MessageType.ObtainModel:
-        model_id = reader.read_to_end()
-
-        model = model_manager.obtain_new(model_id)
+        model = model_manager.obtain_new(models_dict, reader)
 
         result[:] = list(to_bytes(request_id) + model.response_bytes)
         return
@@ -28,7 +26,7 @@ def _process_message(message: bytes, result: List[bytes]):
     if message_type == MessageType.LoadModel:
         file_path = reader.read_string()
 
-        model = model_manager.load_model(file_path)
+        model = model_manager.load_model(models_dict, file_path)
 
         result[:] = list(to_bytes(request_id) + model.response_bytes)
         return
@@ -37,19 +35,18 @@ def _process_message(message: bytes, result: List[bytes]):
         model_id = reader.read_int()
         file_path = reader.read_string()
 
-        model_manager.save_model(model_id, file_path)
+        model_manager.save_model(models_dict, model_id, file_path)
 
         result[:] = list(to_bytes(request_id))
         return
 
     if message_type == MessageType.RunTask:
         model_id = reader.read_int()
-        task = reader.read_to_end()
 
-        model = model_manager.get(model_id)
-        result = model.run_task(task)
+        model = model_manager.get(models_dict, model_id)
+        task_result = model.run_task(reader)
 
-        result[:] = list(to_bytes(request_id) + result)
+        result[:] = list(to_bytes(request_id) + task_result)
         return
 
     if message_type == MessageType.Test:
@@ -84,6 +81,7 @@ class Communicator:
         self.request_handlers: List[Thread] = []
 
         self.manager = mp.Manager()
+        self.models_dict = self.manager.dict()
 
     def start_update_loop(self):
         self.update_worker = Thread(target=self._update_loop)
@@ -103,7 +101,9 @@ class Communicator:
         while not self.should_stop:
             try:
                 message = self.pull.recv(flags=zmq.NOBLOCK)
-                self.request_handlers.append(Thread(target=self._process_message(message)))
+                thread = Thread(target=self._process_message(message))
+                self.request_handlers.append(thread)
+                thread.start()
 
             except zmq.Again as _:
                 pass
@@ -114,7 +114,7 @@ class Communicator:
         print(f"Message received ({len(message)}B)")
 
         result = self.manager.list()
-        handler = mp.Process(target=_process_message, args=(message, result))
+        handler = mp.Process(target=_process_message, args=(message, self.models_dict, result))
         handler.start()
         handler.join()
 
