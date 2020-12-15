@@ -5,7 +5,6 @@ namespace Common
     public class Circle : MonoBehaviour
     {
         [SerializeField] float radius = 1;
-        [SerializeField] Color color;
 
         public Vector2 Position {
             get => transform.position;

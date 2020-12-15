@@ -11,16 +11,16 @@ namespace RL
         protected Module nn;
 
         /// <inheritdoc/>
-        public int Id { get; private set; }
+        public int Id { get; protected set; }
 
         /// <inheritdoc/>
         public abstract ModelType ModelType { get; }
 
         /// <inheritdoc/>
-        public Vector GetAction(Vector state) => nn.Forward(state).ArgMax();
+        public virtual Vector GetAction(Vector state) => nn.Forward(state).ArgMax();
 
         /// <inheritdoc/>
-        public void AssignFromBytes(ByteReader reader)
+        public virtual void AssignFromBytes(ByteReader reader)
         {
             Id = reader.ReadInt();
             nn = reader.Read<Sequential>();

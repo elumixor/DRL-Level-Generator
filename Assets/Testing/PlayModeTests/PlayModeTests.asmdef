@@ -4,7 +4,10 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "RL",
-        "Common"
+        "Common",
+        "Main",
+        "RemoteComputation",
+        "NN"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

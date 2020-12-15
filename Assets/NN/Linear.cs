@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using NN.Configuration;
+using Random = UnityEngine.Random;
 
 namespace NN
 {
-    public class Linear : Module
+    public class Linear : Module, IFixedOutputLayer
     {
-        static readonly Random r = new Random();
         public int InputSize { get; }
         public int OutputSize { get; }
 
@@ -17,19 +17,17 @@ namespace NN
 
         public Linear(int inputSize, int outputSize)
         {
-            this.InputSize  = inputSize;
-            this.OutputSize = outputSize;
+            InputSize  = inputSize;
+            OutputSize = outputSize;
 
             weight = new float[outputSize * inputSize];
             bias   = new float[outputSize];
 
             for (var i = 0; i < outputSize; i++) {
-                for (var j = 0; j < inputSize; j++) weight[i * inputSize + j] = RandomValue;
-                bias[i] = RandomValue;
+                for (var j = 0; j < inputSize; j++) weight[i * inputSize + j] = Random.value * 2f - 1f;
+                bias[i] = Random.value * 2f - 1f;
             }
         }
-
-        static float RandomValue => (float) r.NextDouble() * 2f - 1f;
 
         public override StateDict StateDict {
             get {

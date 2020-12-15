@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.ByteConversions;
-using MainScripts;
 using RemoteComputation;
 using RemoteComputation.Models;
 using RL;
@@ -58,7 +57,7 @@ public class MainController : SingletonBehaviour<MainController>
         return Task.Run(() => {
             var trajectory = new Trajectory();
 
-            var startingState = environment.Reset(generatedData);
+            var startingState = environment.ResetEnvironment(generatedData);
 
             while (true) {
                 var action = actor.GetAction(startingState);

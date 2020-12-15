@@ -13,15 +13,15 @@ namespace NN
 {
     public class Sequential : Module, IByteAssignable
     {
-        Module[] layers;
+        public Module[] Layers { get; private set; }
         public Sequential() { }
-        public Sequential(params Module[] layers) => this.layers = layers;
-        public Sequential(IEnumerable<Module> layers) => this.layers = layers.ToArray();
+        public Sequential(params Module[] layers) => Layers = layers;
+        public Sequential(IEnumerable<Module> layers) => Layers = layers.ToArray();
 
         public override StateDict StateDict => GetStateDict(new int[0]);
 
         public override IEnumerable<float> Forward(IEnumerable<float> input) =>
-                layers.Aggregate(input, (current, layer) => layer.Forward(current));
+                Layers.Aggregate(input, (current, layer) => layer.Forward(current));
 
         public override void LoadStateDict(StateDict stateDict)
         {
@@ -35,7 +35,7 @@ namespace NN
 
             foreach (var i in path)
                 if (layer is Sequential sequential)
-                    layer = sequential.layers[i];
+                    layer = sequential.Layers[i];
                 else
                     throw new SerializationException($"Trying to get a child [{i}] of a module {layer}, but it is not a Sequential");
 
@@ -48,8 +48,8 @@ namespace NN
             var nextPath = new int[currentPath.Length + 1];
             Array.Copy(currentPath, nextPath, currentPath.Length);
 
-            for (var i = 0; i < layers.Length; i++) {
-                var layer = layers[i];
+            for (var i = 0; i < Layers.Length; i++) {
+                var layer = Layers[i];
                 nextPath[currentPath.Length] = i;
                 var childDict = layer is Sequential sequential ? sequential.GetStateDict(nextPath) : layer.StateDict;
 
@@ -62,9 +62,9 @@ namespace NN
 
         bool Equals(Sequential other)
         {
-            if (layers.Length != other.layers.Length) return false;
+            if (Layers.Length != other.Layers.Length) return false;
 
-            return !layers.Where((t, i) => !Equals(t, other.layers[i])).Any();
+            return !Layers.Where((t, i) => !Equals(t, other.Layers[i])).Any();
         }
 
         public override bool Equals(object obj)
@@ -79,20 +79,20 @@ namespace NN
         public void AssignFromBytes(ByteReader reader)
         {
             var layersCount = reader.ReadInt();
-            layers = new Module[layersCount];
+            Layers = new Module[layersCount];
 
             for (var i = 0; i < layersCount; i++) {
                 var layerType = (ModuleLayerName) reader.ReadInt();
 
                 switch (layerType) {
                     case ModuleLayerName.Linear:
-                        layers[i] = new Linear(reader.ReadInt(), reader.ReadInt());
+                        Layers[i] = new Linear(reader.ReadInt(), reader.ReadInt());
                         break;
                     case ModuleLayerName.ReLU:
-                        layers[i] = new ReLU();
+                        Layers[i] = new ReLU();
                         break;
                     case ModuleLayerName.Softmax:
-                        layers[i] = new Softmax();
+                        Layers[i] = new Softmax();
                         break;
                     case ModuleLayerName.Sequential: throw new BaseException("Nested sequential layers are not supported");
                     default:                         throw new ArgumentOutOfRangeException();
@@ -103,9 +103,9 @@ namespace NN
         /// <inheritdoc />
         public override string ToString()
         {
-            var builder = new StringBuilder($"Sequential ({layers.Length})\n");
+            var builder = new StringBuilder($"Sequential ({Layers.Length})\n");
 
-            foreach (var layer in layers) {
+            foreach (var layer in Layers) {
                 if (layer is Linear linear)
                     builder.AppendLine($"\t{layer} ({linear.InputSize} -> {linear.OutputSize})");
                 else

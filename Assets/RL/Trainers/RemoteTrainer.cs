@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RL.Training
+namespace RL.Trainers
 {
     // Has a backend model
     public class RemoteTrainer : MonoBehaviour { }
