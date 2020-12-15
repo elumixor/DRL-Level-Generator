@@ -5,7 +5,9 @@
         "UnityEditor.TestRunner",
         "RL",
         "Common",
-        "NN"
+        "NN",
+        "RemoteComputation",
+        "Main"
     ],
     "includePlatforms": [
         "Editor"

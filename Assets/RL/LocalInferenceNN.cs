@@ -2,16 +2,19 @@
 using Common.ByteConversions;
 using NN;
 using NN.Configuration;
-using RemoteComputation;
+using RemoteComputation.Models;
 
 namespace RL
 {
-    public class LocalInferenceNN : IRemoteModel, IByteAssignable
+    public abstract class LocalInferenceNN : IRemoteModel, IByteAssignable, IActor
     {
         protected Module nn;
 
         /// <inheritdoc/>
         public int Id { get; private set; }
+
+        /// <inheritdoc/>
+        public abstract ModelType ModelType { get; }
 
         /// <inheritdoc/>
         public Vector GetAction(Vector state) => nn.Forward(state).ArgMax();

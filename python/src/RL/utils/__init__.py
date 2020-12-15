@@ -1,7 +1,5 @@
 import torch
 
-from .nn_from_layout import nn_from_layout
-
 
 def bootstrap(rewards, last, discounting=0.99):
     res = torch.zeros_like(rewards)

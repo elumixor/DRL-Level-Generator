@@ -5,6 +5,7 @@ using Common;
 using Common.ByteConversions;
 using MainScripts;
 using RemoteComputation;
+using RemoteComputation.Models;
 using RL;
 using UnityEngine;
 
@@ -16,16 +17,16 @@ public class MainController : SingletonBehaviour<MainController>
             where T : IByteAssignable, IRemoteModel, new()
     {
         var result = new T();
-        var reader = await Communicator.Send(Message.ObtainModel());
+        var reader = await Communicator.Send(Message.ObtainModel(result.ModelType));
         result.AssignFromBytes(reader);
         return result;
     }
 
-    public static async Task<T> ObtainModel<T>(IEnumerable<byte> args)
+    public static async Task<T> ObtainModel<T>(params IEnumerable<byte>[] args)
             where T : IByteAssignable, IRemoteModel, new()
     {
         var result = new T();
-        var reader = await Communicator.Send(Message.ObtainModel(args));
+        var reader = await Communicator.Send(Message.ObtainModel(result.ModelType, args));
         result.AssignFromBytes(reader);
         return result;
     }

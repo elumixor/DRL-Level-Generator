@@ -1,81 +1,69 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting;
+﻿using System;
 using System.Threading;
-using AsyncIO;
-using NetMQ;
-using NetMQ.Sockets;
+using System.Threading.Tasks;
+using Common.ByteConversions;
 using NUnit.Framework;
-using UnityEngine;
-using Random = System.Random;
+using RemoteComputation;
+using RemoteComputation.Models;
+using RL;
 
 namespace Testing.EditorTests
 {
-    [SingleThreaded]
+    class DQN : LocalInferenceNN
+    {
+        /// <inheritdoc/>
+        public override ModelType ModelType { get; } = ModelType.DQN;
+    }
+
     public class CommunicationTest
     {
-        const string addressServer = "tcp://*:5555";
-        const string addressClient = "tcp://localhost:5555";
-        const string filePath = "tests/child_process/server_communication_test.py";
+        object _lock = new object();
+        object cond = new object();
 
-        // [Test]
-        // public void ServerInSeparateWindowWorks()
-        // {
-        //     var args = new Dictionary<string, string> {{"address", addressServer}};
-        //
-        //     using (var p = ProcessRunner.CreateProcess(filePath, args, separateWindow: true)) {
-        //         p.Start();
-        //         Thread.Sleep(1000); // give some time to the process to launch
-        //         Assert.False(p.HasExited);
-        //         Communicator.OpenConnection(addressClient);
-        //         var (responseBytes, startIndex) = Communicator.Send(RequestType.Echo, "echo".ToBytes());
-        //         Assert.AreEqual("echo", responseBytes.GetString(startIndex).result);
-        //         Communicator.Send(RequestType.Echo, "stop".ToBytes());
-        //         Communicator.CloseConnection();
-        //         Thread.Sleep(1000); // give some time to the process to exit
-        //         Assert.True(p.HasExited);
-        //         p.Close();
-        //     }
-        // }
+        readonly SemaphoreSlim ss = new SemaphoreSlim(0, 1);
 
-        /// <summary>
-        /// The tests shows how we do non-blocking receiving: on each update frame we can
-        /// check whether the response is received (via) TryReceive...
-        /// </summary>
-        [Test]
-        public void AsyncClientsTest()
+        Task T1()
         {
-            ForceDotNet.Force();
-            var r = new Random();
+            return Task.Run(() => {
+                Console.WriteLine("Start 1");
+                Thread.Sleep(1000);
+                ss.Release();
+                Console.WriteLine("End 1");
+            });
+        }
 
-            var client = new RequestSocket();
-            client.Connect("tcp://127.0.0.1:5671");
+        Task WaitsOnT1()
+        {
+            return Task.Run(() => {
+                Console.WriteLine("Start 2");
+                Thread.Sleep(500);
+                Console.WriteLine("Sleep ended 2");
 
-            var total = 0;
+                Console.WriteLine("Before wait");
+                ss.Wait();
+                Console.WriteLine("After wait");
 
-            client.ReceiveReady += (sender, args) => Debug.Log("Ready");
+                Console.WriteLine("End 2");
+            });
+        }
 
-            while (true) {
-                client.SendFrame("ready");
+        [Test]
+        public void LockingTest()
+        {
+            Console.WriteLine("?");
+            var t1 = T1();
+            var t2 = WaitsOnT1();
+            t1.Wait();
+            t2.Wait();
+            Console.WriteLine("Finished");
+        }
 
-                string msg;
-
-                while (!client.TryReceiveFrameString(out msg)) {
-                    // Debug.Log("still waiting");
-                }
-
-                Debug.Log(msg);
-
-                if (msg == "END") break;
-
-                total++;
-            }
-
-            Debug.Log($"Received {total}");
-
-
-            client.Dispose();
-            NetMQConfig.Cleanup();
+        [Test]
+        public void ObtainDQN()
+        {
+            var task = Communicator.Send(Message.Test(5.ToBytes()));
+            task.Wait();
+            Console.WriteLine(task.Result);
         }
     }
 }

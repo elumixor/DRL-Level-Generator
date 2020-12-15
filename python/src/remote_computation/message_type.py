@@ -6,3 +6,5 @@ class MessageType(int, Enum):
     LoadModel = 1
     SaveModel = 2
     RunTask = 3
+
+    Test = 99

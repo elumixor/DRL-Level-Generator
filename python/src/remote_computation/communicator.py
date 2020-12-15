@@ -52,20 +52,33 @@ def _process_message(message: bytes, result: List[bytes]):
         result[:] = list(to_bytes(request_id) + result)
         return
 
+    if message_type == MessageType.Test:
+        print(f"Received: {reader.read_int()}")
+        print(request_id)
+        print(to_bytes(request_id))
+        print(list(to_bytes(request_id)))
+        result[:] = list(to_bytes(request_id))
+        print(result)
+        return
+
     raise RuntimeError(f"Unknown message type: {message_type}")
 
 
 class Communicator:
     update_time = 0.05
 
-    def __init__(self, pull_port: int, push_port: int):
+    PULL_PORT = 5671
+    PUSH_PORT = 5672
+
+    def __init__(self):
         self.pull = zmq.Context().socket(zmq.PULL)
-        self.pull.bind(f"tcp://*:{pull_port}")
+        self.pull.bind(f"tcp://*:{Communicator.PULL_PORT}")
 
         self.push = zmq.Context().socket(zmq.PUSH)
-        self.push.connect(f"tcp://localhost:{push_port}")
+        self.push.connect(f"tcp://localhost:{Communicator.PUSH_PORT}")
 
         self.should_stop = False
+        self.is_running = False
 
         self.update_worker: Union[mp.Process, None] = None
         self.request_handlers: List[Thread] = []
@@ -83,8 +96,10 @@ class Communicator:
             handler.join()
 
         self.update_worker.join()
+        self.is_running = False
 
     def _update_loop(self):
+        self.is_running = True
         while not self.should_stop:
             try:
                 message = self.pull.recv(flags=zmq.NOBLOCK)
@@ -103,4 +118,4 @@ class Communicator:
         handler.start()
         handler.join()
 
-        self.push.send(b''.join(result))
+        self.push.send(bytes(result))

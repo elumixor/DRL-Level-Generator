@@ -1,7 +1,6 @@
 from struct import pack, unpack
 from typing import Callable, Tuple, Union, List, TypeVar
 
-from exceptions import SerializationException
 from . import ByteConvertible
 from .data_types import DataTypes
 from .data_types_size import DataTypesSize
@@ -55,7 +54,7 @@ def list_to_bytes(value: Union[List[int], List[float], List[str], List[ByteConve
 
         return result
 
-    raise SerializationException(f"Cannot convert list of type {type(value)} to bytes")
+    raise RuntimeError(f"Cannot convert list of type {type(value)} to bytes")
 
 
 def to_int(value: bytes, start_index: int = 0, endianness: Endianness = Endianness.Native) -> int:

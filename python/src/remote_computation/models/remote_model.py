@@ -1,11 +1,9 @@
 import abc
 from enum import Enum
-from typing import List
 
 from torch.nn import Sequential
 from torch.optim import Adam
 
-from RL import State, Action, Trajectory
 from common import ByteReader
 from serialization import to_bytes
 
@@ -44,38 +42,10 @@ class RemoteModel(abc.ABC):
         self.nn.load_state_dict(state_dict)
         self.optim = Adam(self.nn.parameters())
 
+    @abc.abstractmethod
     def run_task(self, reader: ByteReader) -> bytes:
-        task = TaskType(reader.read_int())
-
-        if task == TaskType.Infer:
-            state = reader.read_list_float()
-            action = self.infer(state)
-            return to_bytes(action)
-
-        if task == TaskType.Train:
-            trajectories_count = reader.read_int()
-            trajectories = []
-
-            for _ in range(trajectories_count):
-                trajectory = reader.read_trajectory()
-                trajectories.append(trajectory)
-
-            self.train(trajectories)
-            return b''
-
-        if task == TaskType.EstimateDifficulty:
-            trajectory = reader.read_trajectory()
-            self.estimate_difficulty(trajectory)
+        pass
 
     @abc.abstractmethod
     def _construct_nn(self, input_size: int, output_size: int):
         pass
-
-    def infer(self, state: State) -> Action:
-        raise NotImplementedError()
-
-    def train(self, trajectories: List[Trajectory]):
-        raise NotImplementedError()
-
-    def estimate_difficulty(self, trajectory: Trajectory):
-        raise NotImplementedError()

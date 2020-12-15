@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Common;
 using Common.ByteConversions;
+using RemoteComputation.Models;
 
 namespace RemoteComputation
 {
@@ -12,15 +13,18 @@ namespace RemoteComputation
 
         enum MessageType
         {
-            ObtainModel,
-            LoadModel,
-            SaveModel,
-            RunTask,
+            ObtainModel = 0,
+            LoadModel = 1,
+            SaveModel = 2,
+            RunTask = 3,
+
+            Test = 99,
         }
 
-        public static Message ObtainModel() => new Message(MessageType.ObtainModel);
+        public static Message ObtainModel(ModelType modelType) => new Message(MessageType.ObtainModel, ((int) modelType).ToBytes());
 
-        public static Message ObtainModel(IEnumerable<byte> args) => new Message(MessageType.ObtainModel, args);
+        public static Message ObtainModel(ModelType modelType, params IEnumerable<byte>[] args) =>
+                new Message(MessageType.ObtainModel, ((int) modelType).ToBytes().ConcatMany(args));
 
         public static Message LoadModel(string path) => new Message(MessageType.LoadModel, path.ToBytes());
 
@@ -28,5 +32,7 @@ namespace RemoteComputation
 
         public static Message RunTask(int id, RemoteTask task, IEnumerable<byte> argument) =>
                 new Message(MessageType.RunTask, id.ToBytes(), ((int) task).ToBytes(), argument);
+
+        public static Message Test(params IEnumerable<byte>[] args) => new Message(MessageType.Test, args);
     }
 }
