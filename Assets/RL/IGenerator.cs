@@ -1,6 +1,6 @@
 ﻿using Common;
 
-namespace MainScripts
+namespace RL
 {
     public interface IGenerator
     {

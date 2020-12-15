@@ -4,7 +4,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "RL",
-        "Common"
+        "Common",
+        "Main"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
