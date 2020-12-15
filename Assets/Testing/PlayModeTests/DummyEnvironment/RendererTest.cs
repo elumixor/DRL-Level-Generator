@@ -21,7 +21,7 @@ namespace Testing.PlayModeTests {
                 this.actor = actor;
             }
 
-            public Vector Reset(Vector generatedData) {
+            public Vector ResetEnvironment(Vector generatedData) {
                 // should return initial state
                 return new MyState(3f);
             }
@@ -51,7 +51,7 @@ namespace Testing.PlayModeTests {
 
         [UnityTest]
         public IEnumerator EnvironmentSetupShouldWork() {
-            SceneManager.LoadScene("Testing/PlayModeTests/Scenes/StateRendererTestScene");
+            SceneManager.LoadScene("Testing/PlayModeTests/DummyEnvironment/StateRendererTestScene");
 
             yield return new WaitForSeconds(1);
             var actor = new GameObject("Actor");
@@ -63,7 +63,7 @@ namespace Testing.PlayModeTests {
             // get some game objects, initialize custom state renderer with references, etc.
             var environment = new MyEnvironment(actor.transform);
 
-            var state = environment.Reset(new Vector());
+            var state = environment.ResetEnvironment(new Vector());
             environment.RenderState(state);
             Assert.AreEqual(actor.transform.position, Vector3.right * 3f);
 

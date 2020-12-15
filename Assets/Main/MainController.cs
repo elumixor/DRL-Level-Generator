@@ -57,7 +57,7 @@ public class MainController : SingletonBehaviour<MainController>
         return Task.Run(() => {
             var trajectory = new Trajectory();
 
-            var startingState = environment.Reset(generatedData);
+            var startingState = environment.ResetEnvironment(generatedData);
 
             while (true) {
                 var action = actor.GetAction(startingState);
