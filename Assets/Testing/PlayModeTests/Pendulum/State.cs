@@ -16,5 +16,7 @@ namespace Testing.PlayModeTests.Pendulum
             angle            = Angle;
             angularDirection = AngularDirection;
         }
+
+        public const int SIZE = 3;
     }
 }

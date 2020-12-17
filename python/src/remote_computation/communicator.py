@@ -119,5 +119,5 @@ class Communicator:
         handler.join()
 
         response = bytes(result)
-        print(f"sending {response}")
+        print(f"sending ({len(response)}B)")
         self.push.send(response)

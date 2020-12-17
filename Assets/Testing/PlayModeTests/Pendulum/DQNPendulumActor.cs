@@ -10,6 +10,7 @@ namespace Testing.PlayModeTests.Pendulum
 {
     public class DQNPendulumActor : LocalInferenceNN
     {
+        new Sequential nn;
         int numActions;
         float epsilon;
         public override ModelType ModelType { get; } = ModelType.DQN;
@@ -20,12 +21,12 @@ namespace Testing.PlayModeTests.Pendulum
         public override void AssignFromBytes(ByteReader reader)
         {
             Id = reader.ReadInt();
-            var sequential = reader.Read<Sequential>();
-            nn = sequential;
+            nn = reader.Read<Sequential>();
             nn.LoadStateDict(reader.Read<StateDict>());
-            epsilon = reader.ReadFloat();
 
-            foreach (var layer in sequential.Layers.Reverse())
+            // epsilon = reader.ReadFloat();
+
+            foreach (var layer in nn.Layers.Reverse())
                 if (layer is IFixedOutputLayer fixedOutputLayer) {
                     numActions = fixedOutputLayer.OutputSize;
                     break;
