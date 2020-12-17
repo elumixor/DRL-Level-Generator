@@ -1,0 +1,19 @@
+{
+    "name": "RL",
+    "references": [
+        "GUID:776d03a35f1b52c4a9aed9f56d7b4229",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:ef5f6c424c06905468a8583ff910261d",
+        "GUID:2d6aee26718155a4c9a4c846c06269bd",
+        "GUID:7f0bd4aad094bdd4cb7b158d09318d49"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

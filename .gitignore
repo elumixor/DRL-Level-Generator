@@ -145,3 +145,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 Recordings
+__pycache__/
+
+**/InitTestScene*.unity
+**/InitTestScene*.unity.meta

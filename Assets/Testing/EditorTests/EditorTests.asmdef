@@ -3,6 +3,10 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "RL",
+        "Common",
+        "NN",
+        "RemoteComputation",
         "Main"
     ],
     "includePlatforms": [
@@ -12,7 +16,9 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll"
+        "nunit.framework.dll",
+        "NetMQ.dll",
+        "AsyncIO.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

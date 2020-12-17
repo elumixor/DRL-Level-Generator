@@ -2,8 +2,10 @@
   <dictionary name="vlado">
     <words>
       <w>cuda</w>
+      <w>logits</w>
       <w>optim</w>
       <w>softmax</w>
+      <w>timesteps</w>
     </words>
   </dictionary>
 </component>

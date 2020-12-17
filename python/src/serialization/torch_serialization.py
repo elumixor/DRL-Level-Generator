@@ -1,7 +1,9 @@
 from collections import OrderedDict
+from enum import Enum
 from typing import Tuple
 
 import torch
+from torch.nn import Sequential, Linear, Softmax, ReLU
 
 from .general import Endianness, DataTypesSize, int_to_bytes, string_to_bytes, list_to_bytes, to_int, to_string, to_list_int, to_list_float
 
@@ -51,3 +53,31 @@ def to_tensor_int(value: bytes, start_index: int = 0, endianness: Endianness = E
     total_read += bytes_read
 
     return torch.tensor(items).reshape(shape), total_read
+
+
+class LayerName(int, Enum):
+    Linear = 0
+    ReLU = 1
+    Softmax = 2
+    Sequential = 3
+
+
+def layout_to_bytes(model: Sequential):
+    if not isinstance(model, Sequential):
+        raise RuntimeError("Works only with Sequential models")
+
+    result = int_to_bytes(len(model))
+
+    for child in model.children():
+        if isinstance(child, Linear):
+            result += int_to_bytes(LayerName.Linear)
+            result += int_to_bytes(child.in_features)
+            result += int_to_bytes(child.out_features)
+        elif isinstance(child, Softmax):
+            result += int_to_bytes(LayerName.Softmax)
+        elif isinstance(child, ReLU):
+            result += int_to_bytes(LayerName.ReLU)
+        else:
+            raise RuntimeError(f"Layer is not supported yet: {type(child)}")
+
+    return result
