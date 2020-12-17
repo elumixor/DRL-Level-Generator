@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using NN.Configuration;
-using Random = UnityEngine.Random;
 
 namespace NN
 {
@@ -15,6 +14,10 @@ namespace NN
         float[] bias;
         float[] weight;
 
+        // We use system's random cause we cannot access Unity's stuff in different threads...
+        static readonly Random R = new Random();
+        float RandomValue => (float) R.NextDouble() * 2 - 1;
+
         public Linear(int inputSize, int outputSize)
         {
             InputSize  = inputSize;
@@ -24,8 +27,8 @@ namespace NN
             bias   = new float[outputSize];
 
             for (var i = 0; i < outputSize; i++) {
-                for (var j = 0; j < inputSize; j++) weight[i * inputSize + j] = Random.value * 2f - 1f;
-                bias[i] = Random.value * 2f - 1f;
+                for (var j = 0; j < inputSize; j++) weight[i * inputSize + j] = RandomValue * 2f - 1f;
+                bias[i] = RandomValue * 2f - 1f;
             }
         }
 

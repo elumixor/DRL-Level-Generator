@@ -148,3 +148,4 @@ Recordings
 __pycache__/
 
 **/InitTestScene*.unity
+**/InitTestScene*.unity.meta

@@ -8,7 +8,7 @@ using RemoteComputation.Models;
 using RL;
 using UnityEngine;
 
-public class MainController : SingletonBehaviour<MainController>
+public static class MainController
 {
     /* High-level abstract stuff */
 

@@ -9,6 +9,7 @@ namespace Testing.PlayModeTests.Pendulum
     {
         [SerializeField] Pendulum pendulum;
         [SerializeField] float maxAngle = 60;
+        [SerializeField] GameObject enemyPrefab;
 
         Circle[] enemies;
 
@@ -29,12 +30,14 @@ namespace Testing.PlayModeTests.Pendulum
             enemies = new Circle[enemiesCount];
 
             for (var i = 0; i < enemiesCount; i++) {
-                var enemy = new GameObject($"Enemy {i}").AddComponent<Circle>();
-                enemy.transform.SetParent(transform);
+                var enemy = Instantiate(enemyPrefab, transform, true);
+                var circle = enemy.AddComponent<Circle>();
 
                 var (position, radius) = generatedData.GetEnemy(i);
-                enemy.LocalPosition    = position;
-                enemy.Radius           = radius;
+                circle.LocalPosition   = position;
+                circle.Radius          = radius;
+
+                enemies[i] = circle;
             }
 
             return new State(0, pendulum.Angle, angularDirection);

@@ -7,7 +7,8 @@ using Common;
 using Common.ByteConversions;
 using Common.Exceptions;
 using NN.Configuration;
-using UnityEngine;
+
+// using UnityEngine;
 
 namespace NN
 {
@@ -75,7 +76,7 @@ namespace NN
             return obj.GetType() == GetType() && Equals((Sequential) obj);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public void AssignFromBytes(ByteReader reader)
         {
             var layersCount = reader.ReadInt();
@@ -100,17 +101,16 @@ namespace NN
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string ToString()
         {
             var builder = new StringBuilder($"Sequential ({Layers.Length})\n");
 
-            foreach (var layer in Layers) {
+            foreach (var layer in Layers)
                 if (layer is Linear linear)
                     builder.AppendLine($"\t{layer} ({linear.InputSize} -> {linear.OutputSize})");
                 else
                     builder.AppendLine($"\t{layer}");
-            }
 
             return builder.ToString();
         }

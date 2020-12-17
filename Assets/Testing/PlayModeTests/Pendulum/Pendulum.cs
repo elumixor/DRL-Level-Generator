@@ -6,8 +6,15 @@ namespace Testing.PlayModeTests.Pendulum
     public class Pendulum : MonoBehaviour
     {
         [SerializeField] Circle bob;
+        [SerializeField] Transform lineRenderer;
 
-        public float ConnectorLength { get; set; }
+        public float ConnectorLength {
+            get => -bob.LocalPosition.y;
+            set {
+                bob.LocalPosition       = Vector2.down * value;
+                lineRenderer.localScale = new Vector2(1, -value);
+            }
+        }
 
         public float BobRadius {
             get => bob.Radius;

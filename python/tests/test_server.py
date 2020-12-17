@@ -26,5 +26,10 @@ class ServerTests(TestCase):
         c.start_update_loop()
         print("update loop started")
         time.sleep(10)
-        c.should_stop = True
+        c.join()
+
+    # noinspection PyMethodMayBeStatic
+    def test_start_server(self):
+        c = Communicator()
+        c.start_update_loop()
         c.join()

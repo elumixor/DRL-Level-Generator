@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
+
+// using UnityEngine;
 
 namespace Common.ByteConversions
 {
@@ -27,10 +28,10 @@ namespace Common.ByteConversions
         }
 
         // Unity Vectors
-        public static IEnumerable<byte> ToBytes(this Vector2 value) => value.x.ToBytes().Concat(value.y.ToBytes());
-
-        public static IEnumerable<byte> ToBytes(this Vector3 value) =>
-                value.x.ToBytes().Concat(value.y.ToBytes()).Concat(value.z.ToBytes());
+        // public static IEnumerable<byte> ToBytes(this Vector2 value) => value.x.ToBytes().Concat(value.y.ToBytes());
+        //
+        // public static IEnumerable<byte> ToBytes(this Vector3 value) =>
+        //         value.x.ToBytes().Concat(value.y.ToBytes()).Concat(value.z.ToBytes());
 
         // When transforming enumerable of elements, also include length
         // public static IEnumerable<byte> ToBytes(this IEnumerable<float> enumerable, int length) =>
@@ -50,11 +51,11 @@ namespace Common.ByteConversions
         public static IEnumerable<byte> ToBytes(this IEnumerable<bool> enumerable, int length) =>
                 length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
 
-        public static IEnumerable<byte> ToBytes(this IEnumerable<Vector2> enumerable, int length) =>
-                length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
-
-        public static IEnumerable<byte> ToBytes(this IEnumerable<Vector3> enumerable, int length) =>
-                length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
+        // public static IEnumerable<byte> ToBytes(this IEnumerable<Vector2> enumerable, int length) =>
+        //         length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
+        //
+        // public static IEnumerable<byte> ToBytes(this IEnumerable<Vector3> enumerable, int length) =>
+        //         length.ToBytes().Concat(enumerable.SelectMany(e => e.ToBytes()));
 
         public static IEnumerable<byte> MapToBytes<T>(this IReadOnlyCollection<T> collection, Func<T, IEnumerable<byte>> mapping) =>
                 collection.Count.ToBytes().Concat(collection.SelectMany(mapping));

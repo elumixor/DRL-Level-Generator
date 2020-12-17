@@ -50,12 +50,14 @@ def _process_message(message: bytes, models_dict, result: List[bytes]):
         return
 
     if message_type == MessageType.Test:
-        print(f"Received: {reader.read_int()}")
-        print(request_id)
-        print(to_bytes(request_id))
-        print(list(to_bytes(request_id)))
-        result[:] = list(to_bytes(request_id))
-        print(result)
+        data = reader.read_to_end()
+        print(f"Received: {data}")
+        # print(request_id)
+        # print(to_bytes(request_id))
+        # print(list(to_bytes(request_id)))
+        # print(reader.read_to_end())
+        result[:] = list(to_bytes(request_id) + data)
+        # print(result)
         return
 
     raise RuntimeError(f"Unknown message type: {message_type}")
@@ -88,8 +90,6 @@ class Communicator:
         self.update_worker.start()
 
     def join(self):
-        self.should_stop = True
-
         for handler in self.request_handlers:
             handler.join()
 
@@ -118,4 +118,6 @@ class Communicator:
         handler.start()
         handler.join()
 
-        self.push.send(bytes(result))
+        response = bytes(result)
+        print(f"sending {response}")
+        self.push.send(response)

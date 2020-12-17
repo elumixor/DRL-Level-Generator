@@ -2,7 +2,7 @@ using RL;
 
 namespace Testing.PlayModeTests.Pendulum
 {
-    public class PendulumGenerator : IGenerator<GeneratedData>
+    public class Generator : IGenerator<GeneratedData>
     {
         public GeneratedData Generate(float difficulty, float randomSeed = 0) =>
                 new GeneratedData(1f,

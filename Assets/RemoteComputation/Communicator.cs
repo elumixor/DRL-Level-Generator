@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ using NetMQ.Sockets;
 
 namespace RemoteComputation
 {
-    public static class Communicator
+    public class Communicator
     {
         static bool isConnected;
 
@@ -28,64 +27,95 @@ namespace RemoteComputation
 
         const int UPDATE_SLEEP_TIME = 50;
 
-        static Task UpdateTask;
+        static Task updateTask;
         static bool shouldExit;
 
-        static readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+        static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1, 1);
 
-        static void CheckInstance()
+        static void Initialize()
         {
-            if (initialized) return;
+            Semaphore.Wait();
+
+            if (initialized) {
+                Semaphore.Release();
+                return;
+            }
+
+            shouldExit = false;
 
             ForceDotNet.Force();
 
             push = new PushSocket();
-            push.Connect($"tcp://localhost:{PUSH_PORT}");
-
             pull = new PullSocket();
+
+            push.Connect($"tcp://localhost:{PUSH_PORT}");
             pull.Bind($"tcp://*:{PULL_PORT}");
 
-            UpdateTask  = new Task(CheckForUpdates);
+            updateTask = Task.Run(CheckForUpdates);
+
             initialized = true;
 
-            UpdateTask.Start();
+            Semaphore.Release();
         }
 
         public static void Close()
         {
-            CheckInstance();
+            Semaphore.Wait();
+
+            if (!initialized) {
+                Semaphore.Release();
+                return;
+            }
 
             shouldExit = true;
-            UpdateTask.Wait();
+
+            Semaphore.Release();
+
+            updateTask.Wait();
+
+            Semaphore.Wait();
 
             push.Dispose();
             pull.Dispose();
 
             NetMQConfig.Cleanup();
+
+            // todo: release all the semaphores for the waiting conditions
+            // todo: throw some error if there is one
+
+            initialized = false;
+
+            Semaphore.Release();
         }
 
         public static Task<ByteReader> Send(IEnumerable<byte> data)
         {
+            Initialize();
+
             return Task.Run(() => {
+                Semaphore.Wait();
+
+                var id = currentId;
                 var cond = new SemaphoreSlim(0, 1);
 
-                semaphore.Wait();
-
-                CheckInstance();
-                var id = currentId;
                 Callbacks[id] = (cond, null);
+
                 push.SendFrame(id.ToBytes().ConcatMany(data).ToArray());
+
                 currentId++;
 
-                semaphore.Release();
+                Semaphore.Release();
 
                 cond.Wait();
 
-                semaphore.Wait();
+                Semaphore.Wait();
 
                 var (_, byteReader) = Callbacks[id];
+
                 Callbacks.Remove(id);
-                semaphore.Release();
+
+                Semaphore.Release();
+
                 return byteReader;
             });
         }
@@ -95,16 +125,23 @@ namespace RemoteComputation
 
         static void CheckForUpdates()
         {
+            Semaphore.Wait();
+
             while (true) {
-                semaphore.Wait();
+                if (shouldExit) {
+                    Semaphore.Release();
+                    return;
+                }
 
-                if (shouldExit) return;
-
-                if (Callbacks.Count == 0) continue;
+                if (Callbacks.Count == 0) {
+                    Semaphore.Release();
+                    Thread.Sleep(UPDATE_SLEEP_TIME);
+                    Semaphore.Wait();
+                    continue;
+                }
 
                 // Get all messages
                 while (pull.TryReceiveFrameBytes(out var message)) {
-                    Console.WriteLine($"received! {message}");
                     var reader = new ByteReader(message);
                     var id = reader.ReadInt();
 
@@ -114,9 +151,9 @@ namespace RemoteComputation
                     cond.Release();
                 }
 
-                semaphore.Release();
-
+                Semaphore.Release();
                 Thread.Sleep(UPDATE_SLEEP_TIME);
+                Semaphore.Wait();
             }
         }
     }

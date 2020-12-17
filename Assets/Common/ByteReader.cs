@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Common.ByteConversions;
-using UnityEngine;
+
+// using UnityEngine;
 
 namespace Common
 {
@@ -47,8 +48,8 @@ namespace Common
             return result;
         }
 
-        public Vector2 ToVector2() => new Vector2(ReadFloat(), ReadFloat());
-        public Vector2 ToVector3() => new Vector3(ReadFloat(), ReadFloat(), ReadFloat());
+        // public Vector2 ToVector2() => new Vector2(ReadFloat(), ReadFloat());
+        // public Vector2 ToVector3() => new Vector3(ReadFloat(), ReadFloat(), ReadFloat());
 
         public IEnumerable<int> GetIntArray()
         {
