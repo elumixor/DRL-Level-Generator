@@ -41,10 +41,15 @@ namespace Testing.PlayModeTests.Pendulum
             yield return null;
 
             for (var i = 0; i < 10; i++) {
-                var (nextState, _, _) = environment.Transition(state, new Action(false));
+                var (nextState, reward, done) = environment.Transition(state, new Action(false));
+
+                Debug.Log($"{i}: {reward} {done}");
+
                 environment.RenderState(nextState);
                 state = nextState;
                 yield return new WaitForSeconds(0.5f);
+
+                if (done) break;
             }
         }
 

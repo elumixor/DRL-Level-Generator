@@ -79,5 +79,7 @@ namespace Common
 
             return sum / count;
         }
+
+        public static float Abs(this float value) => value >= 0 ? value : -value;
     }
 }
