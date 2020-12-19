@@ -2,6 +2,7 @@ using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.ByteConversions;
+using Common.RandomValues;
 using NUnit.Framework;
 using RemoteComputation;
 using UnityEngine;
@@ -29,7 +30,10 @@ namespace Testing.PlayModeTests.Pendulum
 
             var environment = Object.FindObjectOfType<Environment>();
             var pendulum = Object.FindObjectOfType<Pendulum>();
-            var generator = new Generator();
+            var generator = new Generator(new UniformValueInt(2, 3),
+                                          new UniformValue(0.5f, 0.5f),
+                                          new UniformValue(-1, 1),
+                                          new UniformValue(1f, 2f));
 
             var generatedData = generator.Generate(0);
 
@@ -41,10 +45,52 @@ namespace Testing.PlayModeTests.Pendulum
             yield return null;
 
             for (var i = 0; i < 10; i++) {
-                var (nextState, _, _) = environment.Transition(state, new Action(false));
+                var (nextState, reward, done) = environment.Transition(state, new Action(false));
+
+                Debug.Log($"{i}: {reward} {done}");
+
                 environment.RenderState(nextState);
                 state = nextState;
                 yield return new WaitForSeconds(0.5f);
+
+                if (done) break;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator AnimationWorksWithDeltaTime()
+        {
+            SceneManager.LoadScene("Pendulum");
+            yield return null;
+
+            var environment = Object.FindObjectOfType<Environment>();
+            var pendulum = Object.FindObjectOfType<Pendulum>();
+            var generator = new Generator(new UniformValueInt(2, 3),
+                                          new UniformValue(0.5f, 0.5f),
+                                          new UniformValue(-1, 1),
+                                          new UniformValue(1f, 2f));
+
+            var generatedData = generator.Generate(0);
+
+            // Setup stuff
+            var state = environment.ResetEnvironment(generatedData);
+            environment.RenderState(state);
+
+            Debug.Log("Set Up Done");
+            yield return null;
+
+            const float deltaTime = 0.05f;
+
+            for (var i = 0; i < 100; i++) {
+                var (nextState, reward, done) = environment.Transition(state, new Action(false, deltaTime));
+
+                Debug.Log($"{i}: {reward} {done}");
+
+                environment.RenderState(nextState);
+                state = nextState;
+                yield return new WaitForSeconds(deltaTime);
+
+                if (done) break;
             }
         }
 
@@ -79,7 +125,10 @@ namespace Testing.PlayModeTests.Pendulum
 
             var environment = Object.FindObjectOfType<Environment>();
             var pendulum = Object.FindObjectOfType<Pendulum>();
-            var generator = new Generator();
+            var generator = new Generator(new UniformValueInt(2, 3),
+                                          new UniformValue(0.5f, 0.5f),
+                                          new UniformValue(-1, 1),
+                                          new UniformValue(1f, 2f));
 
             var generatedData = generator.Generate(0);
 
