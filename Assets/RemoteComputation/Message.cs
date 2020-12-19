@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Common;
 using Common.ByteConversions;
+using RemoteComputation.Logging;
 using RemoteComputation.Models;
 
 namespace RemoteComputation
@@ -17,6 +18,7 @@ namespace RemoteComputation
             LoadModel = 1,
             SaveModel = 2,
             RunTask = 3,
+            SetLogOptions = 4,
 
             Test = 99,
         }
@@ -34,5 +36,8 @@ namespace RemoteComputation
                 new Message(MessageType.RunTask, id.ToBytes(), ((int) task).ToBytes(), argument);
 
         public static Message Test(params IEnumerable<byte>[] args) => new Message(MessageType.Test, args);
+
+        public static Message SetLogOptions(int modelId, LogOptions logOptions) =>
+                new Message(MessageType.SetLogOptions, modelId.ToBytes(), logOptions.Bytes);
     }
 }

@@ -1,9 +1,10 @@
 {
     "name": "Main",
     "references": [
-        "GUID:ef5f6c424c06905468a8583ff910261d",
-        "GUID:2d6aee26718155a4c9a4c846c06269bd",
-        "GUID:aa0490c95e36e484d91e2347678fd417"
+      "GUID:ef5f6c424c06905468a8583ff910261d",
+      "GUID:2d6aee26718155a4c9a4c846c06269bd",
+      "GUID:aa0490c95e36e484d91e2347678fd417",
+      "GUID:dd40fcb1445b9764b82b25dda3a13cb7"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

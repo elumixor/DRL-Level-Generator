@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.ByteConversions;
+using JetBrains.Annotations;
 using RemoteComputation;
+using RemoteComputation.Logging;
 using RemoteComputation.Models;
 using RL;
 using UnityEngine;
@@ -66,6 +68,40 @@ public static class MainController
                 trajectory.Add(startingState, action, reward, nextState);
 
                 if (done) return trajectory;
+
+                startingState = nextState;
+            }
+        });
+    }
+
+    public static Task<Trajectory> SampleTrajectory(Vector generatedData,
+                                                    IActor actor,
+                                                    IEnvironment environment,
+                                                    IStateRenderer stateRenderer,
+                                                    int renderEvery = 1)
+    {
+        return Task.Run(() => {
+            var trajectory = new Trajectory();
+
+            var startingState = environment.ResetEnvironment(generatedData);
+
+            var currentRendered = 1;
+
+            while (true) {
+                if (currentRendered >= renderEvery) {
+                    currentRendered = 0;
+                    stateRenderer.RenderState(startingState);
+                }
+
+                var action = actor.GetAction(startingState);
+                var (nextState, reward, done) = environment.Transition(startingState, action);
+
+                trajectory.Add(startingState, action, reward, nextState);
+
+                if (done) return trajectory;
+
+                currentRendered++;
+                startingState = nextState;
             }
         });
     }
@@ -92,15 +128,18 @@ public static class MainController
         });
     }
 
-    public static async Task TrainAgentEpoch<TModel>(TModel trainableModel,
-                                                     IGenerator generator,
-                                                     float difficulty,
-                                                     IActor actor,
-                                                     IEnvironment environment,
-                                                     int numTrajectories = 1,
-                                                     int numEpochs = 1)
+    public static async Task TrainAgent<TModel>(TModel trainableModel,
+                                                IGenerator generator,
+                                                float difficulty,
+                                                IActor actor,
+                                                IEnvironment environment,
+                                                int numTrajectories = 1,
+                                                int numEpochs = 1,
+                                                LogOptions logOptions = null)
             where TModel : IRemoteModel, IByteAssignable
     {
+        if (logOptions != null) await SetLogOptions(trainableModel, logOptions);
+
         for (var i = 0; i < numEpochs; i++) {
             var trajectories = await SampleTrajectories(numTrajectories, generator, difficulty, actor, environment);
             await TrainAgent(trainableModel, trajectories);
@@ -130,5 +169,12 @@ public static class MainController
         foreach (var estimator in estimators) difficulties.Add(await EstimateDifficulty(estimator, t));
 
         return difficulties.Mean();
+    }
+
+    /* Helpers */
+
+    public static async Task SetLogOptions(IRemoteModel remoteModel, [NotNull] LogOptions logOptions)
+    {
+        await Communicator.Send(Message.SetLogOptions(remoteModel.Id, logOptions));
     }
 }

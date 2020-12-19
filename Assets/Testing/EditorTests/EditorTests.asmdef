@@ -1,13 +1,14 @@
 {
     "name": "EditorTests",
     "references": [
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
-        "RL",
-        "Common",
-        "NN",
-        "RemoteComputation",
-        "Main"
+      "UnityEngine.TestRunner",
+      "UnityEditor.TestRunner",
+      "RL",
+      "Common",
+      "NN",
+      "RemoteComputation",
+      "Main",
+      "TestCommon"
     ],
     "includePlatforms": [
         "Editor"

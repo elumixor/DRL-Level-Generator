@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Testing.PlayModeTests.Pendulum
 {
-    public class DQNPendulumActor : LocalInferenceNN
+    public class DQNPendulumModel : LocalInferenceNN
     {
         new Sequential nn;
         int numActions;
