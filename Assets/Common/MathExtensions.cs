@@ -81,5 +81,7 @@ namespace Common
         }
 
         public static float Abs(this float value) => value >= 0 ? value : -value;
+
+        public static float Remap(this float value, float min, float max) => value * (max - min) + min;
     }
 }

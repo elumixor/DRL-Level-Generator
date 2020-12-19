@@ -14,6 +14,7 @@ namespace Testing.PlayModeTests.Pendulum
 
         Circle[] enemies;
         float passPoint;
+        const float VERTICAL_SPEED = 1f;
 
         public State ResetEnvironment(GeneratedData generatedData)
         {
@@ -73,22 +74,22 @@ namespace Testing.PlayModeTests.Pendulum
         {
             var (verticalPosition, angle, angularDirection) = state;
             var doSwitch = action.DoSwitch;
+            var deltaTime = action.DeltaTime;
 
-            if (doSwitch) angularDirection *= -1f;
-            angle += angularDirection;
+            if (doSwitch) angularDirection *= -VERTICAL_SPEED;
+            angle += angularDirection * deltaTime;
 
             if (angle >= maxAngle) {
                 angle            =  2 * maxAngle - angle;
-                angularDirection *= -1f;
+                angularDirection *= -VERTICAL_SPEED;
             } else if (angle <= -maxAngle) {
                 angle            =  -2 * maxAngle - angle;
-                angularDirection *= -1f;
+                angularDirection *= -VERTICAL_SPEED;
             }
 
-            var nextState = new State(verticalPosition + 1f, angle, angularDirection);
+            var nextState = new State(verticalPosition + VERTICAL_SPEED * deltaTime, angle, angularDirection);
 
             var bob = pendulum.Bob;
-
 
             var passed = verticalPosition >= passPoint;
             var collided = enemies.Any(enemy => enemy.Intersects(bob));
@@ -96,7 +97,7 @@ namespace Testing.PlayModeTests.Pendulum
 
             var done = collided || passed;
 
-            var reward = passed ? 10f : collided ? 0f : 1f;
+            var reward = passed ? 10f : collided ? 0f : VERTICAL_SPEED;
             return (nextState, reward, done);
         }
 
