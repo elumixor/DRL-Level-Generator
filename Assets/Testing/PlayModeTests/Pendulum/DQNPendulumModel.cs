@@ -8,15 +8,15 @@ using UnityEngine;
 
 namespace Testing.PlayModeTests.Pendulum
 {
-    public class DQNPendulumModel : LocalInferenceNN
+    public class DQNPendulumModel : LocalInferenceNN<State, Action>
     {
         new Sequential nn;
         int numActions;
         readonly float epsilon = 0.2f; // TODO: assign epsilon somehow dynamically and lower throughout the training
         public override ModelType ModelType { get; } = ModelType.DQN;
 
-        public override Vector GetAction(Vector state) =>
-                Random.value < epsilon ? new Vector(Random.Range(0, numActions)) : nn.Forward(state).ArgMax();
+        public override Action GetAction(State state) =>
+                Random.value < epsilon ? new Action(Random.value < 0.5f) : new Action(nn.Forward(state).ArgMax() == 0);
 
         public override void AssignFromBytes(ByteReader reader)
         {

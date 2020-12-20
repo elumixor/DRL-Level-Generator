@@ -8,4 +8,7 @@ class LogOptions(dict):
     def __init__(self, reader: ByteReader):
         super().__init__()
         self.length = reader.read_int()
-        self[LogOptionName(reader.read_int())] = LogOption(reader)
+
+        for _ in range(self.length):
+            opt = reader.read_int()
+            self[LogOptionName(opt)] = LogOption(reader)

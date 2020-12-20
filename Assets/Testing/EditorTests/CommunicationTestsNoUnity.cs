@@ -30,9 +30,8 @@ namespace Testing.EditorTests
                 var model = await MainController.ObtainModel<DQN>(5.ToBytes(), 7.ToBytes());
                 o.WriteLine(model);
                 var logOptions = new LogOptions((LogOptionName.TrajectoryReward, new LogOption(10, 100, runningAverageSmoothing: 0.8f)));
-                o.WriteLine(logOptions);
                 await MainController.SetLogOptions(model, logOptions);
-                o.WriteLine("Good!");
+                await o.WriteLineAsync("Good!");
             });
             o.WriteLine("b");
 

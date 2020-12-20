@@ -54,7 +54,12 @@ public static class MainController
         return trainableModel;
     }
 
-    public static Task<Trajectory> SampleTrajectory(Vector generatedData, IActor actor, IEnvironment environment)
+    public static Task<Trajectory> SampleTrajectory<TGenData, TState, TAction>(TGenData generatedData,
+                                                                               IActor<TState, TAction> actor,
+                                                                               IEnvironment<TGenData, TState, TAction> environment)
+            where TGenData : Vector
+            where TState : Vector
+            where TAction : Vector
     {
         return Task.Run(() => {
             var trajectory = new Trajectory();
@@ -106,11 +111,14 @@ public static class MainController
         });
     }
 
-    public static Task<Trajectory[]> SampleTrajectories(int count,
-                                                        IGenerator generator,
-                                                        float difficulty,
-                                                        IActor actor,
-                                                        IEnvironment environment)
+    public static Task<Trajectory[]> SampleTrajectories<TGenData, TState, TAction>(int count,
+                                                                                   IGenerator<TGenData> generator,
+                                                                                   float difficulty,
+                                                                                   IActor<TState, TAction> actor,
+                                                                                   IEnvironment<TGenData, TState, TAction> environment)
+            where TGenData : Vector
+            where TState : Vector
+            where TAction : Vector
     {
         // todo: maybe this is better to do with multiple task and mutex synchronization
         return Task.Run(() => {
@@ -128,15 +136,18 @@ public static class MainController
         });
     }
 
-    public static async Task TrainAgent<TModel>(TModel trainableModel,
-                                                IGenerator generator,
-                                                float difficulty,
-                                                IActor actor,
-                                                IEnvironment environment,
-                                                int numTrajectories = 1,
-                                                int numEpochs = 1,
-                                                LogOptions logOptions = null)
+    public static async Task TrainAgent<TModel, TGenData, TState, TAction>(TModel trainableModel,
+                                                                           IGenerator<TGenData> generator,
+                                                                           float difficulty,
+                                                                           IActor<TState, TAction> actor,
+                                                                           IEnvironment<TGenData, TState, TAction> environment,
+                                                                           int numTrajectories = 1,
+                                                                           int numEpochs = 1,
+                                                                           LogOptions logOptions = null)
             where TModel : IRemoteModel, IByteAssignable
+            where TGenData : Vector
+            where TState : Vector
+            where TAction : Vector
     {
         if (logOptions != null) await SetLogOptions(trainableModel, logOptions);
 
