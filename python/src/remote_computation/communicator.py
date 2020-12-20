@@ -1,17 +1,18 @@
 import multiprocessing as mp
 import time
 from threading import Thread
-from typing import Union, List
+from typing import Union, List, Dict
 
 import zmq
 
 from common import ByteReader
-from remote_computation import model_manager
-from remote_computation.message_type import MessageType
+from remote_computation import model_manager, RemoteModel, logging
 from serialization import to_bytes
+from .logging import LogOptions
+from .message_type import MessageType
 
 
-def _process_message(message: bytes, models_dict, result: List[bytes]):
+def _process_message(message: bytes, result: List[bytes], models_dict: Dict[int, RemoteModel]):
     reader = ByteReader(message)
 
     request_id = reader.read_int()
@@ -47,6 +48,27 @@ def _process_message(message: bytes, models_dict, result: List[bytes]):
         task_result = model.run_task(reader)
 
         result[:] = list(to_bytes(request_id) + task_result)
+        return
+
+    if message_type == MessageType.SetLogOptions:
+        model_id = reader.read_int()
+
+        model = model_manager.get(models_dict, model_id)
+        model.log_options = LogOptions(reader)
+
+        result[:] = list(to_bytes(request_id))
+        return
+
+    # Test messages
+    if message_type == MessageType.ShowLog:
+        model_id = reader.read_int()
+
+        model = model_manager.get(models_dict, model_id)
+        logging.show(model.log_data, model.log_options)
+
+        model.log_options = LogOptions(reader)
+
+        result[:] = list(to_bytes(request_id))
         return
 
     if message_type == MessageType.Test:
@@ -114,7 +136,7 @@ class Communicator:
         print(f"Message received ({len(message)}B)")
 
         result = self.manager.list()
-        handler = mp.Process(target=_process_message, args=(message, self.models_dict, result))
+        handler = mp.Process(target=_process_message, args=(message, result, self.models_dict))
         handler.start()
         handler.join()
 

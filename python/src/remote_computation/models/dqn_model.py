@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.nn import Sequential, Linear, ReLU
@@ -8,6 +9,7 @@ from RL import Trajectory, State, Action, Transition
 from common import ByteReader
 from serialization import to_bytes
 from .remote_model import RemoteModel, TaskType
+from ..logging import LogOptionName
 
 discount = 0.99
 
@@ -47,6 +49,13 @@ class DQNModel(RemoteModel):
                 transition = reader.read_transition()
                 transitions.append(transition)
 
+            _, _, rewards, _ = zip(*transitions)
+            self.log_data.add_entry(LogOptionName.TrajectoryReward, (np.min(rewards), np.mean(rewards), np.max(rewards)))
+
+            # todo: NOTE: transitions are newly sampled transitions
+            # todo: this is not how DQN should work
+            # todo: we should add these transition into the buffer and
+            # todo: then sample some random transitions
             self.train(transitions)
             return b''
 
@@ -79,6 +88,8 @@ class DQNModel(RemoteModel):
         self.optim.zero_grad()
         loss.backward()
         self.optim.step()
+
+        self.log_data.add_entry(LogOptionName.TrainingLoss, float(loss))
 
     def estimate_difficulty(self, trajectory: Trajectory):
         states, *_ = zip(*trajectory)

@@ -11,11 +11,14 @@ class ByteReader:
         self.b = b
         self.current_index = start_index
 
-    def read_int(self):
+    def read_int(self) -> int:
         return struct.unpack('i', self._get_part(4))[0]
 
-    def read_float(self):
+    def read_float(self) -> float:
         return struct.unpack('f', self._get_part(4))[0]
+
+    def read_bool(self) -> bool:
+        return struct.unpack('?', self._get_part(1))[0]
 
     def read_string(self):
         length = self.read_int()

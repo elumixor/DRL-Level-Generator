@@ -20,6 +20,9 @@ namespace RemoteComputation
             RunTask = 3,
             SetLogOptions = 4,
 
+            // Testing options below
+            ShowLog = 90,
+
             Test = 99,
         }
 

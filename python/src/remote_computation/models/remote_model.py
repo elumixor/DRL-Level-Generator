@@ -1,10 +1,12 @@
 import abc
 from enum import Enum
+from typing import Union
 
 from torch.nn import Sequential
 from torch.optim import Adam
 
 from common import ByteReader
+from remote_computation.logging import LogOptions, LogData
 from serialization import to_bytes
 
 
@@ -23,6 +25,8 @@ class RemoteModel(abc.ABC):
         self.output_size = reader.read_int()
         self.nn: Sequential = self._construct_nn(self.input_size, self.output_size)
         self.optim = Adam(self.nn.parameters())
+        self.log_options: Union[LogOptions, None] = None
+        self.log_data = LogData()
 
     @property
     def response_bytes(self) -> bytes:
