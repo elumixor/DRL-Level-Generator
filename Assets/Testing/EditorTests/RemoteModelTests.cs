@@ -11,15 +11,6 @@ namespace Testing.EditorTests
 {
     public class RemoteModelTests
     {
-        class DQN : LocalInferenceNN
-        {
-            /// <inheritdoc/>
-            public override ModelType ModelType { get; } = ModelType.DQN;
-
-            /// <inheritdoc/>
-            public override string ToString() => "DQN:\n" + nn;
-        }
-
         [TearDown] public void TearDown() { Communicator.Close(); }
 
         [Test]

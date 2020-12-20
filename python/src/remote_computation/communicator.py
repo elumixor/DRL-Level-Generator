@@ -5,11 +5,13 @@ from typing import Union, List, Dict
 
 import zmq
 
+import remote_computation.logging as logging
+import remote_computation.model_manager as model_manager
 from common import ByteReader
-from remote_computation import model_manager, RemoteModel, logging
 from serialization import to_bytes
 from .logging import LogOptions
 from .message_type import MessageType
+from .models import RemoteModel
 
 
 def _process_message(message: bytes, result: List[bytes], models_dict: Dict[int, RemoteModel]):

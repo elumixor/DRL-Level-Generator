@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ using NetMQ.Sockets;
 
 namespace RemoteComputation
 {
-    public class Communicator
+    public static class Communicator
     {
         static bool isConnected;
 
@@ -128,6 +129,8 @@ namespace RemoteComputation
             Semaphore.Wait();
 
             while (true) {
+                Console.WriteLine("checking...");
+
                 if (shouldExit) {
                     Semaphore.Release();
                     return;
@@ -142,12 +145,17 @@ namespace RemoteComputation
 
                 // Get all messages
                 while (pull.TryReceiveFrameBytes(out var message)) {
+                    // when there is an error on the back-end, 0 byte response is incoming
+                    if (message.Length == 0) {
+                        Semaphore.Release();
+                        throw new CommunicationException("Received an empty message");
+                    }
+
                     var reader = new ByteReader(message);
                     var id = reader.ReadInt();
 
                     var (cond, _) = Callbacks[id];
                     Callbacks[id] = (cond, reader);
-
                     cond.Release();
                 }
 

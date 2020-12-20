@@ -12,7 +12,7 @@ namespace Testing.PlayModeTests.Pendulum
     {
         new Sequential nn;
         int numActions;
-        float epsilon;
+        readonly float epsilon = 0.2f; // TODO: assign epsilon somehow dynamically and lower throughout the training
         public override ModelType ModelType { get; } = ModelType.DQN;
 
         public override Vector GetAction(Vector state) =>
