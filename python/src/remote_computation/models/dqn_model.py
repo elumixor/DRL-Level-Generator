@@ -8,6 +8,7 @@ from torch.nn import Sequential, Linear, ReLU
 from RL import Trajectory, State, Action, Transition
 from common import ByteReader
 from serialization import to_bytes
+from .model_type import ModelType
 from .remote_model import RemoteModel, TaskType
 from ..logging import LogOptionName
 
@@ -29,6 +30,10 @@ class DQNModel(RemoteModel):
 
     def __init__(self, model_id: int, reader: ByteReader):
         super().__init__(model_id, reader)
+
+    @property
+    def model_type(self) -> ModelType:
+        return ModelType.DQN
 
     def _construct_nn(self, input_size: int, output_size: int):
         hidden_size = 5
@@ -61,7 +66,8 @@ class DQNModel(RemoteModel):
             mins, means, maxs, lengths = zip(*datas)
 
             self.log_data.add_entry(LogOptionName.TrajectoryReward,
-                                    (np.min(mins), ((np.array(means) * np.array(lengths)).sum() / np.sum(lengths)), np.max(maxs)))
+                                    (np.min(mins), ((np.array(means) * np.array(lengths)).sum() / np.sum(lengths)),
+                                     np.max(maxs)))
 
             # print(f"training... {len(transitions)} transitions received")
 

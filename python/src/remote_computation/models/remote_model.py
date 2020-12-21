@@ -7,6 +7,7 @@ from torch.optim import Adam
 
 from common import ByteReader
 from remote_computation.logging import LogOptions, LogData
+from .model_type import ModelType
 from serialization import to_bytes
 
 
@@ -20,9 +21,6 @@ class RemoteModel(abc.ABC):
 
     def __init__(self, model_id: int, reader: ByteReader):
         self.model_id = model_id
-
-        print("INIT!")
-
         self.input_size = reader.read_int()
         self.output_size = reader.read_int()
         self.nn: Sequential = self._construct_nn(self.input_size, self.output_size)
@@ -31,19 +29,22 @@ class RemoteModel(abc.ABC):
         self.log_data = LogData()
 
     @property
+    @abc.abstractmethod
+    def model_type(self) -> ModelType:
+        pass
+
+    @property
     def response_bytes(self) -> bytes:
         return to_bytes(self.model_id) + to_bytes(self.nn) + to_bytes(self.nn.state_dict())
 
     @property
     def save_bytes(self):
-        return to_bytes(self.input_size) + to_bytes(self.output_size) + to_bytes(self.nn.state_dict())
+        return to_bytes(self.model_type) + \
+               to_bytes(self.input_size) + \
+               to_bytes(self.output_size) + \
+               to_bytes(self.nn.state_dict())
 
     def load_from_file(self, reader: ByteReader):
-        input_size = reader.read_int()
-        output_size = reader.read_int()
-        self.nn = self._construct_nn(input_size, output_size)
-        self.input_size = input_size
-        self.output_size = output_size
         state_dict = reader.read_state_dict()
         self.nn.load_state_dict(state_dict)
         self.optim = Adam(self.nn.parameters())
