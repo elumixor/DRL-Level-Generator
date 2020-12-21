@@ -148,6 +148,7 @@ namespace RemoteComputation
                     // when there is an error on the back-end, 0 byte response is incoming
                     if (message.Length == 0) {
                         Semaphore.Release();
+                        // Close(); // todo: change, this is incorrect!
                         throw new CommunicationException("Received an empty message");
                     }
 

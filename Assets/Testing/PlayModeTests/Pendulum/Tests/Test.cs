@@ -13,7 +13,12 @@ namespace Testing.PlayModeTests.Pendulum.Tests
 {
     public class Test
     {
-        [TearDown] public void TearDown() { Communicator.Close(); }
+        [TearDown]
+        public void TearDown()
+        {
+            Debug.Log("closed...");
+            Communicator.Close();
+        }
 
         [UnityTest]
         public IEnumerator AnimationWorks()

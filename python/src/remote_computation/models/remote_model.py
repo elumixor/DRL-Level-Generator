@@ -21,6 +21,8 @@ class RemoteModel(abc.ABC):
     def __init__(self, model_id: int, reader: ByteReader):
         self.model_id = model_id
 
+        print("INIT!")
+
         self.input_size = reader.read_int()
         self.output_size = reader.read_int()
         self.nn: Sequential = self._construct_nn(self.input_size, self.output_size)

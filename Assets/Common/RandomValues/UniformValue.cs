@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Common.RandomValues
 {
@@ -17,7 +16,7 @@ namespace Common.RandomValues
         }
 
         /// <inheritdoc/>
-        public float Sample => Random.value.Remap(min, max);
+        public float Sample => MathExtensions.RandomValue(min, max);
     }
 
     [Serializable]
@@ -33,6 +32,6 @@ namespace Common.RandomValues
         }
 
         /// <inheritdoc/>
-        public int Sample => Random.Range(min, max);
+        public int Sample => MathExtensions.RandomValue(min, max);
     }
 }

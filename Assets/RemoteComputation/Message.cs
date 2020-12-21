@@ -38,9 +38,12 @@ namespace RemoteComputation
         public static Message RunTask(int id, RemoteTask task, IEnumerable<byte> argument) =>
                 new Message(MessageType.RunTask, id.ToBytes(), ((int) task).ToBytes(), argument);
 
-        public static Message Test(params IEnumerable<byte>[] args) => new Message(MessageType.Test, args);
-
         public static Message SetLogOptions(int modelId, LogOptions logOptions) =>
                 new Message(MessageType.SetLogOptions, modelId.ToBytes(), logOptions.Bytes);
+
+        public static Message ShowLog(int modelId) =>
+                new Message(MessageType.ShowLog, modelId.ToBytes());
+
+        public static Message Test(params IEnumerable<byte>[] args) => new Message(MessageType.Test, args);
     }
 }

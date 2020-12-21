@@ -20,7 +20,7 @@ class LogData:
             raise RuntimeError(f"Previous entry type was {self.entries_types[name]}, now is {value_type}")
 
         entry = RangedEntry(*value) if isinstance(value, Tuple) else SingleEntry(value)
-        if name not in self.entries_types:
+        if name not in self.entries:
             self.entries[name] = [entry]
         else:
             self.entries[name].append(entry)

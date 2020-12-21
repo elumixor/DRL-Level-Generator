@@ -38,8 +38,8 @@ def load_model(model_dict: MD, file_path) -> RemoteModel:
     if model_type == ModelType.DQN:
         model_id = _next_model_id(model_dict)
         model = DQNModel(model_id, reader)
-        model_dict[model_id] = model
         model.load_from_file(reader)
+        model_dict[model_id] = model
         return model
 
     raise RuntimeError(f"Unknown model type: {model_type}")

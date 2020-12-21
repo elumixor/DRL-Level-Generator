@@ -1,8 +1,10 @@
 ﻿using System.Collections;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Common.ByteConversions;
 using Common.RandomValues;
 using NUnit.Framework;
+using RemoteComputation;
 using RemoteComputation.Logging;
 using Testing.TestCommon;
 using UnityEngine;
@@ -60,15 +62,81 @@ namespace Testing.PlayModeTests.Pendulum.Tests
 
             var dqnModel = dqnTask.Result;
 
-            var trainingTask = MainController.TrainAgent(dqnModel,
-                                                         generator,
-                                                         0.5f,
-                                                         dqnModel,
-                                                         environment,
-                                                         10,
-                                                         10,
-                                                         new LogOptions((LogOptionName.TrajectoryReward,
-                                                                         new LogOption(10, 100, runningAverageSmoothing: 0.8f))));
+            // var trainingTask = MainController.TrainAgent(dqnModel,
+            //                                              generator,
+            //                                              0.5f,
+            //                                              dqnModel,
+            //                                              environment,
+            //                                              10,
+            //                                              10,
+            //                                              new LogOptions((LogOptionName.TrajectoryReward,
+            //                                                              new LogOption(10, 100, runningAverageSmoothing: 0.8f))));
+            // yield return new WaitUntil(() => trainingTask.IsCompleted);
+
+            Debug.Log("Training done");
+
+            var trajectoryTask = MainController.SampleTrajectory(generator.Generate(0.5f), dqnModel, environment);
+
+            yield return new WaitUntil(() => trajectoryTask.IsCompleted);
+
+            var trajectory = trajectoryTask.Result;
+            Debug.Log("Trajectory done");
+            Debug.Log(trajectory.Length);
+
+            var trainingTask = MainController.TrainAgent(dqnModel, new[] {trajectory});
+
+            var elapsed = 0f;
+
+            while (elapsed < 10f && !trainingTask.IsCompleted) {
+                yield return new WaitForSeconds(1f);
+
+                elapsed += 1f;
+
+                Debug.Log("Still waiting...");
+            }
+
+            // yield return new WaitUntil(() => trainingTask.IsCompleted);
+
+            Debug.Log($"Training done? {trainingTask.IsCompleted}");
+
+            // var elapsed = 0f;
+            //
+            // while (elapsed < 10f && !trainingTask.IsCompleted) {
+            //     Debug.Log("Task running...");
+            //     yield return new WaitForSeconds(1f);
+            //     elapsed += 1f;
+            //
+            //     Debug.Log(elapsed);
+            //     Debug.Log(trainingTask.IsCompleted);
+            // }
+            //
+            // if (!trainingTask.IsCompleted) Assert.Fail("Too slow");
+
+            Debug.Log("Yay!");
+            var logOptions = new LogOptions((LogOptionName.TrajectoryReward, new LogOption(10, 100, runningAverageSmoothing: 0.8f)));
+            var setOptionsTask = Communicator.Send(Message.SetLogOptions(dqnModel.Id, logOptions));
+            elapsed = 0f;
+
+            while (elapsed < 10f && !setOptionsTask.IsCompleted) {
+                yield return new WaitForSeconds(1f);
+
+                elapsed += 1f;
+
+                Debug.Log("Still waiting...");
+            }
+            Debug.Log($"Set Log options done? {setOptionsTask.IsCompleted}");
+
+            var loggingTask = Communicator.Send(Message.ShowLog(dqnModel.Id));
+            elapsed = 0f;
+
+            while (elapsed < 10f && !loggingTask.IsCompleted) {
+                yield return new WaitForSeconds(1f);
+
+                elapsed += 1f;
+
+                Debug.Log("Still waiting...");
+            }
+            Debug.Log($"Logging done? {loggingTask.IsCompleted}");
         }
     }
 }

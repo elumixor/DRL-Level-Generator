@@ -16,7 +16,7 @@ namespace Testing.PlayModeTests.Pendulum
         public override ModelType ModelType { get; } = ModelType.DQN;
 
         public override Action GetAction(State state) =>
-                Random.value < epsilon ? new Action(Random.value < 0.5f) : new Action(nn.Forward(state).ArgMax() == 0);
+                MathExtensions.RandomValue() < epsilon ? new Action(MathExtensions.RandomValue() < 0.5f) : new Action(nn.Forward(state).ArgMax() == 0);
 
         public override void AssignFromBytes(ByteReader reader)
         {

@@ -45,13 +45,11 @@ public static class MainController
 
     /* More specific stuff */
 
-    public static async Task<TModel> TrainAgent<TModel>(TModel trainableModel, IEnumerable<Trajectory> episodes)
+    public static async Task TrainAgent<TModel>(TModel trainableModel, IReadOnlyCollection<Trajectory> trajectories)
             where TModel : IRemoteModel, IByteAssignable
     {
-        var asList = episodes.ToList();
-        var reader = await RemoteTaskRunner.RunTask(trainableModel.Id, RemoteTask.Train, asList.MapToBytes(t => t.Bytes));
+        var reader = await RemoteTaskRunner.RunTask(trainableModel.Id, RemoteTask.Train, trajectories.MapToBytes(t => t.Bytes));
         trainableModel.AssignFromBytes(reader);
-        return trainableModel;
     }
 
     public static Task<Trajectory> SampleTrajectory<TGenData, TState, TAction>(TGenData generatedData,
@@ -151,10 +149,15 @@ public static class MainController
     {
         if (logOptions != null) await SetLogOptions(trainableModel, logOptions);
 
+        Debug.Log($"? {numEpochs}");
+
         for (var i = 0; i < numEpochs; i++) {
+            Debug.Log(i);
             var trajectories = await SampleTrajectories(numTrajectories, generator, difficulty, actor, environment);
             await TrainAgent(trainableModel, trajectories);
         }
+
+        Debug.Log("Returning?????");
     }
 
     public static async Task<float> EstimateDifficulty(IRemoteModel estimator, Trajectory trajectory)

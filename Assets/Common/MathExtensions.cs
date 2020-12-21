@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using Random = System.Random;
 
 namespace Common
 {
     public static class MathExtensions
     {
+        // We use custom random not to depend on UnityEngine, and to call from the other threads
+        public static readonly Random Random = new Random();
+        public static float RandomValue(float min = 0f, float max = 1f) => (float) Random.NextDouble() * (max - min) + min;
+        public static int RandomValue(int max) => Random.Next(max);
+        public static int RandomValue(int min, int max) => Random.Next(min, max);
+
         public static IEnumerable<float> Softmax(this IEnumerable<float> x)
         {
             var input = x.ToArray();
@@ -36,7 +42,7 @@ namespace Common
 
             // Choose from CDF:
             var max = cdf[p.Length - 1];
-            var cdf_value = Random.Range(0.0f, max);
+            var cdf_value = RandomValue(0.0f, max);
             var index = Array.BinarySearch(cdf, cdf_value);
 
             if (index < 0)
@@ -65,7 +71,7 @@ namespace Common
         }
 
         public static int SampleEpsilonGreedy(this IEnumerable<float> qValues, float epsilon) =>
-                Random.value < epsilon ? qValues.ArgMax() : Random.Range(0, qValues.Count());
+                RandomValue() < epsilon ? qValues.ArgMax() : RandomValue(0, qValues.Count());
 
         public static float Mean(this IEnumerable<float> values)
         {

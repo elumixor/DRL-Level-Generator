@@ -21,12 +21,14 @@ def _process_message(message: bytes, result: List[bytes], models_dict: Dict[int,
     message_type = MessageType(reader.read_int())
 
     if message_type == MessageType.ObtainModel:
+        print("Obtain model")
         model = model_manager.obtain_new(models_dict, reader)
 
         result[:] = list(to_bytes(request_id) + model.response_bytes)
         return
 
     if message_type == MessageType.LoadModel:
+        print("Load model")
         file_path = reader.read_string()
 
         model = model_manager.load_model(models_dict, file_path)
@@ -35,6 +37,7 @@ def _process_message(message: bytes, result: List[bytes], models_dict: Dict[int,
         return
 
     if message_type == MessageType.SaveModel:
+        print("Save model")
         model_id = reader.read_int()
         file_path = reader.read_string()
 
@@ -44,36 +47,55 @@ def _process_message(message: bytes, result: List[bytes], models_dict: Dict[int,
         return
 
     if message_type == MessageType.RunTask:
+        print("Run task")
         model_id = reader.read_int()
 
         model = model_manager.get(models_dict, model_id)
         task_result = model.run_task(reader)
 
+        # Update the dict in case the model has changed
+        models_dict[model_id] = model
+
         result[:] = list(to_bytes(request_id) + task_result)
         return
 
     if message_type == MessageType.SetLogOptions:
+        print("Set log options")
         model_id = reader.read_int()
 
         model = model_manager.get(models_dict, model_id)
         model.log_options = LogOptions(reader)
+        print(model_id)
+        print(model.log_options)
+        print(model)
+        print(model.nn.state_dict())
+        # Update the dict in case the model has changed
+        models_dict[model_id] = model
 
         result[:] = list(to_bytes(request_id))
         return
 
     # Test messages
     if message_type == MessageType.ShowLog:
+        print("Show log")
         model_id = reader.read_int()
 
         model = model_manager.get(models_dict, model_id)
+        print(model_id)
+        print(model.log_options)
+        print(model)
+        print(model.nn.state_dict())
+
         logging.show(model.log_data, model.log_options)
 
-        model.log_options = LogOptions(reader)
+        # Update the dict in case the model has changed
+        models_dict[model_id] = model
 
         result[:] = list(to_bytes(request_id))
         return
 
     if message_type == MessageType.Test:
+        print("Test")
         data = reader.read_to_end()
         print(f"Received: {data}")
         # print(request_id)
