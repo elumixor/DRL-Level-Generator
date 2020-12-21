@@ -1,3 +1,4 @@
+from random import random
 from typing import List
 
 import numpy as np
@@ -86,41 +87,25 @@ class DQNModel(RemoteModel):
         raise NotImplementedError()
 
     def infer(self, state: State) -> Action:
-        raise NotImplementedError()
+        epsilon = 0.2  # todo move this elsewhere, set dynamically somehow
+        if random() < epsilon:
+            return np.random.randint(self.output_size)
+
+        return self.nn.forward(torch.tensor(state).unsqueeze(0)).squeeze().argmax().item()
 
     def train(self, transitions: List[Transition]):
         states, actions, rewards, next_states = zip(*transitions)
-
-        print(states)
-        print(actions)
-        print(rewards)
-        print(next_states)
-
-        print("Now torch: ")
 
         states = torch.tensor(states)
         actions = torch.tensor(actions)[:, 0].long()
         rewards = torch.tensor(rewards)
         next_states = torch.tensor(next_states)
 
-        print(states)
-        print(actions)
-        print(rewards)
-        print(next_states)
-
-        print("now stuff:")
-
         v_next = self.nn.forward(next_states).max(dim=1, keepdim=True)[0]
-        q = self.nn.forward(states)
-        print(q)
         q_current = self.nn.forward(states)[range(actions.shape[0]), actions].flatten()
         v_next = v_next.flatten()
 
-        print(v_next)
-        print(q_current)
-
         # Smooth l1 loss behaves like L2 near zero, but otherwise it's L1
-        print(rewards + discount * v_next)
         loss = F.smooth_l1_loss(q_current, rewards + discount * v_next)
 
         self.optim.zero_grad()
