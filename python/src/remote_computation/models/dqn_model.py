@@ -8,6 +8,7 @@ from torch.nn import Sequential, Linear, ReLU
 
 from RL import Trajectory, State, Action, Transition
 from common import ByteReader
+from common.memory_buffer import MemoryBuffer
 from serialization import to_bytes
 from .model_type import ModelType
 from .remote_model import RemoteModel, TaskType
@@ -32,6 +33,19 @@ class DQNModel(RemoteModel):
     def __init__(self, model_id: int, reader: ByteReader):
         super().__init__(model_id, reader)
 
+        # These should probably be set from the reader
+        self.epsilon_initial = 0.5
+        self.epsilon_end = 0.01
+        self.epsilon_decay_epochs = 2000
+
+        self.epsilon = self.epsilon_initial
+        self.elapsed_epochs = 0
+
+        # store last 2000 transitions
+        self.memory = MemoryBuffer(capacity=2000)
+
+        self.training_batch_size = 200
+
     @property
     def model_type(self) -> ModelType:
         return ModelType.DQN
@@ -53,15 +67,17 @@ class DQNModel(RemoteModel):
             return to_bytes(action)
 
         if task == TaskType.Train:
-            trajectories = []
             trajectories_count = reader.read_int()
 
             datas = []
 
             for _ in range(trajectories_count):
                 trajectory = reader.read_trajectory()
-                trajectories.append(trajectory)
                 data = get_trajectory_data(trajectory)
+
+                for transition in trajectory:
+                    self.memory.push(transition)
+
                 datas.append(data)
 
             mins, means, maxs, lengths = zip(*datas)
@@ -70,13 +86,7 @@ class DQNModel(RemoteModel):
                                     (np.min(mins), ((np.array(means) * np.array(lengths)).sum() / np.sum(lengths)),
                                      np.max(maxs)))
 
-            # print(f"training... {len(transitions)} transitions received")
-
-            # todo: NOTE: transitions are newly sampled transitions
-            # todo: this is not how DQN should work
-            # todo: we should add these transition into the buffer and
-            # todo: then sample some random transitions
-            self.train(trajectories[0])
+            self.train()
             return b''
 
         if task == TaskType.EstimateDifficulty:
@@ -87,13 +97,19 @@ class DQNModel(RemoteModel):
         raise NotImplementedError()
 
     def infer(self, state: State) -> Action:
-        epsilon = 0.2  # todo move this elsewhere, set dynamically somehow
-        if random() < epsilon:
-            return np.random.randint(self.output_size)
+        if random() < self.epsilon:
+            return [np.random.randint(self.output_size)]
 
-        return self.nn.forward(torch.tensor(state).unsqueeze(0)).squeeze().argmax().item()
+        q = self.nn.forward(torch.tensor(state).unsqueeze(0))
+        action = q.squeeze().argmax().item()
+        return [action]
 
-    def train(self, transitions: List[Transition]):
+    def train(self):
+        if not self.memory.is_full:
+            print(f"memory is not yet full [{self.memory.size}/{self.memory.capacity}]")
+            return
+
+        transitions = self.memory.sample(self.training_batch_size)
         states, actions, rewards, next_states = zip(*transitions)
 
         states = torch.tensor(states)
@@ -113,6 +129,10 @@ class DQNModel(RemoteModel):
         self.optim.step()
 
         self.log_data.add_entry(LogOptionName.TrainingLoss, float(loss))
+
+        # Update epsilon
+        r = max((self.epsilon_decay_epochs - self.elapsed_epochs) / self.epsilon_decay_epochs, 0.0)
+        self.epsilon = (self.epsilon_initial - self.epsilon_end) * r + self.epsilon_end
 
     def estimate_difficulty(self, trajectory: Trajectory):
         states, *_ = zip(*trajectory)

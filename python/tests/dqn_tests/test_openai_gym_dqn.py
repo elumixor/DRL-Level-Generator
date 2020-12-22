@@ -4,18 +4,20 @@ from unittest import TestCase
 import gym
 import torch
 
-import remote_computation.model_manager as mm
 import remote_computation.logging as L
+import remote_computation.model_manager as mm
 from common import ByteReader
 from fake_frontend.base_framework import train
 from remote_computation.logging import LogOptions, LogOptionName
 from remote_computation.models import ModelType, DQNModel
+from remote_computation.models.remote_model import TaskType
 from serialization import to_bytes
 
 
 class RemoteModelLocalTests(TestCase):
+
     def test_obtain_works(self):
-        class DQNAgentWrapper():
+        class DQNAgentWrapper:
             torch_device = "cuda"
 
             def __init__(self, env, plotter=None):
@@ -66,11 +68,22 @@ class RemoteModelLocalTests(TestCase):
                 with torch.no_grad():
                     self.previous_state = state
                     action = self.model.infer(state.tolist())
-                    return action
+                    return int(action[0])
 
             def update(self) -> None:
-                print("update")
-                self.model.train(self.current_trajectory)
+                b = to_bytes(TaskType.Train)
+                # num trajectories
+                b += to_bytes(1)
+                # num transitions in trajectory
+                b += to_bytes(len(self.current_trajectory))
+
+                for state, action, reward, next_state in self.current_trajectory:
+                    b += to_bytes(state)
+                    b += to_bytes(action)
+                    b += to_bytes(reward)
+                    b += to_bytes(next_state)
+
+                self.model.run_task(ByteReader(b))
                 L.show(self.model.log_data, self.model.log_options)
                 self.current_trajectory = []
 

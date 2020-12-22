@@ -149,3 +149,4 @@ __pycache__/
 
 **/InitTestScene*.unity
 **/InitTestScene*.unity.meta
+/python/tests/dqn_tests/dqn_model.m
