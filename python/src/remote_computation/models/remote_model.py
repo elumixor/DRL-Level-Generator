@@ -7,8 +7,8 @@ from torch.optim import Adam
 
 from common import ByteReader
 from remote_computation.logging import LogOptions, LogData
-from .model_type import ModelType
 from serialization import to_bytes
+from .model_type import ModelType
 
 
 class TaskType(int, Enum):
@@ -24,7 +24,7 @@ class RemoteModel(abc.ABC):
         self.input_size = reader.read_int()
         self.output_size = reader.read_int()
         self.nn: Sequential = self._construct_nn(self.input_size, self.output_size)
-        self.optim = Adam(self.nn.parameters())
+        self.optim = Adam(self.nn.parameters(), lr=0.1)  # todo: read learning rate from byte reader
         self.log_options: Union[LogOptions, None] = None
         self.log_data = LogData()
 
