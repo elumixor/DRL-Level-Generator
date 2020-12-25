@@ -8,7 +8,7 @@ import remote_computation.logging as L
 import remote_computation.model_manager as mm
 from common import ByteReader
 from fake_frontend.base_framework import train
-from remote_computation.logging import LogOptions, LogOptionName
+from remote_computation.logging import LogOptions, LogOptionName, LogOption
 from remote_computation.models import ModelType, DQNModel
 from remote_computation.models.remote_model import TaskType
 from serialization import to_bytes
@@ -20,7 +20,7 @@ class RemoteModelLocalTests(TestCase):
         class DQNAgentWrapper:
             torch_device = "cuda"
 
-            def __init__(self, env, plotter=None):
+            def __init__(self, env):
                 self.state_size = env.observation_space.shape[0]
                 self.action_size = env.action_space.n
                 self.current_trajectory = []
@@ -35,24 +35,12 @@ class RemoteModelLocalTests(TestCase):
 
                 self.model: DQNModel = mm.obtain_new(model_dict, ByteReader(b))
 
-                b = b''
-                b += to_bytes(1)
-                b += to_bytes(LogOptionName.TrainingLoss)
+                self.model.log_options = LogOptions.create([
+                        (LogOptionName.TrajectoryReward, LogOption.create(5, 100, True, True, True, 0.8)),
+                        (LogOptionName.TrainingLoss, LogOption.create(5, 100, True, True, True, 0.8)),
+                        (LogOptionName.Epsilon, LogOption.create(5, 100, True, True, True, 0.8)),
+                ])
 
-                # self.frequency = reader.read_int()
-                b += to_bytes(5)
-                # self.logLastN = reader.read_int()
-                b += to_bytes(100)
-                # self.print = reader.read_bool()
-                b += to_bytes(True)
-                # self.plot = reader.read_bool()
-                b += to_bytes(False)
-                # self.minMax = reader.read_bool()
-                b += to_bytes(False)
-                # self.runningAverageSmoothing = reader.read_float()
-                b += to_bytes(0.8)
-
-                self.model.log_options = LogOptions(ByteReader(b))
                 self.current_trajectory: List[Tuple[List[float], List[float], float, List[float]]] = []
 
             def on_trajectory_started(self, state):
@@ -84,7 +72,7 @@ class RemoteModelLocalTests(TestCase):
                     b += to_bytes(next_state)
 
                 self.model.run_task(ByteReader(b))
-                L.show(self.model.log_data, self.model.log_options)
+                L.show(self.model.model_id, self.model.log_data, self.model.log_options)
                 self.current_trajectory = []
 
         train(gym.make('CartPole-v0'), DQNAgentWrapper, epochs=2000, num_rollouts=5, render_frequency=5)

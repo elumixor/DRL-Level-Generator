@@ -23,9 +23,8 @@ def one_hot(x, size):
     return res
 
 
-def get_trajectory_data(trajectory: List[Transition]):
-    _, _, rewards, _ = zip(*trajectory)
-    return np.min(rewards), np.mean(rewards), np.max(rewards), len(trajectory)
+def get_trajectory_total_reward(trajectory: List[Transition]):
+    return sum([transition[2] for transition in trajectory])
 
 
 class DQNModel(RemoteModel):
@@ -36,7 +35,7 @@ class DQNModel(RemoteModel):
         # These should probably be set from the reader
         self.epsilon_initial = 0.5
         self.epsilon_end = 0.01
-        self.epsilon_decay_epochs = 2000
+        self.epsilon_decay_epochs = 100
 
         self.epsilon = self.epsilon_initial
         self.elapsed_epochs = 0
@@ -69,24 +68,21 @@ class DQNModel(RemoteModel):
         if task == TaskType.Train:
             trajectories_count = reader.read_int()
 
-            datas = []
+            trajectory_rewards: List[float] = []
 
             for _ in range(trajectories_count):
                 trajectory = reader.read_trajectory()
-                data = get_trajectory_data(trajectory)
+                trajectory_reward = get_trajectory_total_reward(trajectory)
 
                 for transition in trajectory:
                     self.memory.push(transition)
 
-                datas.append(data)
-
-            mins, means, maxs, lengths = zip(*datas)
+                trajectory_rewards.append(trajectory_reward)
 
             self.log_data.add_entry(LogOptionName.TrajectoryReward,
-                                    (np.min(mins), ((np.array(means) * np.array(lengths)).sum() / np.sum(lengths)),
-                                     np.max(maxs)))
+                                    (min(trajectory_rewards), np.mean(trajectory_rewards).tolist(), max(trajectory_rewards)))
 
-            self.train()
+            self.train(10)
             return b''
 
         if task == TaskType.EstimateDifficulty:
@@ -104,35 +100,44 @@ class DQNModel(RemoteModel):
         action = q.squeeze().argmax().item()
         return [action]
 
-    def train(self):
+    def train(self, times: int):
         if not self.memory.is_full:
             print(f"memory is not yet full [{self.memory.size}/{self.memory.capacity}]")
             return
 
-        transitions = self.memory.sample(self.training_batch_size)
-        states, actions, rewards, next_states = zip(*transitions)
+        losses = []
 
-        states = torch.tensor(states)
-        actions = torch.tensor(actions)[:, 0].long()
-        rewards = torch.tensor(rewards)
-        next_states = torch.tensor(next_states)
+        for _ in range(times):
+            transitions = self.memory.sample(self.training_batch_size)
+            states, actions, rewards, next_states = zip(*transitions)
 
-        v_next = self.nn.forward(next_states).max(dim=1, keepdim=True)[0]
-        q_current = self.nn.forward(states)[range(actions.shape[0]), actions].flatten()
-        v_next = v_next.flatten()
+            states = torch.tensor(states)
+            actions = torch.tensor(actions)[:, 0].long()
+            rewards = torch.tensor(rewards)
+            next_states = torch.tensor(next_states)
 
-        # Smooth l1 loss behaves like L2 near zero, but otherwise it's L1
-        loss = F.smooth_l1_loss(q_current, rewards + discount * v_next)
+            v_next = self.nn.forward(next_states).max(dim=1, keepdim=True)[0]
+            q_current = self.nn.forward(states)[range(actions.shape[0]), actions].flatten()
+            v_next = v_next.flatten()
 
-        self.optim.zero_grad()
-        loss.backward()
-        self.optim.step()
+            # Smooth l1 loss behaves like L2 near zero, but otherwise it's L1
+            loss = F.smooth_l1_loss(q_current, rewards + discount * v_next)
 
-        self.log_data.add_entry(LogOptionName.TrainingLoss, float(loss))
+            self.optim.zero_grad()
+            loss.backward()
+            self.optim.step()
+
+            losses.append(loss.item())
+
+        self.log_data.add_entry(LogOptionName.TrainingLoss, np.mean(losses))
 
         # Update epsilon
         r = max((self.epsilon_decay_epochs - self.elapsed_epochs) / self.epsilon_decay_epochs, 0.0)
         self.epsilon = (self.epsilon_initial - self.epsilon_end) * r + self.epsilon_end
+
+        self.log_data.add_entry(LogOptionName.Epsilon, self.epsilon)
+
+        self.elapsed_epochs += 1
 
     def estimate_difficulty(self, trajectory: Trajectory):
         states, *_ = zip(*trajectory)

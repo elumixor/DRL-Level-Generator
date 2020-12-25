@@ -24,7 +24,7 @@ class RemoteModel(abc.ABC):
         self.input_size = reader.read_int()
         self.output_size = reader.read_int()
         self.nn: Sequential = self._construct_nn(self.input_size, self.output_size)
-        self.optim = Adam(self.nn.parameters(), lr=0.1)  # todo: read learning rate from byte reader
+        self.optim = Adam(self.nn.parameters(), lr=0.05)
         self.log_options: Union[LogOptions, None] = None
         self.log_data = LogData()
 

@@ -3,6 +3,7 @@ from typing import List
 from torch.nn import Sequential
 
 from .general import *
+from .general.simple_types_serialization import bool_to_bytes
 from .torch_serialization import tensor_to_bytes, state_dict_to_bytes, to_tensor_int, to_tensor_float, to_state_dict, layout_to_bytes
 from .training_data_serialization import to_training_data
 from .utils import get_format
@@ -27,6 +28,9 @@ def to_bytes(value: Union[Serializable, List[int], List[float], List[str], List[
 
     if isinstance(value, List):
         return list_to_bytes(value, endianness)
+
+    if isinstance(value, bool):
+        return bool_to_bytes(value, endianness)
 
     if isinstance(value, int):
         return int_to_bytes(value, endianness)
