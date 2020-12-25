@@ -36,9 +36,9 @@ class RemoteModelLocalTests(TestCase):
                 self.model: DQNModel = mm.obtain_new(model_dict, ByteReader(b))
 
                 self.model.log_options = LogOptions.create([
-                        (LogOptionName.TrajectoryReward, LogOption.create(5, 100, True, True, True, 0.8)),
-                        (LogOptionName.TrainingLoss, LogOption.create(5, 100, True, True, True, 0.8)),
-                        (LogOptionName.Epsilon, LogOption.create(5, 100, True, True, True, 0.8)),
+                        (LogOptionName.TrajectoryReward, LogOption.create(50, 250, True, True, True, 0.8)),
+                        (LogOptionName.TrainingLoss, LogOption.create(50, 250, True, True, True, 0.8)),
+                        (LogOptionName.Epsilon, LogOption.create(50, 250, True, True, True, 0.8)),
                 ])
 
                 self.current_trajectory: List[Tuple[List[float], List[float], float, List[float]]] = []
@@ -56,7 +56,7 @@ class RemoteModelLocalTests(TestCase):
                 with torch.no_grad():
                     self.previous_state = state
                     action = self.model.infer(state.tolist())
-                    return int(action[0])
+                    return int(action[0])  # note: openai gym requires int
 
             def update(self) -> None:
                 b = to_bytes(TaskType.Train)
@@ -67,7 +67,7 @@ class RemoteModelLocalTests(TestCase):
 
                 for state, action, reward, next_state in self.current_trajectory:
                     b += to_bytes(state)
-                    b += to_bytes(action)
+                    b += to_bytes([float(a) for a in action])  # note: our framework requires float
                     b += to_bytes(reward)
                     b += to_bytes(next_state)
 
@@ -75,4 +75,4 @@ class RemoteModelLocalTests(TestCase):
                 L.show(self.model.model_id, self.model.log_data, self.model.log_options)
                 self.current_trajectory = []
 
-        train(gym.make('CartPole-v0'), DQNAgentWrapper, epochs=2000, num_rollouts=5, render_frequency=5)
+        train(gym.make('CartPole-v0'), DQNAgentWrapper, epochs=2000, num_rollouts=5, render_frequency=150)

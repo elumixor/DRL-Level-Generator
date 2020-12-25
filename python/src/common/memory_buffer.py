@@ -25,7 +25,8 @@ class MemoryBuffer(Generic[T]):
         else:
             self.data[self.position] = item
 
-        self.position = (self.position + 1) % self.capacity
+        if self.capacity is not None:
+            self.position = (self.position + 1) % self.capacity
 
     def sample(self, size: int) -> List[T]:
         # If size is less than self.capacity, this will throw an error...

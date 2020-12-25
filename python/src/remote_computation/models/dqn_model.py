@@ -33,24 +33,27 @@ class DQNModel(RemoteModel):
         super().__init__(model_id, reader)
 
         # These should probably be set from the reader
-        self.epsilon_initial = 0.5
+        self.train_times = 1
+        self.training_batch_size = 5
+
+        self.epsilon_initial = 1
         self.epsilon_end = 0.01
-        self.epsilon_decay_epochs = 100
+        self.epsilon_decay_epochs = 500
+
+        # store last 2000 transitions
+        self.memory = MemoryBuffer(capacity=1000)
 
         self.epsilon = self.epsilon_initial
         self.elapsed_epochs = 0
-
-        # store last 2000 transitions
-        self.memory = MemoryBuffer(capacity=2000)
-
-        self.training_batch_size = 200
 
     @property
     def model_type(self) -> ModelType:
         return ModelType.DQN
 
+    # todo: pass parameters such as hidden size?
     def _construct_nn(self, input_size: int, output_size: int):
-        hidden_size = 5
+        hidden_size = 32
+
         return Sequential(Linear(input_size, hidden_size),
                           ReLU(),
                           Linear(hidden_size, hidden_size),
@@ -67,7 +70,6 @@ class DQNModel(RemoteModel):
 
         if task == TaskType.Train:
             trajectories_count = reader.read_int()
-
             trajectory_rewards: List[float] = []
 
             for _ in range(trajectories_count):
@@ -82,7 +84,7 @@ class DQNModel(RemoteModel):
             self.log_data.add_entry(LogOptionName.TrajectoryReward,
                                     (min(trajectory_rewards), np.mean(trajectory_rewards).tolist(), max(trajectory_rewards)))
 
-            self.train(10)
+            self.train()
             return b''
 
         if task == TaskType.EstimateDifficulty:
@@ -96,18 +98,17 @@ class DQNModel(RemoteModel):
         if random() < self.epsilon:
             return [np.random.randint(self.output_size)]
 
-        q = self.nn.forward(torch.tensor(state).unsqueeze(0))
-        action = q.squeeze().argmax().item()
-        return [action]
+        q = self.nn.forward(torch.tensor(state))
+        return [q.squeeze().argmax().item()]
 
-    def train(self, times: int):
+    def train(self):
         if not self.memory.is_full:
             print(f"memory is not yet full [{self.memory.size}/{self.memory.capacity}]")
             return
 
         losses = []
 
-        for _ in range(times):
+        for _ in range(self.train_times):
             transitions = self.memory.sample(self.training_batch_size)
             states, actions, rewards, next_states = zip(*transitions)
 
@@ -116,12 +117,34 @@ class DQNModel(RemoteModel):
             rewards = torch.tensor(rewards)
             next_states = torch.tensor(next_states)
 
+            # print(states)
+            # print()
+            # print(actions)
+            # print()
+            # print(rewards)
+            # print()
+            # print(next_states)
+            # print()
+
             v_next = self.nn.forward(next_states).max(dim=1, keepdim=True)[0]
-            q_current = self.nn.forward(states)[range(actions.shape[0]), actions].flatten()
+
+            # print(v_next)
+            # print()
+            q = self.nn.forward(states)
+            # print(q)
+            # print()
+            q_current = q[range(actions.shape[0]), actions].flatten()
+            # print(q_current)
+            # print()
             v_next = v_next.flatten()
+            # print(v_next)
+            # print()
 
             # Smooth l1 loss behaves like L2 near zero, but otherwise it's L1
             loss = F.smooth_l1_loss(q_current, rewards + discount * v_next)
+            loss = F.smooth_l1_loss(q_current, rewards + discount * v_next)
+            # print(loss)
+            # print()
 
             self.optim.zero_grad()
             loss.backward()
@@ -129,7 +152,9 @@ class DQNModel(RemoteModel):
 
             losses.append(loss.item())
 
-        self.log_data.add_entry(LogOptionName.TrainingLoss, np.mean(losses))
+            # exit()
+
+        self.log_data.add_entry(LogOptionName.TrainingLoss, np.sum(losses))
 
         # Update epsilon
         r = max((self.epsilon_decay_epochs - self.elapsed_epochs) / self.epsilon_decay_epochs, 0.0)
