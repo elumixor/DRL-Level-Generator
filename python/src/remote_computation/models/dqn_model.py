@@ -33,8 +33,8 @@ class DQNModel(RemoteModel):
         super().__init__(model_id, reader)
 
         # These should probably be set from the reader
-        self.train_times = 1
-        self.training_batch_size = 5
+        self.train_times = 5
+        self.training_batch_size = 100
 
         self.epsilon_initial = 1
         self.epsilon_end = 0.01
@@ -82,9 +82,16 @@ class DQNModel(RemoteModel):
                 trajectory_rewards.append(trajectory_reward)
 
             self.log_data.add_entry(LogOptionName.TrajectoryReward,
-                                    (min(trajectory_rewards), np.mean(trajectory_rewards).tolist(), max(trajectory_rewards)))
+                                    (min(trajectory_rewards), np.mean(trajectory_rewards).tolist(),
+                                     max(trajectory_rewards)))
 
             self.train()
+
+            if self.logger is not None:
+                self.logger.update(self.log_data)
+
+            self.elapsed_epochs += 1
+
             return b''
 
         if task == TaskType.EstimateDifficulty:
@@ -117,42 +124,19 @@ class DQNModel(RemoteModel):
             rewards = torch.tensor(rewards)
             next_states = torch.tensor(next_states)
 
-            # print(states)
-            # print()
-            # print(actions)
-            # print()
-            # print(rewards)
-            # print()
-            # print(next_states)
-            # print()
-
             v_next = self.nn.forward(next_states).max(dim=1, keepdim=True)[0]
-
-            # print(v_next)
-            # print()
             q = self.nn.forward(states)
-            # print(q)
-            # print()
             q_current = q[range(actions.shape[0]), actions].flatten()
-            # print(q_current)
-            # print()
             v_next = v_next.flatten()
-            # print(v_next)
-            # print()
 
             # Smooth l1 loss behaves like L2 near zero, but otherwise it's L1
             loss = F.smooth_l1_loss(q_current, rewards + discount * v_next)
-            loss = F.smooth_l1_loss(q_current, rewards + discount * v_next)
-            # print(loss)
-            # print()
 
             self.optim.zero_grad()
             loss.backward()
             self.optim.step()
 
             losses.append(loss.item())
-
-            # exit()
 
         self.log_data.add_entry(LogOptionName.TrainingLoss, np.sum(losses))
 
@@ -161,8 +145,6 @@ class DQNModel(RemoteModel):
         self.epsilon = (self.epsilon_initial - self.epsilon_end) * r + self.epsilon_end
 
         self.log_data.add_entry(LogOptionName.Epsilon, self.epsilon)
-
-        self.elapsed_epochs += 1
 
     def estimate_difficulty(self, trajectory: Trajectory):
         states, *_ = zip(*trajectory)

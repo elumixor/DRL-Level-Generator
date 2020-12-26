@@ -6,7 +6,7 @@ from torch.nn import Sequential
 from torch.optim import Adam
 
 from common import ByteReader
-from remote_computation.logging import LogOptions, LogData
+from remote_computation.logging import LogOptions, LogData, Logger
 from serialization import to_bytes
 from .model_type import ModelType
 
@@ -25,8 +25,18 @@ class RemoteModel(abc.ABC):
         self.output_size = reader.read_int()
         self.nn: Sequential = self._construct_nn(self.input_size, self.output_size)
         self.optim = Adam(self.nn.parameters(), lr=0.001)
-        self.log_options: Union[LogOptions, None] = None
+        self._log_options: Union[LogOptions, None] = None
         self.log_data = LogData()
+        self.logger: Union[Logger, None] = None
+
+    @property
+    def log_options(self):
+        return self._log_options
+
+    @log_options.setter
+    def log_options(self, value: LogOptions):
+        self._log_options = value
+        self.logger = Logger(self.model_id, value)
 
     @property
     @abc.abstractmethod

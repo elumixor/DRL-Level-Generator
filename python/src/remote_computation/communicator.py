@@ -5,7 +5,6 @@ from typing import Union, List, Dict
 
 import zmq
 
-import remote_computation.logging as logging
 import remote_computation.model_manager as model_manager
 from common import ByteReader
 from serialization import to_bytes
@@ -65,10 +64,7 @@ def _process_message(message: bytes, result: List[bytes], models_dict: Dict[int,
 
         model = model_manager.get(models_dict, model_id)
         model.log_options = LogOptions(reader)
-        print(model_id)
-        print(model.log_options)
-        print(model)
-        print(model.nn.state_dict())
+
         # Update the dict in case the model has changed
         models_dict[model_id] = model
 
@@ -81,12 +77,8 @@ def _process_message(message: bytes, result: List[bytes], models_dict: Dict[int,
         model_id = reader.read_int()
 
         model = model_manager.get(models_dict, model_id)
-        print(model_id)
-        print(model.log_options)
-        print(model)
-        print(model.nn.state_dict())
 
-        logging.show(model.log_data, model.log_options)
+        model.logger.show(model.log_data)
 
         # Update the dict in case the model has changed
         models_dict[model_id] = model

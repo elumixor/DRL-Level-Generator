@@ -83,9 +83,23 @@ namespace Testing.PlayModeTests.Pendulum.Tests
             Debug.Log("Trajectory done");
             Debug.Log(trajectory.Length);
 
+            var logOptions = new LogOptions((LogOptionName.TrajectoryReward, new LogOption(10, 100, runningAverageSmoothing: 0.8f)));
+            var setOptionsTask = Communicator.Send(Message.SetLogOptions(dqnModel.Id, logOptions));
+            var elapsed = 0f;
+
+            while (elapsed < 10f && !setOptionsTask.IsCompleted) {
+                yield return new WaitForSeconds(1f);
+
+                elapsed += 1f;
+
+                Debug.Log("Still waiting...");
+            }
+            Debug.Log($"Set Log options done? {setOptionsTask.IsCompleted}");
+            if (!setOptionsTask.IsCompleted) Assert.Fail("Couldn't set log options");
+
             var trainingTask = MainController.TrainAgent(dqnModel, new[] {trajectory});
 
-            var elapsed = 0f;
+            elapsed = 0f;
 
             while (elapsed < 10f && !trainingTask.IsCompleted) {
                 yield return new WaitForSeconds(1f);
@@ -113,18 +127,7 @@ namespace Testing.PlayModeTests.Pendulum.Tests
             // if (!trainingTask.IsCompleted) Assert.Fail("Too slow");
 
             Debug.Log("Yay!");
-            var logOptions = new LogOptions((LogOptionName.TrajectoryReward, new LogOption(10, 100, runningAverageSmoothing: 0.8f)));
-            var setOptionsTask = Communicator.Send(Message.SetLogOptions(dqnModel.Id, logOptions));
-            elapsed = 0f;
 
-            while (elapsed < 10f && !setOptionsTask.IsCompleted) {
-                yield return new WaitForSeconds(1f);
-
-                elapsed += 1f;
-
-                Debug.Log("Still waiting...");
-            }
-            Debug.Log($"Set Log options done? {setOptionsTask.IsCompleted}");
 
             var loggingTask = Communicator.Send(Message.ShowLog(dqnModel.Id));
             elapsed = 0f;
