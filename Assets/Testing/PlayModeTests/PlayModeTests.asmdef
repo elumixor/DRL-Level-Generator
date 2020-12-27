@@ -1,13 +1,14 @@
 {
     "name": "PlayModeTests",
     "references": [
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
-        "RL",
-        "Common",
-        "Main",
-        "RemoteComputation",
-        "NN"
+      "UnityEngine.TestRunner",
+      "UnityEditor.TestRunner",
+      "RL",
+      "Common",
+      "Main",
+      "RemoteComputation",
+      "NN",
+      "TestCommon"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

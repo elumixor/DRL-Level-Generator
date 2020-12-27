@@ -5,20 +5,20 @@ namespace Testing.PlayModeTests.Pendulum
 {
     public class Pendulum : MonoBehaviour
     {
-        [SerializeField] Circle bob;
+        [SerializeField] CircleBehaviour bob;
         [SerializeField] Transform lineRenderer;
 
         public float ConnectorLength {
-            get => -bob.LocalPosition.y;
+            get => -bob.transform.localPosition.y;
             set {
-                bob.LocalPosition       = Vector2.down * value;
+                bob.transform.localPosition       = Vector2.down * value;
                 lineRenderer.localScale = new Vector2(1, -value);
             }
         }
 
         public float BobRadius {
-            get => bob.Radius;
-            set => bob.Radius = value;
+            get => bob.circle.radius;
+            set => bob.circle.radius = value;
         }
 
         public float Angle {
@@ -26,6 +26,6 @@ namespace Testing.PlayModeTests.Pendulum
             set => transform.localEulerAngles = Vector3.forward * value;
         }
 
-        public Circle Bob => bob;
+        public CircleBehaviour Bob => bob;
     }
 }

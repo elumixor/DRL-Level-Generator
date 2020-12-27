@@ -9,18 +9,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-namespace Testing.PlayModeTests.Pendulum
+namespace Testing.PlayModeTests.Pendulum.Tests
 {
     public class Test
     {
-        // [SetUp]
-        // public void SetUp()
-        // {
-        // Console.WriteLine("before communicator initialize");
-        // RemoteComputation.Communicator.Initialize();
-        // }
-
-        [TearDown] public void TearDown() { Communicator.Close(); }
+        [TearDown]
+        public void TearDown()
+        {
+            Debug.Log("closed...");
+            Communicator.Close();
+        }
 
         [UnityTest]
         public IEnumerator AnimationWorks()
@@ -141,7 +139,7 @@ namespace Testing.PlayModeTests.Pendulum
 
             // Start training
 
-            var dqnTask = MainController.ObtainModel<DQNPendulumActor>(State.SIZE.ToBytes(), Action.SIZE.ToBytes());
+            var dqnTask = MainController.ObtainModel<DQNPendulumModel>(State.SIZE.ToBytes(), Action.SIZE.ToBytes());
             yield return new WaitUntil(() => dqnTask.IsCompleted);
 
             Assert.IsTrue(dqnTask.IsCompleted);

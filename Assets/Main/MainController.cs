@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.ByteConversions;
+using JetBrains.Annotations;
 using RemoteComputation;
+using RemoteComputation.Logging;
 using RemoteComputation.Models;
 using RL;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public static class MainController
 {
@@ -43,16 +47,19 @@ public static class MainController
 
     /* More specific stuff */
 
-    public static async Task<TModel> TrainAgent<TModel>(TModel trainableModel, IEnumerable<Trajectory> episodes)
+    public static async Task TrainAgent<TModel>(TModel trainableModel, IReadOnlyCollection<Trajectory> trajectories)
             where TModel : IRemoteModel, IByteAssignable
     {
-        var asList = episodes.ToList();
-        var reader = await RemoteTaskRunner.RunTask(trainableModel.Id, RemoteTask.Train, asList.MapToBytes(t => t.Bytes));
+        var reader = await RemoteTaskRunner.RunTask(trainableModel.Id, RemoteTask.Train, trajectories.MapToBytes(t => t.Bytes));
         trainableModel.AssignFromBytes(reader);
-        return trainableModel;
     }
 
-    public static Task<Trajectory> SampleTrajectory(Vector generatedData, IActor actor, IEnvironment environment)
+    public static Task<Trajectory> SampleTrajectory<TGenData, TState, TAction>(TGenData generatedData,
+                                                                               IActor<TState, TAction> actor,
+                                                                               IEnvironment<TGenData, TState, TAction> environment)
+            where TGenData : Vector
+            where TState : Vector
+            where TAction : Vector
     {
         return Task.Run(() => {
             var trajectory = new Trajectory();
@@ -66,15 +73,52 @@ public static class MainController
                 trajectory.Add(startingState, action, reward, nextState);
 
                 if (done) return trajectory;
+
+                startingState = nextState;
             }
         });
     }
 
-    public static Task<Trajectory[]> SampleTrajectories(int count,
-                                                        IGenerator generator,
-                                                        float difficulty,
-                                                        IActor actor,
-                                                        IEnvironment environment)
+    public static Task<Trajectory> SampleTrajectory(Vector generatedData,
+                                                    IActor actor,
+                                                    IEnvironment environment,
+                                                    IStateRenderer stateRenderer,
+                                                    int renderEvery = 1)
+    {
+        return Task.Run(() => {
+            var trajectory = new Trajectory();
+
+            var startingState = environment.ResetEnvironment(generatedData);
+
+            var currentRendered = 1;
+
+            while (true) {
+                if (currentRendered >= renderEvery) {
+                    currentRendered = 0;
+                    stateRenderer.RenderState(startingState);
+                }
+
+                var action = actor.GetAction(startingState);
+                var (nextState, reward, done) = environment.Transition(startingState, action);
+
+                trajectory.Add(startingState, action, reward, nextState);
+
+                if (done) return trajectory;
+
+                currentRendered++;
+                startingState = nextState;
+            }
+        });
+    }
+
+    public static Task<Trajectory[]> SampleTrajectories<TGenData, TState, TAction>(int count,
+                                                                                   IGenerator<TGenData> generator,
+                                                                                   float difficulty,
+                                                                                   IActor<TState, TAction> actor,
+                                                                                   IEnvironment<TGenData, TState, TAction> environment)
+            where TGenData : Vector
+            where TState : Vector
+            where TAction : Vector
     {
         // todo: maybe this is better to do with multiple task and mutex synchronization
         return Task.Run(() => {
@@ -92,19 +136,53 @@ public static class MainController
         });
     }
 
-    public static async Task TrainAgentEpoch<TModel>(TModel trainableModel,
-                                                     IGenerator generator,
-                                                     float difficulty,
-                                                     IActor actor,
-                                                     IEnvironment environment,
-                                                     int numTrajectories = 1,
-                                                     int numEpochs = 1)
-            where TModel : IRemoteModel, IByteAssignable
+    public static Task<Trajectory[]> SampleTrajectories<TGenData, TState, TAction>(int count,
+                                                                                   Func<TGenData> generatedDataProducer,
+                                                                                   IActor<TState, TAction> actor,
+                                                                                   IEnvironment<TGenData, TState, TAction> environment)
+            where TGenData : Vector
+            where TState : Vector
+            where TAction : Vector
     {
+        // todo: maybe this is better to do with multiple task and mutex synchronization
+        return Task.Run(() => {
+            var result = new Trajectory[count];
+
+            for (var i = 0; i < count; i++) {
+                var seed = Random.value;
+                var sampleTask = SampleTrajectory(generatedDataProducer(), actor, environment);
+                sampleTask.Wait();
+                result[i] = sampleTask.Result;
+            }
+
+            return result;
+        });
+    }
+
+    public static async Task TrainAgent<TModel, TGenData, TState, TAction>(TModel trainableModel,
+                                                                           IGenerator<TGenData> generator,
+                                                                           float difficulty,
+                                                                           IActor<TState, TAction> actor,
+                                                                           IEnvironment<TGenData, TState, TAction> environment,
+                                                                           int numTrajectories = 1,
+                                                                           int numEpochs = 1,
+                                                                           LogOptions logOptions = null)
+            where TModel : IRemoteModel, IByteAssignable
+            where TGenData : Vector
+            where TState : Vector
+            where TAction : Vector
+    {
+        if (logOptions != null) await SetLogOptions(trainableModel, logOptions);
+
+        Debug.Log($"? {numEpochs}");
+
         for (var i = 0; i < numEpochs; i++) {
+            Debug.Log(i);
             var trajectories = await SampleTrajectories(numTrajectories, generator, difficulty, actor, environment);
             await TrainAgent(trainableModel, trajectories);
         }
+
+        Debug.Log("Returning?????");
     }
 
     public static async Task<float> EstimateDifficulty(IRemoteModel estimator, Trajectory trajectory)
@@ -130,5 +208,12 @@ public static class MainController
         foreach (var estimator in estimators) difficulties.Add(await EstimateDifficulty(estimator, t));
 
         return difficulties.Mean();
+    }
+
+    /* Helpers */
+
+    public static async Task SetLogOptions(IRemoteModel remoteModel, [NotNull] LogOptions logOptions)
+    {
+        await Communicator.Send(Message.SetLogOptions(remoteModel.Id, logOptions));
     }
 }

@@ -2,8 +2,12 @@
 
 namespace RL
 {
-    public interface IActor
+    public interface IActor<in TState, out TAction>
+            where TState : Vector
+            where TAction : Vector
     {
-        Vector GetAction(Vector state);
+        TAction GetAction(TState state);
     }
+
+    public interface IActor : IActor<Vector, Vector> { }
 }
