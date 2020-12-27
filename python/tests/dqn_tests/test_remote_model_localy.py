@@ -28,7 +28,7 @@ class RemoteModelLocalTests(TestCase):
         # output_size
         b += to_bytes(7)
 
-        model: DQNModel = mm.obtain_new(model_dict, ByteReader(b))
+        model: DQNModel = mm.obtain_new(ByteReader(b))
 
         self.assertEqual(model.input_size, 5)
         self.assertEqual(model.output_size, 7)
@@ -45,12 +45,12 @@ class RemoteModelLocalTests(TestCase):
         # output_size
         b += to_bytes(7)
 
-        model: DQNModel = mm.obtain_new(model_dict, ByteReader(b))
+        model: DQNModel = mm.obtain_new(ByteReader(b))
 
         file_path = "./dqn_model.m"
 
-        mm.save_model(model_dict, model.model_id, file_path)
-        restored = mm.load_model(model_dict, file_path)
+        mm.save_model(model.model_id, file_path)
+        restored = mm.load_model(file_path)
 
         self.assertIsInstance(restored, DQNModel)
         self.assertEqual(restored.model_type, ModelType.DQN)

@@ -1,17 +1,19 @@
 from typing import List
 
 import numpy as np
-from matplotlib import pyplot as plt
 
-from remote_computation.logging import LogOptions, LogData, LogOption, LogOptionName, LogEntry, RangedEntry
 from utilities import running_average
-
-plt.ion()
+from .entries import RangedEntry, LogEntry
+from .log_data import LogData
+from .log_option import LogOption
+from .log_option_name import LogOptionName
+from .log_options import LogOptions
 
 
 class Logger:
 
-    def __init__(self, model_id: int, options: LogOptions):
+    def __init__(self, plt, model_id: int, options: LogOptions):
+        self.plt = plt
         self.model_id = model_id
         self.options = options
 
@@ -63,39 +65,12 @@ class Logger:
             for name, option, entries in to_plot:
                 self.plot(name, option, entries)
 
-            plt.draw()
-            plt.tight_layout()
+            self.plt.draw()
+            self.plt.tight_layout()
 
-            plt.pause(0.001)
+            # plt.pause(0.001)
 
         self.epoch += 1
-
-    def plot(self, name: LogOptionName, option: LogOption, entries: List[LogEntry]):
-        ax = self.axs[name]
-        example = entries[0]
-
-        # Clear already plotted data
-        ax.clear()
-
-        ax.set_title(str(name))
-
-        last_n = min(option.log_last_n, len(entries))
-        last = entries[-last_n:]
-        data = np.array([item.value for item in last])
-        epochs = [x + max(self.epoch - last_n, 0) for x in range(last_n)]
-
-        ax.plot(epochs, data)
-
-        if option.running_average_smoothing != 0.0:
-            ax.plot(epochs, running_average(data))
-
-        if isinstance(example, RangedEntry) and option.min_max:
-            mins = np.array([item.min_value for item in last])
-            maxs = np.array([item.max_value for item in last])
-
-            ax.fill_between(epochs, maxs, mins, alpha=0.2)
-
-        ax.grid(color='black', linestyle='-', linewidth=.1)
 
     def show(self, data: LogData):
         """Force showing, disregarding frequency, don't increase the current epoch"""
@@ -127,7 +102,33 @@ class Logger:
             for name, option, entries in to_plot:
                 self.plot(name, option, entries)
 
-            plt.draw()
-            plt.tight_layout()
+            self.plt.draw()
+            self.plt.tight_layout()
+            self.plt.pause(0.001)
 
-            plt.pause(0.001)
+    def plot(self, name: LogOptionName, option: LogOption, entries: List[LogEntry]):
+        ax = self.axs[name]
+        example = entries[0]
+
+        # Clear already plotted data
+        ax.clear()
+
+        ax.set_title(str(name))
+
+        last_n = min(option.log_last_n, len(entries))
+        last = entries[-last_n:]
+        data = np.array([item.value for item in last])
+        epochs = [x + max(self.epoch - last_n, 0) for x in range(last_n)]
+
+        ax.plot(epochs, data)
+
+        if option.running_average_smoothing != 0.0:
+            ax.plot(epochs, running_average(data))
+
+        if isinstance(example, RangedEntry) and option.min_max:
+            mins = np.array([item.min_value for item in last])
+            maxs = np.array([item.max_value for item in last])
+
+            ax.fill_between(epochs, maxs, mins, alpha=0.2)
+
+        ax.grid(color='black', linestyle='-', linewidth=.1)

@@ -55,91 +55,24 @@ namespace Testing.PlayModeTests.Pendulum.Tests
 
             // Start training
 
-            var dqnTask = MainController.ObtainModel<DQNPendulumModel>(State.SIZE.ToBytes(), Action.SIZE.ToBytes());
-            yield return new WaitUntil(() => dqnTask.IsCompleted);
+            var t = Task.Run(async () => {
+                var dqn = await MainController.ObtainModel<DQNPendulumModel>(State.SIZE.ToBytes(), Action.SIZE.ToBytes());
+                var logOptions = new LogOptions((LogOptionName.TrajectoryReward, new LogOption(10, 100, runningAverageSmoothing: 0.8f)));
+                await Communicator.Send(Message.SetLogOptions(dqn.Id, logOptions));
 
-            Assert.IsTrue(dqnTask.IsCompleted);
+                for (var i = 0; i < 300; i++) {
+                    Debug.Log(i);
+                    var trajectory = await MainController.SampleTrajectory(generator.Generate(0.5f), dqn, environment);
+                    await MainController.TrainAgent(dqn, new[] {trajectory});
+                }
+            });
 
-            var dqnModel = dqnTask.Result;
-
-            // var trainingTask = MainController.TrainAgent(dqnModel,
-            //                                              generator,
-            //                                              0.5f,
-            //                                              dqnModel,
-            //                                              environment,
-            //                                              10,
-            //                                              10,
-            //                                              new LogOptions((LogOptionName.TrajectoryReward,
-            //                                                              new LogOption(10, 100, runningAverageSmoothing: 0.8f))));
-            // yield return new WaitUntil(() => trainingTask.IsCompleted);
-
-            Debug.Log("Training done");
-
-            var trajectoryTask = MainController.SampleTrajectory(generator.Generate(0.5f), dqnModel, environment);
-
-            yield return new WaitUntil(() => trajectoryTask.IsCompleted);
-
-            var trajectory = trajectoryTask.Result;
-            Debug.Log("Trajectory done");
-            Debug.Log(trajectory.Length);
-
-            var logOptions = new LogOptions((LogOptionName.TrajectoryReward, new LogOption(10, 100, runningAverageSmoothing: 0.8f)));
-            var setOptionsTask = Communicator.Send(Message.SetLogOptions(dqnModel.Id, logOptions));
-            var elapsed = 0f;
-
-            while (elapsed < 10f && !setOptionsTask.IsCompleted) {
+            while (!t.IsCompleted) {
+                Debug.Log("not yet completed...");
                 yield return new WaitForSeconds(1f);
-
-                elapsed += 1f;
-
-                Debug.Log("Still waiting...");
-            }
-            Debug.Log($"Set Log options done? {setOptionsTask.IsCompleted}");
-            if (!setOptionsTask.IsCompleted) Assert.Fail("Couldn't set log options");
-
-            var trainingTask = MainController.TrainAgent(dqnModel, new[] {trajectory});
-
-            elapsed = 0f;
-
-            while (elapsed < 10f && !trainingTask.IsCompleted) {
-                yield return new WaitForSeconds(1f);
-
-                elapsed += 1f;
-
-                Debug.Log("Still waiting...");
             }
 
-            // yield return new WaitUntil(() => trainingTask.IsCompleted);
-
-            Debug.Log($"Training done? {trainingTask.IsCompleted}");
-
-            // var elapsed = 0f;
-            //
-            // while (elapsed < 10f && !trainingTask.IsCompleted) {
-            //     Debug.Log("Task running...");
-            //     yield return new WaitForSeconds(1f);
-            //     elapsed += 1f;
-            //
-            //     Debug.Log(elapsed);
-            //     Debug.Log(trainingTask.IsCompleted);
-            // }
-            //
-            // if (!trainingTask.IsCompleted) Assert.Fail("Too slow");
-
-            Debug.Log("Yay!");
-
-
-            var loggingTask = Communicator.Send(Message.ShowLog(dqnModel.Id));
-            elapsed = 0f;
-
-            while (elapsed < 10f && !loggingTask.IsCompleted) {
-                yield return new WaitForSeconds(1f);
-
-                elapsed += 1f;
-
-                Debug.Log("Still waiting...");
-            }
-            Debug.Log($"Logging done? {loggingTask.IsCompleted}");
+            Debug.Log("done");
         }
     }
 }

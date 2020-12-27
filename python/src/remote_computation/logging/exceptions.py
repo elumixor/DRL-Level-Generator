@@ -1,0 +1,2 @@
+class LoggingError(RuntimeError):
+    pass

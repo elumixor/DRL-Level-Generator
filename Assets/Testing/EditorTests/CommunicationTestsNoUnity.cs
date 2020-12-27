@@ -13,10 +13,11 @@ namespace Testing.EditorTests
         [Test]
         public void TestCommunication()
         {
-            Communicator.Close();
             var task = Communicator.Send(Message.Test(5.ToBytes()));
             task.Wait();
-            Console.WriteLine(task.Result.ReadInt());
+            var result = task.Result;
+            Console.WriteLine(result);
+            Assert.AreEqual(result.ReadInt(), 5);
         }
 
         [Test]

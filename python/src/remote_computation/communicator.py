@@ -1,104 +1,18 @@
 import multiprocessing as mp
 import time
+from concurrent.futures._base import Future
+from concurrent.futures.thread import ThreadPoolExecutor
 from threading import Thread
-from typing import Union, List, Dict
+from typing import Union, List
 
 import zmq
 
 import remote_computation.model_manager as model_manager
 from common import ByteReader
 from serialization import to_bytes
+from . import logging
 from .logging import LogOptions
 from .message_type import MessageType
-from .models import RemoteModel
-
-
-def _process_message(message: bytes, result: List[bytes], models_dict: Dict[int, RemoteModel]):
-    reader = ByteReader(message)
-
-    request_id = reader.read_int()
-    message_type = MessageType(reader.read_int())
-
-    if message_type == MessageType.ObtainModel:
-        print("Obtain model")
-        model = model_manager.obtain_new(models_dict, reader)
-
-        result[:] = list(to_bytes(request_id) + model.response_bytes)
-        return
-
-    if message_type == MessageType.LoadModel:
-        print("Load model")
-        file_path = reader.read_string()
-
-        model = model_manager.load_model(models_dict, file_path)
-
-        result[:] = list(to_bytes(request_id) + model.response_bytes)
-        return
-
-    if message_type == MessageType.SaveModel:
-        print("Save model")
-        model_id = reader.read_int()
-        file_path = reader.read_string()
-
-        model_manager.save_model(models_dict, model_id, file_path)
-
-        result[:] = list(to_bytes(request_id))
-        return
-
-    if message_type == MessageType.RunTask:
-        print("Run task")
-        model_id = reader.read_int()
-
-        model = model_manager.get(models_dict, model_id)
-        task_result = model.run_task(reader)
-
-        # Update the dict in case the model has changed
-        models_dict[model_id] = model
-
-        result[:] = list(to_bytes(request_id) + task_result)
-        return
-
-    if message_type == MessageType.SetLogOptions:
-        print("Set log options")
-        model_id = reader.read_int()
-
-        model = model_manager.get(models_dict, model_id)
-        model.log_options = LogOptions(reader)
-
-        # Update the dict in case the model has changed
-        models_dict[model_id] = model
-
-        result[:] = list(to_bytes(request_id))
-        return
-
-    # Test messages
-    if message_type == MessageType.ShowLog:
-        print("Show log")
-        model_id = reader.read_int()
-
-        model = model_manager.get(models_dict, model_id)
-
-        model.logger.show(model.log_data)
-
-        # Update the dict in case the model has changed
-        models_dict[model_id] = model
-
-        result[:] = list(to_bytes(request_id))
-        return
-
-    if message_type == MessageType.Test:
-        print("Test")
-        data = reader.read_to_end()
-        print(f"Received: {data}")
-        # print(request_id)
-        # print(to_bytes(request_id))
-        # print(list(to_bytes(request_id)))
-        # print(reader.read_to_end())
-        result[:] = list(to_bytes(request_id) + data)
-        # print(result)
-        return
-
-    raise RuntimeError(f"Unknown message type: {message_type}")
 
 
 class Communicator:
@@ -118,10 +32,9 @@ class Communicator:
         self.is_running = False
 
         self.update_worker: Union[mp.Process, None] = None
-        self.request_handlers: List[Thread] = []
+        self.request_handlers: List[Future[None]] = []
 
-        self.manager = mp.Manager()
-        self.models_dict = self.manager.dict()
+        self.executor = ThreadPoolExecutor()
 
     def start_update_loop(self):
         self.update_worker = Thread(target=self._update_loop)
@@ -129,7 +42,7 @@ class Communicator:
 
     def join(self):
         for handler in self.request_handlers:
-            handler.join()
+            handler.result()
 
         self.update_worker.join()
         self.is_running = False
@@ -139,9 +52,8 @@ class Communicator:
         while not self.should_stop:
             try:
                 message = self.pull.recv(flags=zmq.NOBLOCK)
-                thread = Thread(target=self._process_message(message))
+                thread = self.executor.submit(self._process_message, message)
                 self.request_handlers.append(thread)
-                thread.start()
 
             except zmq.Again as _:
                 pass
@@ -151,11 +63,60 @@ class Communicator:
     def _process_message(self, message: bytes):
         print(f"Message received ({len(message)}B)")
 
-        result = self.manager.list()
-        handler = mp.Process(target=_process_message, args=(message, result, self.models_dict))
-        handler.start()
-        handler.join()
+        reader = ByteReader(message)
 
-        response = bytes(result)
-        print(f"sending ({len(response)}B)")
-        self.push.send(response)
+        request_id = reader.read_int()
+        message_type = MessageType(reader.read_int())
+
+        def OK(b: bytes = b''):
+            """Helper to return the response with given data"""
+            print(f"sending ({len(b)}B)")
+            self.push.send(to_bytes(request_id) + b)
+
+        # Handlers of various message types
+
+        if message_type == MessageType.RunTask:
+            model_id = reader.read_int()
+            model = model_manager.get(model_id)
+            task_result = model.run_task(reader)
+            return OK(task_result)
+
+        if message_type == MessageType.ObtainModel:
+            model = model_manager.obtain_new(reader)
+            return OK(model.response_bytes)
+
+        if message_type == MessageType.LoadModel:
+            file_path = reader.read_string()
+            model = model_manager.load_model(file_path)
+            return OK(model.response_bytes)
+
+        if message_type == MessageType.SaveModel:
+            model_id = reader.read_int()
+            file_path = reader.read_string()
+            model_manager.save_model(model_id, file_path)
+            return OK()
+
+        if message_type == MessageType.SetLogOptions:
+            model_id = reader.read_int()
+            model = model_manager.get(model_id)
+            log_options = LogOptions(reader)
+            logging.register(model.model_id, log_options)
+            return OK()
+
+        if message_type == MessageType.ShowLog:
+            model_id = reader.read_int()
+            model = model_manager.get(model_id)
+            logging.show(model.model_id, model.log_data)
+            return OK()
+
+        # Test message
+
+        if message_type == MessageType.Test:
+            print("Test")
+            data = reader.read_to_end()
+            print(f"Received: {data}")
+            return OK(data)
+
+        # Unknown message type - throw error
+
+        raise RuntimeError(f"Unknown message type: {message_type}")

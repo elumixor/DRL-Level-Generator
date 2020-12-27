@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Common;
@@ -9,6 +10,7 @@ using RemoteComputation.Logging;
 using RemoteComputation.Models;
 using RL;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public static class MainController
 {
@@ -126,6 +128,29 @@ public static class MainController
                 var seed = Random.value;
                 var generatedData = generator.Generate(difficulty, seed);
                 var sampleTask = SampleTrajectory(generatedData, actor, environment);
+                sampleTask.Wait();
+                result[i] = sampleTask.Result;
+            }
+
+            return result;
+        });
+    }
+
+    public static Task<Trajectory[]> SampleTrajectories<TGenData, TState, TAction>(int count,
+                                                                                   Func<TGenData> generatedDataProducer,
+                                                                                   IActor<TState, TAction> actor,
+                                                                                   IEnvironment<TGenData, TState, TAction> environment)
+            where TGenData : Vector
+            where TState : Vector
+            where TAction : Vector
+    {
+        // todo: maybe this is better to do with multiple task and mutex synchronization
+        return Task.Run(() => {
+            var result = new Trajectory[count];
+
+            for (var i = 0; i < count; i++) {
+                var seed = Random.value;
+                var sampleTask = SampleTrajectory(generatedDataProducer(), actor, environment);
                 sampleTask.Wait();
                 result[i] = sampleTask.Result;
             }

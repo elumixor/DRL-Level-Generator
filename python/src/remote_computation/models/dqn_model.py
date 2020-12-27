@@ -12,7 +12,8 @@ from common.memory_buffer import MemoryBuffer
 from serialization import to_bytes
 from .model_type import ModelType
 from .remote_model import RemoteModel, TaskType
-from ..logging import LogOptionName
+from .. import logging
+from ..logging import LogOptionName, LoggingError
 
 discount = 0.99
 
@@ -87,12 +88,15 @@ class DQNModel(RemoteModel):
 
             self.train()
 
-            if self.logger is not None:
-                self.logger.update(self.log_data)
+            try:
+                logging.update(self.model_id, self.log_data)
+            except LoggingError as err:
+                print(err)
+                pass
 
             self.elapsed_epochs += 1
 
-            return b''
+            return self.response_bytes
 
         if task == TaskType.EstimateDifficulty:
             trajectory = reader.read_trajectory()

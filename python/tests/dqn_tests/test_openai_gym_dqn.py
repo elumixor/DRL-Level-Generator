@@ -26,20 +26,20 @@ class RemoteModelLocalTests(TestCase):
                 self.current_trajectory = []
                 self.previous_state = None
 
-                model_dict = dict()
-
                 b = b''
                 b += to_bytes(ModelType.DQN)
                 b += to_bytes(self.state_size)
                 b += to_bytes(self.action_size)
 
-                self.model: DQNModel = mm.obtain_new(model_dict, ByteReader(b))
+                self.model: DQNModel = mm.obtain_new(ByteReader(b))
 
-                self.model.log_options = LogOptions.create([
-                        (LogOptionName.TrajectoryReward, LogOption.create(50, 250, True, True, True, 0.8)),
-                        (LogOptionName.TrainingLoss, LogOption.create(50, 250, True, True, True, 0.8)),
-                        (LogOptionName.Epsilon, LogOption.create(50, 250, True, True, True, 0.8)),
+                log_options = LogOptions.create([
+                    (LogOptionName.TrajectoryReward, LogOption.create(50, 250, True, True, True, 0.8)),
+                    (LogOptionName.TrainingLoss, LogOption.create(50, 250, True, True, True, 0.8)),
+                    (LogOptionName.Epsilon, LogOption.create(50, 250, True, True, True, 0.8)),
                 ])
+
+                L.register(self.model.model_id, log_options)
 
                 self.current_trajectory: List[Tuple[List[float], List[float], float, List[float]]] = []
 
@@ -72,7 +72,7 @@ class RemoteModelLocalTests(TestCase):
                     b += to_bytes(next_state)
 
                 self.model.run_task(ByteReader(b))
-                L.show(self.model.model_id, self.model.log_data, self.model.log_options)
+                L.show(self.model.model_id, self.model.log_data)
                 self.current_trajectory = []
 
         train(gym.make('CartPole-v0'), DQNAgentWrapper, epochs=2000, num_rollouts=5, render_frequency=150)
