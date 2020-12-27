@@ -68,6 +68,8 @@ class Communicator:
         request_id = reader.read_int()
         message_type = MessageType(reader.read_int())
 
+        print(f"Message type: {message_type}")
+
         def OK(b: bytes = b''):
             """Helper to return the response with given data"""
             print(f"sending ({len(b)}B)")

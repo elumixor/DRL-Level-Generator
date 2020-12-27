@@ -67,10 +67,7 @@ namespace Testing.PlayModeTests.Pendulum.Tests
                 }
             });
 
-            while (!t.IsCompleted) {
-                Debug.Log("not yet completed...");
-                yield return new WaitForSeconds(1f);
-            }
+            yield return new WaitUntil(() => t.IsCompleted);
 
             Debug.Log("done");
         }

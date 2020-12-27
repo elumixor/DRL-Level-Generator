@@ -67,8 +67,7 @@ class Logger:
 
             self.plt.draw()
             self.plt.tight_layout()
-
-            # plt.pause(0.001)
+            self.plt.pause(0.001)
 
         self.epoch += 1
 
