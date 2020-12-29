@@ -8,6 +8,7 @@ using Common;
 using Common.ByteConversions;
 using NetMQ;
 using NetMQ.Sockets;
+using UnityEngine;
 
 namespace RemoteComputation
 {
@@ -94,30 +95,34 @@ namespace RemoteComputation
             Initialize();
 
             return Task.Run(() => {
-                Semaphore.Wait();
+                try {
+                    Semaphore.Wait();
 
-                var id = currentId;
-                var cond = new SemaphoreSlim(0, 1);
+                    var id = currentId;
+                    var cond = new SemaphoreSlim(0, 1);
 
-                Callbacks[id] = (cond, null);
+                    Callbacks[id] = (cond, null);
 
-                push.SendFrame(id.ToBytes().ConcatMany(data).ToArray());
+                    push.SendFrame(id.ToBytes().ConcatMany(data).ToArray());
 
-                currentId++;
+                    currentId++;
 
-                Semaphore.Release();
+                    Semaphore.Release();
 
-                cond.Wait();
+                    cond.Wait();
 
-                Semaphore.Wait();
+                    Semaphore.Wait();
 
-                var (_, byteReader) = Callbacks[id];
+                    var (_, byteReader) = Callbacks[id];
 
-                Callbacks.Remove(id);
+                    Callbacks.Remove(id);
 
-                Semaphore.Release();
-
-                return byteReader;
+                    Semaphore.Release();
+                    return byteReader;
+                } catch (Exception e) {
+                    Debug.LogException(e);
+                    throw e;
+                }
             });
         }
 

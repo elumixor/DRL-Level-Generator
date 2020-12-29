@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Common.ByteConversions;
 
-namespace Common
+namespace RL
 {
-    public class Vector : IEnumerable<float>, IByteConvertible
+    public class Vector : ObservableState<Vector>, IEnumerable<float>, IByteConvertible
     {
         protected readonly float[] values;
 
@@ -23,6 +23,9 @@ namespace Common
         public IEnumerable<byte> Bytes => values.ToBytes(values.Length);
 
         public static implicit operator Vector(float value) => new Vector(value);
+
+        /// <inheritdoc/>
+        public override Vector Observation => this;
 
         public override bool Equals(object obj)
         {

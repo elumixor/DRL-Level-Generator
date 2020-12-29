@@ -11,14 +11,17 @@ namespace Testing.PlayModeTests.Pendulum
         public float ConnectorLength {
             get => -bob.transform.localPosition.y;
             set {
-                bob.transform.localPosition       = Vector2.down * value;
-                lineRenderer.localScale = new Vector2(1, -value);
+                bob.transform.localPosition = Vector2.down * value;
+                lineRenderer.localScale     = new Vector2(1, -value);
             }
         }
 
         public float BobRadius {
             get => bob.circle.radius;
-            set => bob.circle.radius = value;
+            set {
+                bob.circle.radius = value;
+                bob.OnValidate();
+            }
         }
 
         public float Angle {

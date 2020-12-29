@@ -6,8 +6,8 @@ using RemoteComputation.Models;
 
 namespace RL
 {
-    public abstract class LocalInferenceNN<TState, TAction> : IRemoteModel, IByteAssignable, IActor<TState, TAction>
-            where TState : Vector
+    public abstract class LocalInferenceNN<TObservation, TAction> : IRemoteModel, IByteAssignable, IActor<TObservation, TAction>
+            where TObservation : Vector
             where TAction : Vector
     {
         protected Module nn;
@@ -19,7 +19,7 @@ namespace RL
         public abstract ModelType ModelType { get; }
 
         /// <inheritdoc/>
-        public abstract TAction GetAction(TState state);
+        public abstract TAction GetAction(TObservation obs);
 
         /// <inheritdoc/>
         public virtual void AssignFromBytes(ByteReader reader)

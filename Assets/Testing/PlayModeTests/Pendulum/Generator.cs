@@ -28,7 +28,7 @@ namespace Testing.PlayModeTests.Pendulum
             for (var i = 0; i < ec; i++)
                 enemies[i] = new GeneratedData.CircleConfiguration(enemyX.Sample, enemyY.Sample, enemyRadius.Sample);
 
-            return new GeneratedData(1f, .25f, 30f, 1f, ec, enemies);
+            return new GeneratedData(1f, .25f, 30f, 1f, 5f, ec, enemies);
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using Common;
+﻿using RL;
 
-public interface IStateRenderer<in TState>
-        where TState : Vector
+public interface IStateRenderer<in TState, in TGeneratedData>
 {
+    void Setup(TGeneratedData generatedData);
     void RenderState(TState state);
 }
 
-public interface IStateRenderer : IStateRenderer<Vector> { }
+public interface IStateRenderer : IStateRenderer<Vector, Vector> { }

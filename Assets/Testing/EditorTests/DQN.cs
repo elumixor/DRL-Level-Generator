@@ -10,7 +10,7 @@ namespace Testing.EditorTests
         public override ModelType ModelType { get; } = ModelType.DQN;
 
         /// <inheritdoc/>
-        public override Vector GetAction(Vector state) => nn.Forward(state).ArgMax();
+        public override Vector GetAction(Vector obs) => nn.Forward(obs).ArgMax();
 
         /// <inheritdoc/>
         public override string ToString() => "DQN:\n" + nn;

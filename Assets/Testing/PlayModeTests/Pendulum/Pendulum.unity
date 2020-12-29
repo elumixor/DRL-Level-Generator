@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 239573181}
   - component: {fileID: 239573180}
   m_Layer: 0
-  m_Name: Environment
+  m_Name: State Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -149,7 +149,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 239573179}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c3c402c81d74a879f67ff8eb8d85b58, type: 3}
+  m_Script: {fileID: 11500000, guid: 7e90709ce83e49428ebafadf76be683c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pendulum: {fileID: 1195490288}
@@ -456,7 +456,7 @@ Transform:
   m_GameObject: {fileID: 625458724}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -2, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_Children: []
   m_Father: {fileID: 1195490289}
   m_RootOrder: 0
@@ -473,7 +473,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b80c9aca44794d3695bff270dca43240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.5
+  circle:
+    radius: 0.4
+    position: {x: 0, y: 0}
 --- !u!33 &625458727
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -551,7 +553,7 @@ Transform:
   m_GameObject: {fileID: 1094145706}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 1195490289}
   m_RootOrder: 2
@@ -617,7 +619,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b80c9aca44794d3695bff270dca43240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.1
+  circle:
+    radius: 0
+    position: {x: 0, y: 0}
 --- !u!1 &1195490287
 GameObject:
   m_ObjectHideFlags: 0

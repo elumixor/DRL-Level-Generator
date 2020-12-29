@@ -9,15 +9,12 @@ using RemoteComputation;
 using RemoteComputation.Logging;
 using RemoteComputation.Models;
 using RL;
-using UnityEngine;
-using Random = UnityEngine.Random;
 
 public static class MainController
 {
     /* High-level abstract stuff */
 
-    public static async Task<T> ObtainModel<T>()
-            where T : IByteAssignable, IRemoteModel, new()
+    public static async Task<T> ObtainModel<T>() where T : IByteAssignable, IRemoteModel, new()
     {
         var result = new T();
         var reader = await Communicator.Send(Message.ObtainModel(result.ModelType));
@@ -25,8 +22,7 @@ public static class MainController
         return result;
     }
 
-    public static async Task<T> ObtainModel<T>(params IEnumerable<byte>[] args)
-            where T : IByteAssignable, IRemoteModel, new()
+    public static async Task<T> ObtainModel<T>(params IEnumerable<byte>[] args) where T : IByteAssignable, IRemoteModel, new()
     {
         var result = new T();
         var reader = await Communicator.Send(Message.ObtainModel(result.ModelType, args));
@@ -34,8 +30,7 @@ public static class MainController
         return result;
     }
 
-    public static async Task<T> LoadModel<T>(string path)
-            where T : IByteAssignable, IRemoteModel, new()
+    public static async Task<T> LoadModel<T>(string path) where T : IByteAssignable, IRemoteModel, new()
     {
         var result = new T();
         var reader = await Communicator.Send(Message.LoadModel(path));
@@ -47,27 +42,31 @@ public static class MainController
 
     /* More specific stuff */
 
-    public static async Task TrainAgent<TModel>(TModel trainableModel, IReadOnlyCollection<Trajectory> trajectories)
+    public static async Task TrainAgent<TModel, TState, TObservation, TAction>
+            (TModel trainableModel, IReadOnlyCollection<Trajectory<TState, TAction, TObservation>> trajectories)
             where TModel : IRemoteModel, IByteAssignable
+            where TObservation : Vector
+            where TAction : Vector
+            where TState : ObservableState<TObservation>, IByteConvertible
     {
         var reader = await RemoteTaskRunner.RunTask(trainableModel.Id, RemoteTask.Train, trajectories.MapToBytes(t => t.Bytes));
         trainableModel.AssignFromBytes(reader);
     }
 
-    public static Task<Trajectory> SampleTrajectory<TGenData, TState, TAction>(TGenData generatedData,
-                                                                               IActor<TState, TAction> actor,
-                                                                               IEnvironment<TGenData, TState, TAction> environment)
+    public static Task<Trajectory<TState, TAction, TObservation>> SampleTrajectory<TGenData, TState, TAction, TObservation>
+            (TGenData generatedData, IActor<TObservation, TAction> actor, IEnvironment<TGenData, TState, TAction> environment)
             where TGenData : Vector
-            where TState : Vector
+            where TObservation : Vector
             where TAction : Vector
+            where TState : ObservableState<TObservation>, IByteConvertible
     {
         return Task.Run(() => {
-            var trajectory = new Trajectory();
+            var trajectory = new Trajectory<TState, TAction, TObservation>();
 
             var startingState = environment.ResetEnvironment(generatedData);
 
             while (true) {
-                var action = actor.GetAction(startingState);
+                var action = actor.GetAction(startingState.Observation);
                 var (nextState, reward, done) = environment.Transition(startingState, action);
 
                 trajectory.Add(startingState, action, reward, nextState);
@@ -79,11 +78,8 @@ public static class MainController
         });
     }
 
-    public static Task<Trajectory> SampleTrajectory(Vector generatedData,
-                                                    IActor actor,
-                                                    IEnvironment environment,
-                                                    IStateRenderer stateRenderer,
-                                                    int renderEvery = 1)
+    public static Task<Trajectory> SampleTrajectory
+            (Vector generatedData, IActor actor, IEnvironment environment, IStateRenderer stateRenderer, int renderEvery = 1)
     {
         return Task.Run(() => {
             var trajectory = new Trajectory();
@@ -111,21 +107,21 @@ public static class MainController
         });
     }
 
-    public static Task<Trajectory[]> SampleTrajectories<TGenData, TState, TAction>(int count,
-                                                                                   IGenerator<TGenData> generator,
-                                                                                   float difficulty,
-                                                                                   IActor<TState, TAction> actor,
-                                                                                   IEnvironment<TGenData, TState, TAction> environment)
-            where TGenData : Vector
-            where TState : Vector
-            where TAction : Vector
+    public static Task<Trajectory<TState, TAction, TObservation>[]> SampleTrajectories<TGenData, TState, TAction, TObservation>
+    (int count,
+     IGenerator<TGenData> generator,
+     float difficulty,
+     IActor<TObservation, TAction> actor,
+     IEnvironment<TGenData, TState, TAction> environment) where TGenData : Vector
+                                                          where TAction : Vector
+                                                          where TObservation : Vector
+                                                          where TState : ObservableState<TObservation>, IByteConvertible
     {
-        // todo: maybe this is better to do with multiple task and mutex synchronization
         return Task.Run(() => {
-            var result = new Trajectory[count];
+            var result = new Trajectory<TState, TAction, TObservation>[count];
 
             for (var i = 0; i < count; i++) {
-                var seed = Random.value;
+                var seed = MathExtensions.RandomValue();
                 var generatedData = generator.Generate(difficulty, seed);
                 var sampleTask = SampleTrajectory(generatedData, actor, environment);
                 sampleTask.Wait();
@@ -136,20 +132,19 @@ public static class MainController
         });
     }
 
-    public static Task<Trajectory[]> SampleTrajectories<TGenData, TState, TAction>(int count,
-                                                                                   Func<TGenData> generatedDataProducer,
-                                                                                   IActor<TState, TAction> actor,
-                                                                                   IEnvironment<TGenData, TState, TAction> environment)
-            where TGenData : Vector
-            where TState : Vector
-            where TAction : Vector
+    public static Task<Trajectory<TState, TAction, TObservation>[]> SampleTrajectories<TGenData, TState, TAction, TObservation>
+    (int count,
+     Func<TGenData> generatedDataProducer,
+     IActor<TObservation, TAction> actor,
+     IEnvironment<TGenData, TState, TAction> environment) where TGenData : Vector
+                                                          where TState : ObservableState<TObservation>, IByteConvertible
+                                                          where TAction : Vector
+                                                          where TObservation : Vector
     {
-        // todo: maybe this is better to do with multiple task and mutex synchronization
         return Task.Run(() => {
-            var result = new Trajectory[count];
+            var result = new Trajectory<TState, TAction, TObservation>[count];
 
             for (var i = 0; i < count; i++) {
-                var seed = Random.value;
                 var sampleTask = SampleTrajectory(generatedDataProducer(), actor, environment);
                 sampleTask.Wait();
                 result[i] = sampleTask.Result;
@@ -159,30 +154,26 @@ public static class MainController
         });
     }
 
-    public static async Task TrainAgent<TModel, TGenData, TState, TAction>(TModel trainableModel,
-                                                                           IGenerator<TGenData> generator,
-                                                                           float difficulty,
-                                                                           IActor<TState, TAction> actor,
-                                                                           IEnvironment<TGenData, TState, TAction> environment,
-                                                                           int numTrajectories = 1,
-                                                                           int numEpochs = 1,
-                                                                           LogOptions logOptions = null)
-            where TModel : IRemoteModel, IByteAssignable
-            where TGenData : Vector
-            where TState : Vector
-            where TAction : Vector
+    public static async Task TrainAgent<TModel, TGenData, TState, TAction, TObservation>
+    (TModel trainableModel,
+     IGenerator<TGenData> generator,
+     float difficulty,
+     IActor<TObservation, TAction> actor,
+     IEnvironment<TGenData, TState, TAction> environment,
+     int numTrajectories = 1,
+     int numEpochs = 1,
+     LogOptions logOptions = null) where TModel : IRemoteModel, IByteAssignable
+                                   where TGenData : Vector
+                                   where TState : ObservableState<TObservation>, IByteConvertible
+                                   where TAction : Vector
+                                   where TObservation : Vector
     {
         if (logOptions != null) await SetLogOptions(trainableModel, logOptions);
 
-        Debug.Log($"? {numEpochs}");
-
         for (var i = 0; i < numEpochs; i++) {
-            Debug.Log(i);
             var trajectories = await SampleTrajectories(numTrajectories, generator, difficulty, actor, environment);
             await TrainAgent(trainableModel, trajectories);
         }
-
-        Debug.Log("Returning?????");
     }
 
     public static async Task<float> EstimateDifficulty(IRemoteModel estimator, Trajectory trajectory)

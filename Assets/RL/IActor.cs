@@ -1,12 +1,9 @@
-﻿using Common;
-
-namespace RL
+﻿namespace RL
 {
-    public interface IActor<in TState, out TAction>
-            where TState : Vector
-            where TAction : Vector
+    public interface IActor<in TObservation, out TAction> where TObservation : Vector
+                                                          where TAction : Vector
     {
-        TAction GetAction(TState state);
+        TAction GetAction(TObservation obs);
     }
 
     public interface IActor : IActor<Vector, Vector> { }

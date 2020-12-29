@@ -16,7 +16,8 @@ namespace Common.RandomValues
         }
 
         /// <inheritdoc/>
-        public float Sample => MathExtensions.RandomValue(min, max);
+        public float Sample => Get(min, max);
+        public static float Get(float min, float max) => MathExtensions.RandomValue(min, max);
     }
 
     [Serializable]
@@ -32,6 +33,7 @@ namespace Common.RandomValues
         }
 
         /// <inheritdoc/>
-        public int Sample => MathExtensions.RandomValue(min, max);
+        public int Sample => Get(min, max);
+        public static int Get(int min, int max) => MathExtensions.RandomValue(min, max);
     }
 }

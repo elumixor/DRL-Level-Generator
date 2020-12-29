@@ -1,5 +1,4 @@
 using System.Collections;
-using Common;
 using RL;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -38,12 +37,15 @@ namespace Testing.PlayModeTests.DummyEnvironment
                 return (nextState, reward, done);
             }
 
+            /// <inheritdoc/>
+            public void Setup(Vector generatedData) { }
+
             public void RenderState(Vector state) { actor.position = Vector3.right * state[0]; }
         }
 
         class MyActor : IActor
         {
-            public Vector GetAction(Vector state) => new Vector(1);
+            public Vector GetAction(Vector obs) => new Vector(1);
         }
 
         [UnityTest]

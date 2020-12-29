@@ -4,7 +4,7 @@ namespace Common
 {
     public class CircleBehaviour : MonoBehaviour
     {
-        public Circle circle;
+        public Circle circle = new Circle(Vector2.zero, 1f);
 
         void Reset()
         {

@@ -14,6 +14,13 @@ namespace Common
         public static int RandomValue(int max) => Random.Next(max);
         public static int RandomValue(int min, int max) => Random.Next(min, max);
 
+        public static T RandomChoice<T>(this IReadOnlyList<T> elements) => elements[RandomValue(elements.Count)];
+
+        public static IEnumerable<T> RandomChoice<T>(this IReadOnlyList<T> elements, int count)
+        {
+            for (var i = 0; i < count; i++) yield return elements.RandomChoice();
+        }
+
         public static IEnumerable<float> Softmax(this IEnumerable<float> x)
         {
             var input = x.ToArray();
