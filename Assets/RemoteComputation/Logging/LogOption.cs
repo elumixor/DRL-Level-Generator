@@ -4,14 +4,14 @@ using Common.ByteConversions;
 
 namespace RemoteComputation.Logging
 {
-    public readonly struct LogOption : IByteConvertible
+    public class LogOption : IByteConvertible
     {
-        readonly int frequency;
-        readonly int logLastN;
-        readonly bool print;
-        readonly bool plot;
-        readonly bool minMax;
-        readonly float runningAverageSmoothing;
+        public int frequency;
+        public int logLastN;
+        public bool print;
+        public bool plot;
+        public bool minMax;
+        public float runningAverageSmoothing;
 
         /// <summary> Creates a log option with the given name and parameters </summary>
         /// <param name="frequency"> How much epochs should elapse between the logging </param>
@@ -26,12 +26,13 @@ namespace RemoteComputation.Logging
         /// <param name="runningAverageSmoothing">
         ///     If greater than zero, will plot the running average of the data, with the given smoothing coefficient
         /// </param>
-        public LogOption(int frequency = 1,
-                         int logLastN = 0,
-                         bool print = true,
-                         bool plot = true,
-                         bool minMax = true,
-                         float runningAverageSmoothing = 0f)
+        public LogOption
+        (int frequency = 1,
+         int logLastN = 0,
+         bool print = true,
+         bool plot = true,
+         bool minMax = true,
+         float runningAverageSmoothing = 0f)
         {
             this.frequency               = frequency;
             this.logLastN                = logLastN;

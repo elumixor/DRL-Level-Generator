@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 564401852268802868}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -45,7 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b80c9aca44794d3695bff270dca43240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 1
+  circle:
+    radius: 0
+    position: {x: 0, y: 0}
 --- !u!33 &7488285247925321427
 MeshFilter:
   m_ObjectHideFlags: 0

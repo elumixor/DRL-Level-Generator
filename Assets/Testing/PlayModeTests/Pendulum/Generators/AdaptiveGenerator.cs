@@ -1,13 +1,11 @@
 ﻿using Common.RandomValues;
-using RL;
-using Testing.PlayModeTests.Pendulum;
 
-namespace Testing.PlayModeTests
+namespace Testing.PlayModeTests.Pendulum.Generators
 {
-    public class AdaptiveGenerator : IGenerator<GeneratedData>
+    public class AdaptiveGenerator : PendulumGenerator
     {
         /// <inheritdoc/>
-        public GeneratedData Generate(float difficulty, float randomSeed = 0)
+        public override GeneratedData Generate(float difficulty, float randomSeed = 0)
         {
             var level = difficulty == 0f ? 0 : difficulty < 0.25f ? 1 : difficulty < 1f ? 2 : 3;
 

@@ -9,7 +9,7 @@ namespace Testing.PlayModeTests.Pendulum
     {
         const float MAX_ANGLE = 60f;
         const float VERTICAL_SPEED = 1f;
-        const float ANGULAR_SPEED = 5f;
+        const float ANGULAR_SPEED = 10f;
 
         Circle[] enemies;
         float bobRadius;

@@ -21,7 +21,7 @@ public class WaitForTrajectoryRender<TState, TAction, TObservation, TGeneratedDa
     (TGeneratedData generatedData,
      Trajectory<TState, TAction, TObservation> trajectory,
      IStateRenderer<TState, TGeneratedData> stateRenderer,
-     float deltaTime = 0)
+     float deltaTime = 0.1f)
     {
         this.trajectory    = trajectory;
         this.stateRenderer = stateRenderer;

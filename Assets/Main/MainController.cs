@@ -44,7 +44,7 @@ public static class MainController
 
     public static async Task TrainAgent<TModel, TState, TObservation, TAction>
             (TModel trainableModel, IReadOnlyCollection<Trajectory<TState, TAction, TObservation>> trajectories)
-            where TModel : IRemoteModel, IByteAssignable
+            where TModel : ITrainableRemoteModel
             where TObservation : Vector
             where TAction : Vector
             where TState : ObservableState<TObservation>, IByteConvertible
@@ -112,17 +112,17 @@ public static class MainController
      IGenerator<TGenData> generator,
      float difficulty,
      IActor<TObservation, TAction> actor,
-     IEnvironment<TGenData, TState, TAction> environment) where TGenData : Vector
-                                                          where TAction : Vector
-                                                          where TObservation : Vector
-                                                          where TState : ObservableState<TObservation>, IByteConvertible
+     IEnvironment<TGenData, TState, TAction> environment,
+     float randomSeed = 0f) where TGenData : Vector
+                            where TAction : Vector
+                            where TObservation : Vector
+                            where TState : ObservableState<TObservation>, IByteConvertible
     {
         return Task.Run(() => {
             var result = new Trajectory<TState, TAction, TObservation>[count];
 
             for (var i = 0; i < count; i++) {
-                var seed = MathExtensions.RandomValue();
-                var generatedData = generator.Generate(difficulty, seed);
+                var generatedData = generator.Generate(difficulty, randomSeed);
                 var sampleTask = SampleTrajectory(generatedData, actor, environment);
                 sampleTask.Wait();
                 result[i] = sampleTask.Result;
@@ -162,7 +162,7 @@ public static class MainController
      IEnvironment<TGenData, TState, TAction> environment,
      int numTrajectories = 1,
      int numEpochs = 1,
-     LogOptions logOptions = null) where TModel : IRemoteModel, IByteAssignable
+     LogOptions logOptions = null) where TModel : ITrainableRemoteModel
                                    where TGenData : Vector
                                    where TState : ObservableState<TObservation>, IByteConvertible
                                    where TAction : Vector

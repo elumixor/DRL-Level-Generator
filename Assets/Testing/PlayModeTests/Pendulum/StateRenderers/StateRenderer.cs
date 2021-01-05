@@ -1,7 +1,7 @@
 ﻿using Common;
 using UnityEngine;
 
-namespace Testing.PlayModeTests.Pendulum
+namespace Testing.PlayModeTests.Pendulum.StateRenderers
 {
     public class StateRenderer : MonoBehaviour, IStateRenderer<State, GeneratedData>
     {
@@ -34,7 +34,7 @@ namespace Testing.PlayModeTests.Pendulum
             enemiesObjects = new GameObject[enemiesCount];
 
             var top = float.NegativeInfinity;
-            var left = 0f;
+            var left = connectorLength + bobRadius;
 
             for (var i = 0; i < enemiesCount; i++) {
                 var enemy = Instantiate(enemyPrefab, transform, true);

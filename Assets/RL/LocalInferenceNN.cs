@@ -1,12 +1,11 @@
 ﻿using Common;
-using Common.ByteConversions;
 using NN;
 using NN.Configuration;
 using RemoteComputation.Models;
 
 namespace RL
 {
-    public abstract class LocalInferenceNN<TObservation, TAction> : IRemoteModel, IByteAssignable, IActor<TObservation, TAction>
+    public abstract class LocalInferenceNN<TObservation, TAction> : ITrainableRemoteModel, IActor<TObservation, TAction>
             where TObservation : Vector
             where TAction : Vector
     {

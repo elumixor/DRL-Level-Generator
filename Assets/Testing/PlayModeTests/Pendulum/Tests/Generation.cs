@@ -1,10 +1,12 @@
 ﻿using System.Collections;
+using Testing.PlayModeTests.Pendulum.Generators;
+using Testing.PlayModeTests.Pendulum.StateRenderers;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace Testing.PlayModeTests.Pendulum.Tests
 {
-    public class Generation : PendulumFixture
+    public class Generation : PendulumFixture<AdaptiveGenerator, StateRenderer>
     {
         bool done;
         State state;

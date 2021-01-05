@@ -9,4 +9,7 @@ class RangedEntry(LogEntry):
         self.min_value = min_value
 
     def __str__(self):
-        return f"{self.min_value} {self.value} {self.max_value}"
+        return f"({self.min_value:.2f} {self.value:.2f} {self.max_value:.2f})"
+
+    def __repr__(self):
+        return str(self)

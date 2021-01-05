@@ -2,7 +2,9 @@
   "name": "TestCommon",
   "references": [
     "GUID:2d6aee26718155a4c9a4c846c06269bd",
-    "GUID:ad03cf0c34b5b484b9f487b8574fe11f"
+    "GUID:ad03cf0c34b5b484b9f487b8574fe11f",
+    "GUID:aa0490c95e36e484d91e2347678fd417",
+    "GUID:ef5f6c424c06905468a8583ff910261d"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

@@ -2,6 +2,8 @@
 using Common;
 using Common.ByteConversions;
 using RemoteComputation.Logging;
+using Testing.PlayModeTests.Pendulum.Generators;
+using Testing.PlayModeTests.Pendulum.StateRenderers;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.TestTools;
@@ -9,7 +11,7 @@ using LogOption = RemoteComputation.Logging.LogOption;
 
 namespace Testing.PlayModeTests.Pendulum.Tests
 {
-    public class ContinuousRendering : PendulumFixture
+    public class ContinuousRendering : PendulumFixture<AdaptiveGenerator, StateRenderer>
     {
         [UnityTest]
         public IEnumerator ObtainDQNModelShouldWork()
@@ -44,8 +46,7 @@ namespace Testing.PlayModeTests.Pendulum.Tests
                 // Render random trajectory with the current data
                 yield return new WaitForTrajectoryRender<State, Action, Observation, GeneratedData>(generatedData,
                                                                                                     trajectory,
-                                                                                                    stateRenderer,
-                                                                                                    .1f);
+                                                                                                    stateRenderer);
 
                 // Train the agent
                 var i1 = i;

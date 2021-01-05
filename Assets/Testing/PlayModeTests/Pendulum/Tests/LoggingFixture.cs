@@ -1,6 +1,9 @@
-﻿namespace Testing.PlayModeTests.Pendulum.Tests
+﻿using Testing.PlayModeTests.Pendulum.Generators;
+using Testing.PlayModeTests.Pendulum.StateRenderers;
+
+namespace Testing.PlayModeTests.Pendulum.Tests
 {
-    public class LoggingFixture : PendulumFixture
+    public class LoggingFixture : PendulumFixture<AdaptiveGenerator, StateRenderer>
     {
         // [UnityTest]
         // public IEnumerator DummyLogging()

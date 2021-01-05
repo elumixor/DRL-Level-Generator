@@ -1,4 +1,5 @@
 import multiprocessing as mp
+import threading
 from typing import Dict, Optional
 
 from ._logger import Logger as _Logger
@@ -65,7 +66,7 @@ def _logger_main(queue: mp.Queue):
 class _LoggerWrapper:
     def __init__(self):
         # Start the actual process
-        self.queue = mp.Queue()
+        self.queue = mp.Queue(1)
         self.logger_process = mp.Process(target=_logger_main, args=(self.queue,))
         self.logger_process.start()
 

@@ -1,3 +1,5 @@
+import threading
+from queue import Queue
 from random import random
 from typing import List
 
@@ -6,7 +8,7 @@ import torch
 import torch.nn.functional as F
 from torch.nn import Sequential, Linear, ReLU
 
-from RL import Trajectory, State, Action, Transition
+from RL import Trajectory, State, Action
 from common import ByteReader
 from common.memory_buffer import MemoryBuffer
 from serialization import to_bytes
@@ -24,10 +26,6 @@ def one_hot(x, size):
     return res
 
 
-def get_trajectory_total_reward(trajectory: List[Transition]):
-    return sum([transition[2] for transition in trajectory])
-
-
 class DQNModel(RemoteModel):
 
     def __init__(self, model_id: int, reader: ByteReader):
@@ -37,7 +35,7 @@ class DQNModel(RemoteModel):
         self.train_times = 5
         self.training_batch_size = 100
 
-        self.epsilon_initial = 1
+        self.epsilon_initial = 1.0
         self.epsilon_end = 0.01
         self.epsilon_decay_epochs = 500
 
@@ -47,9 +45,15 @@ class DQNModel(RemoteModel):
         self.epsilon = self.epsilon_initial
         self.elapsed_epochs = 0
 
+        self._lock = threading.Lock()
+
     @property
     def model_type(self) -> ModelType:
         return ModelType.DQN
+
+    @property
+    def response_bytes(self) -> bytes:
+        return super().response_bytes + to_bytes(self.epsilon)
 
     # todo: pass parameters such as hidden size?
     def _construct_nn(self, input_size: int, output_size: int):
@@ -70,12 +74,13 @@ class DQNModel(RemoteModel):
             return to_bytes(action)
 
         if task == TaskType.Train:
+            self._lock.acquire()
             trajectories_count = reader.read_int()
             trajectory_rewards: List[float] = []
 
             for _ in range(trajectories_count):
                 trajectory = reader.read_trajectory()
-                trajectory_reward = get_trajectory_total_reward(trajectory)
+                trajectory_reward = sum([t[2] for t in trajectory])
 
                 for transition in trajectory:
                     self.memory.push(transition)
@@ -95,7 +100,7 @@ class DQNModel(RemoteModel):
                 pass
 
             self.elapsed_epochs += 1
-
+            self._lock.release()
             return self.response_bytes
 
         if task == TaskType.EstimateDifficulty:

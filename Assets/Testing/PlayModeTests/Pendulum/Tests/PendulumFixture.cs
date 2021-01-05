@@ -4,6 +4,7 @@ using Common.ByteConversions;
 using NUnit.Framework;
 using RemoteComputation;
 using RemoteComputation.Logging;
+using RL;
 using Testing.TestCommon;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,12 +13,14 @@ using LogOption = RemoteComputation.Logging.LogOption;
 
 namespace Testing.PlayModeTests.Pendulum.Tests
 {
-    public abstract class PendulumFixture : CommunicatorFixture
+    public abstract class PendulumFixture<TGenerator, TStateRenderer> : CommunicatorFixture
+            where TGenerator : MonoBehaviour, IGenerator<GeneratedData>
+            where TStateRenderer : MonoBehaviour, IStateRenderer<State, GeneratedData>
     {
-        protected StateRenderer stateRenderer;
+        protected TStateRenderer stateRenderer;
         protected Environment environment;
         protected Pendulum pendulum;
-        protected AdaptiveGenerator generator;
+        protected TGenerator generator;
         protected DQNPendulumModel dqn;
 
         [UnitySetUp]
@@ -26,7 +29,6 @@ namespace Testing.PlayModeTests.Pendulum.Tests
             yield return LoadScene();
             yield return ObtainDQN();
 
-            generator   = new AdaptiveGenerator();
             environment = new Environment();
         }
 
@@ -36,11 +38,13 @@ namespace Testing.PlayModeTests.Pendulum.Tests
 
             yield return null;
 
-            stateRenderer = Object.FindObjectOfType<StateRenderer>();
+            stateRenderer = Object.FindObjectOfType<TStateRenderer>();
             pendulum      = Object.FindObjectOfType<Pendulum>();
+            generator     = Object.FindObjectOfType<TGenerator>();
 
             Assert.NotNull(stateRenderer);
             Assert.NotNull(pendulum);
+            Assert.NotNull(generator);
         }
 
         protected IEnumerator ObtainDQN()

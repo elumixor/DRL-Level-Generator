@@ -30,3 +30,14 @@ class LogData:
 
     def __getitem__(self, item: LogOptionName) -> List[LogEntry]:
         return self.entries[item]
+
+    def __str__(self):
+        s = f"LogData {len(self.entries)} entries:\n"
+
+        for name, data in self.entries.items():
+            s += f"\t{name} {data}\n"
+
+        return s
+
+    def __repr__(self):
+        return str(self)

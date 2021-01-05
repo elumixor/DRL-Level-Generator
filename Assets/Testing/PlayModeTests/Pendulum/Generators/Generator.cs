@@ -2,7 +2,7 @@ using System;
 using Common.RandomValues;
 using RL;
 
-namespace Testing.PlayModeTests.Pendulum
+namespace Testing.PlayModeTests.Pendulum.Generators
 {
     [Serializable]
     public class Generator : IGenerator<GeneratedData>
