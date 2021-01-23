@@ -9,11 +9,12 @@ using NetMQ;
 using NetMQ.Sockets;
 using NUnit.Framework;
 using RemoteComputation;
+using Testing.TestCommon;
 using UnityEngine;
 
 namespace Testing.EditorTests
 {
-    public class CommunicationTest
+    public class CommunicationTest : CommunicatorFixture
     {
         readonly SemaphoreSlim ss = new SemaphoreSlim(0, 1);
 
@@ -56,10 +57,10 @@ namespace Testing.EditorTests
         [Test]
         public void TestCommunication()
         {
+            Communicator.Close();
             var task = Communicator.Send(Message.Test(5.ToBytes()));
             task.Wait();
             Debug.Log(task.Result.ReadInt());
-            Communicator.Close();
         }
 
         [Test]

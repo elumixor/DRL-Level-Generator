@@ -8,6 +8,10 @@ from .endianness import Endianness
 from ..utils import get_format
 
 
+def bool_to_bytes(value: int, endianness: Endianness = Endianness.Native) -> bytes:
+    return pack('?', value)
+
+
 def int_to_bytes(value: int, endianness: Endianness = Endianness.Native) -> bytes:
     return pack(get_format(DataTypes.Int, endianness, 1), value)
 

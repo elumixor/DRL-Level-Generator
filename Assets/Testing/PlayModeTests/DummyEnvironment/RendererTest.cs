@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-namespace Testing.PlayModeTests
+namespace Testing.PlayModeTests.DummyEnvironment
 {
     public class RendererTest
     {
