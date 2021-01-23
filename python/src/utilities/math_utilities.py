@@ -22,3 +22,7 @@ def running_average(arr, smoothing=0.8):
         res[i] = res[i - 1] * smoothing + arr[i] * (1 - smoothing)
 
     return res
+
+
+def approx(a: float, b: float, eps=1e-7):
+    return abs(a - b) < eps
