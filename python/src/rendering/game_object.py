@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from typing import Optional, List
 
+import numpy as np
+
 from .point import Point
 from .polygon import Polygon
 from .transform import Transform
 
 
 class GameObject:
-    # Todo: add collider
     def __init__(self, position=Point.zero, scale=Point.one, parent: Optional[GameObject] = None,
                  polygon: Optional[Polygon] = None):
         self.transform = Transform(position, scale)
@@ -30,6 +31,17 @@ class GameObject:
 
         self._parent = value
         self._parent.children.append(self)
+
+    @property
+    def global_matrix(self):
+        if self.parent is None:
+            return self.transform.local_matrix
+
+        return self.parent.global_matrix @ self.transform.local_matrix
+
+    @property
+    def global_center(self):
+        return self.global_matrix @ np.array([0, 0, 1], dtype=np.float32)
 
     def render(self, parent_matrix):
         local_matrix = parent_matrix @ self.transform.local_matrix
