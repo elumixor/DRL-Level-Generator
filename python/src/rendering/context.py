@@ -19,7 +19,7 @@ class Context:
         glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 1)
         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-        self.window = glfw.create_window(800, 600, title, None, None)
+        self.window = glfw.create_window(width, height, title, None, None)
 
         if not self.window:
             eprint("Could not create window")
@@ -33,7 +33,10 @@ class Context:
         glBindVertexArray(VAO)
 
         self._main_scene = GameObject()
-        self._projection_matrix = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=np.float32)
+
+        aspect = width / height
+
+        self._projection_matrix = np.array([[1, 0, 0], [0, aspect, 0], [0, 0, 1]], dtype=np.float32)
 
     @property
     def main_scene(self):

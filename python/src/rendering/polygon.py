@@ -15,11 +15,11 @@ class Polygon:
         # Vertices
         self._vertex_buffer = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self._vertex_buffer)
-        glBufferData(GL_ARRAY_BUFFER, 4 * len(positions), positions, GL_STATIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, 4 * positions.size, positions, GL_STATIC_DRAW)
 
         # Indices
         self._index_buffer = glGenBuffers(1)
-        self._indices_length = len(indices)
+        self._indices_length = indices.size
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._index_buffer)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * self._indices_length, indices, GL_STATIC_DRAW)
 

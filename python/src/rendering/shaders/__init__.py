@@ -6,6 +6,7 @@ from OpenGL.GL import *
 
 class ShaderType(str, Enum):
     Unlit = "unlit"
+    Circle = "circle"
 
 
 class Shader:

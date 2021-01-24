@@ -1,6 +1,6 @@
 import numpy as np
 
-from rendering import Shader, ShaderType, Polygon, Context
+from rendering import Shader, ShaderType, Polygon, Context, Circle
 from rendering.game_object import GameObject
 
 
@@ -23,8 +23,11 @@ def main():
                  np.array([0.0, 0.0, 1.0, 1.0], dtype=np.float32),
                  shader)
 
-    GameObject(parent=context.main_scene, polygon=t1)
-    GameObject(parent=context.main_scene, polygon=t2)
+    t3 = Circle(1.0, np.array([0, 1, 0, 1]))
+
+    # GameObject(parent=context.main_scene, polygon=t1)
+    # GameObject(parent=context.main_scene, polygon=t2)
+    GameObject(parent=context.main_scene, polygon=t3)
 
     context.render()
 
