@@ -11,6 +11,14 @@ class Point:
         self._y = float(x if y is None else y)
         self._arr = np.array([x, y, 1])
 
+    # Forward declare static fields
+    zero = None
+    one = None
+    right = None
+    left = None
+    top = None
+    bottom = None
+
     @property
     def x(self):
         return self._x
@@ -41,3 +49,12 @@ class Point:
     def get_global(self, matrix):
         [x, y, _] = matrix @ self._arr
         return Point(x, y)
+
+
+# Assign static fields
+Point.zero = Point()
+Point.one = Point(1, 1)
+Point.right = Point(1, 0)
+Point.left = Point(-1, 0)
+Point.top = Point(0, 1)
+Point.bottom = Point(0, -1)
