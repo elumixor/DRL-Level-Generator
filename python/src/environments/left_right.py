@@ -3,7 +3,7 @@ from typing import Tuple, Any
 
 import numpy as np
 
-from fake_frontend.environments import BaseEnvironment
+from environments import BaseEnvironment
 from utilities import DotDict
 
 

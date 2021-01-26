@@ -1,11 +1,11 @@
 import numpy as np
 
-from rendering import Shader, ShaderType, Polygon, Context, Circle
+from rendering import Shader, ShaderType, Polygon, RenderingContext, Circle
 from rendering.game_object import GameObject
 
 
 def main():
-    context = Context(800, 600)
+    context = RenderingContext(800, 600)
 
     shader = Shader(ShaderType.Unlit)
 

@@ -1,4 +1,5 @@
 from .circle import Circle
-from .context import Context
+from .rendering_context import RenderingContext
 from .polygon import Polygon
 from .shaders import Shader, ShaderType
+from .game_object import GameObject

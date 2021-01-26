@@ -6,7 +6,7 @@ from rendering.game_object import GameObject
 from utilities import eprint
 
 
-class Context:
+class RenderingContext:
     def __init__(self, width, height, title=""):
         self.height = height
         self.width = width
@@ -28,6 +28,8 @@ class Context:
 
         glfw.make_context_current(self.window)
 
+        self._clear_color = [0.0, 0.0, 0.0, 1.0]
+
         glClearColor(0.0, 0.0, 0.0, 1.0)
         VAO = glGenVertexArrays(1)
         glBindVertexArray(VAO)
@@ -38,18 +40,36 @@ class Context:
 
         self._projection_matrix = np.array([[1, 0, 0], [0, aspect, 0], [0, 0, 1]], dtype=np.float32)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        glfw.terminate()
+
+    @property
+    def clear_color(self):
+        return self._clear_color
+
+    @clear_color.setter
+    def clear_color(self, value):
+        self._clear_color = value
+        glClearColor(*value)
+
     @property
     def main_scene(self):
         return self._main_scene
 
     def render_frame(self):
+        glfw.poll_events()
         glClear(GL_COLOR_BUFFER_BIT)
         self._main_scene.render(self._projection_matrix)
         glfw.swap_buffers(self.window)
 
     def render(self):
-        while not glfw.window_should_close(self.window) and glfw.get_key(self.window, glfw.KEY_ESCAPE) != glfw.PRESS:
-            glfw.poll_events()
+        while not glfw.window_should_close(self.window) and not self.is_key_down(glfw.KEY_ESCAPE):
             self.render_frame()
 
         glfw.terminate()
+
+    def is_key_down(self, key):
+        return glfw.get_key(self.window, key) == glfw.PRESS

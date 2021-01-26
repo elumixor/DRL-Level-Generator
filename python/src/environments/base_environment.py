@@ -9,6 +9,7 @@ class BaseEnvironment(ABC):
     def seed(self, seed):
         pass
 
+    @abstractmethod
     def render(self):
         pass
 

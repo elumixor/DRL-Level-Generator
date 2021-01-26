@@ -7,7 +7,6 @@ from .shaders import Shader, ShaderType
 
 class Circle(Polygon):
     def __init__(self, radius: float, color: np.ndarray):
-        radius *= 0.5
         positions = np.array([
             [-radius, radius],
             [radius, radius],

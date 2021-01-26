@@ -2,7 +2,7 @@
 import math
 from typing import Optional
 
-from .environments import BaseEnvironment
+from environments import BaseEnvironment
 
 
 def train(env: BaseEnvironment,

@@ -3,6 +3,9 @@ from enum import Enum
 import OpenGL.GL.shaders as S
 from OpenGL.GL import *
 
+import sys, os
+file_path = os.path.realpath(__file__)
+pathname = file_path[:file_path.rindex("/")]
 
 class ShaderType(str, Enum):
     Unlit = "unlit"
@@ -10,11 +13,11 @@ class ShaderType(str, Enum):
 
 
 class Shader:
-    _base = "C:\\dev\\DRL-Level-Generator\\python\\src\\rendering\\shaders"
+    _base = f"{pathname}"
 
     def __init__(self, shader_type: ShaderType):
-        vertex_path = f"{Shader._base}\\{shader_type}\\{shader_type}.vert"
-        fragment_path = f"{Shader._base}\\{shader_type}\\{shader_type}.frag"
+        vertex_path = f"{Shader._base}/{shader_type}/{shader_type}.vert"
+        fragment_path = f"{Shader._base}/{shader_type}/{shader_type}.frag"
 
         with open(vertex_path, "r") as file:
             vertex = file.read()

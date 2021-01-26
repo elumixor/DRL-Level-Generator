@@ -4,7 +4,7 @@ from RL.agents import VPGAgent, A2CAgentSeparate, A2CAgentTwoHeaded
 from configuration.nn import LayerName, IntParameter
 from fake_frontend.agent_wrapper import AgentWrapper
 from fake_frontend.base_framework import train
-from fake_frontend.environments import LeftRightEnvironment
+from environments import LeftRightEnvironment
 from utilities import DotDict, np
 from utilities.logging.left_right_plotter import LeftRightPlotter
 

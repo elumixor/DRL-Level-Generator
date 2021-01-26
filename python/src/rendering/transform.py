@@ -18,4 +18,4 @@ class Transform:
             [sx, 0, dx],
             [0, sy, dy],
             [0, 0, 1],
-        ])
+        ], dtype=np.float32)
