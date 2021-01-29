@@ -4,7 +4,7 @@ from OpenGL.GL import *
 from .shaders import Shader
 
 
-class Polygon:
+class Renderable:
     def __init__(self, positions: np.ndarray, indices: np.ndarray, color: np.ndarray, shader: Shader):
         self._shader = shader
         self._position_location = None

@@ -5,16 +5,16 @@ from typing import Optional, List
 import numpy as np
 
 from .point import Point
-from .polygon import Polygon
+from .renderable import Renderable
 from .transform import Transform
 
 
 class GameObject:
     def __init__(self, position=Point.zero, scale=Point.one, parent: Optional[GameObject] = None,
-                 polygon: Optional[Polygon] = None):
+                 renderable: Optional[Renderable] = None):
         self.transform = Transform(position, scale)
         self.children: List[GameObject] = []
-        self.polygon = polygon
+        self.renderable = renderable
 
         self._parent = None
         if parent is not None:
@@ -47,8 +47,8 @@ class GameObject:
         local_matrix = parent_matrix @ self.transform.local_matrix
 
         # render self
-        if self.polygon is not None:
-            self.polygon.render(local_matrix)
+        if self.renderable is not None:
+            self.renderable.render(local_matrix)
 
         # render children
         for child in self.children:
