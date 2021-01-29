@@ -1,9 +1,10 @@
 from typing import Tuple, Any
 
-import numpy as np
 import glfw
+import numpy as np
 
-from rendering import RenderingContext, Circle, GameObject, Shader, ShaderType, Renderable
+from rendering import RenderingContext
+from rendering.game_objects import Circle
 from rendering.point import Point
 from .gl_renderable import GLRenderable
 
@@ -23,8 +24,7 @@ class InteractiveEnvironment(GLRenderable):
     def __init__(self, rendering_context: RenderingContext):
         GLRenderable.__init__(self, rendering_context)
 
-        circle = Circle(0.5, np.array([1, 0, 0, 0]))
-        self.circle = GameObject(renderable=circle, parent=self.game_object)
+        self.circle = Circle(0.5, np.array([1, 0, 0, 0]), parent=self.game_object)
 
     def reset(self):
         self.circle.transform.local_position = Point.zero

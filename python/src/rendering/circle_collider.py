@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from rendering.game_object import GameObject
+from rendering.game_objects.game_object import GameObject
 
 
 class CircleCollider:

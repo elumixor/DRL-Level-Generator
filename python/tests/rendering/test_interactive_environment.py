@@ -1,7 +1,7 @@
 import numpy as np
 
 from environments.interactive_environment import InteractiveEnvironment
-from rendering import RenderingContext, Circle, GameObject
+from rendering import RenderingContext, CircleRenderable, GameObject
 
 if __name__ == '__main__':
     with RenderingContext(800, 600) as context:

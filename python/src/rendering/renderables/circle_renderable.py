@@ -1,11 +1,11 @@
 import numpy as np
 from OpenGL.GL import *
 
-from .renderable import Renderable
-from .shaders import Shader, ShaderType
+from rendering.renderables.renderable import Renderable
+from rendering.shaders import Shader, ShaderType
 
 
-class Circle(Renderable):
+class CircleRenderable(Renderable):
     def __init__(self, radius: float, color: np.ndarray):
         positions = np.array([
             [-radius, radius],

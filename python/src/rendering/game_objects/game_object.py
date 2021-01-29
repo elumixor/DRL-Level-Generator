@@ -4,15 +4,16 @@ from typing import Optional, List
 
 import numpy as np
 
-from .point import Point
-from .renderable import Renderable
-from .transform import Transform
+from rendering.point import Point
+from rendering.renderables.renderable import Renderable
+from rendering.transform import Transform
 
 
 class GameObject:
-    def __init__(self, position=Point.zero, scale=Point.one, parent: Optional[GameObject] = None,
+    def __init__(self, position: Point = Point.zero, scale: Point = Point.one, rotation: float = 0.0,
+                 parent: Optional[GameObject] = None,
                  renderable: Optional[Renderable] = None):
-        self.transform = Transform(position, scale)
+        self.transform = Transform(position, scale, rotation)
         self.children: List[GameObject] = []
         self.renderable = renderable
 

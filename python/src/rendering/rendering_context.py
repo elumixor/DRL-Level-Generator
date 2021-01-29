@@ -2,7 +2,7 @@ import glfw
 import numpy as np
 from OpenGL.GL import *
 
-from rendering.game_object import GameObject
+from rendering.game_objects.game_object import GameObject
 from utilities import eprint
 
 

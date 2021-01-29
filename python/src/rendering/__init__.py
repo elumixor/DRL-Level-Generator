@@ -1,5 +1,4 @@
-from .circle import Circle
 from .rendering_context import RenderingContext
-from .renderable import Renderable
+from .renderables import Renderable, CircleRenderable
 from .shaders import Shader, ShaderType
-from .game_object import GameObject
+from rendering.game_objects.game_object import GameObject

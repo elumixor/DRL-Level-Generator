@@ -1,7 +1,7 @@
 import numpy as np
 from OpenGL.GL import *
 
-from .shaders import Shader
+from rendering.shaders import Shader
 
 
 class Renderable:
