@@ -1,11 +1,12 @@
 import numpy as np
 from OpenGL.GL import *
 
-from rendering.shaders import Shader
+from ..color import Color
+from ..shaders import Shader
 
 
 class Renderable:
-    def __init__(self, positions: np.ndarray, indices: np.ndarray, color: np.ndarray, shader: Shader):
+    def __init__(self, positions: np.ndarray, indices: np.ndarray, color: Color, shader: Shader):
         self._shader = shader
         self._position_location = None
         self._color_location = None
@@ -43,7 +44,7 @@ class Renderable:
         glVertexAttribPointer(self._position_location, 2, GL_FLOAT, GL_FALSE, 0, None)
 
         # Set color
-        glUniform4fv(self._color_location, 1, self.color)
+        glUniform4fv(self._color_location, 1, self.color.to_numpy)
 
         # Set transform matrix
         glUniformMatrix3fv(self._matrix_location, 1, GL_FALSE, transform_matrix)

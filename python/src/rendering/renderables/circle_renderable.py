@@ -1,25 +1,26 @@
 import numpy as np
 from OpenGL.GL import *
 
-from rendering.renderables.renderable import Renderable
-from rendering.shaders import Shader, ShaderType
+from .renderable import Renderable
+from ..color import Color
+from ..shaders import Shader
 
 
 class CircleRenderable(Renderable):
-    def __init__(self, radius: float, color: np.ndarray):
+    def __init__(self, radius: float, color: Color):
         positions = np.array([
+            [-radius, -radius],
             [-radius, radius],
             [radius, radius],
             [radius, -radius],
-            [-radius, -radius],
         ], dtype=np.float32)
 
-        indices = np.array([[0, 1, 2], [0, 2, 3]], dtype=np.uintc)
+        indices = np.array([[0, 2, 1], [0, 3, 2]], dtype=np.uintc)
 
         self._radius_location = None
         self._uv_location = None
 
-        super().__init__(positions, indices, color, Shader(ShaderType.Circle))
+        super().__init__(positions, indices, color, Shader.circle)
 
         uv = np.array([[0, 1],
                        [1, 1],
@@ -46,7 +47,7 @@ class CircleRenderable(Renderable):
         glVertexAttribPointer(self._uv_location, 2, GL_FLOAT, GL_FALSE, 0, None)
 
         # Set color
-        glUniform4fv(self._color_location, 1, self.color)
+        glUniform4fv(self._color_location, 1, self.color.to_numpy)
 
         # Set radius
         glUniform1f(self._radius_location, self.radius)

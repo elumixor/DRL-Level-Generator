@@ -4,9 +4,9 @@ from typing import Optional, List
 
 import numpy as np
 
-from rendering.point import Point
-from rendering.renderables.renderable import Renderable
-from rendering.transform import Transform
+from ..point import Point
+from ..renderables import Renderable
+from ..transform import Transform
 
 
 class GameObject:

@@ -2,7 +2,8 @@ import glfw
 import numpy as np
 from OpenGL.GL import *
 
-from rendering.game_objects.game_object import GameObject
+from .color import Color
+from .game_objects import GameObject
 from utilities import eprint
 
 
@@ -28,21 +29,30 @@ class RenderingContext:
 
         glfw.make_context_current(self.window)
 
-        self._clear_color = [0.0, 0.0, 0.0, 1.0]
-
+        self._clear_color = Color.black
         glClearColor(0.0, 0.0, 0.0, 1.0)
 
+        # Enable blending
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+        # Enable backface culling
+        glEnable(GL_CULL_FACE)
 
         VAO = glGenVertexArrays(1)
         glBindVertexArray(VAO)
 
         self._main_scene = GameObject()
 
+        # Constant AR
         aspect = width / height
-
         self._projection_matrix = np.array([[1, 0, 0], [0, aspect, 0], [0, 0, 1]], dtype=np.float32)
+
+        def resize_callback(_, width, height):
+            aspect = width / height
+            self._projection_matrix = np.array([[1, 0, 0], [0, aspect, 0], [0, 0, 1]], dtype=np.float32)
+
+        glfw.set_framebuffer_size_callback(self.window, resize_callback)
 
     def __enter__(self):
         return self
@@ -55,9 +65,9 @@ class RenderingContext:
         return self._clear_color
 
     @clear_color.setter
-    def clear_color(self, value):
+    def clear_color(self, value: Color):
         self._clear_color = value
-        glClearColor(*value)
+        glClearColor(*value.to_numpy)
 
     @property
     def main_scene(self):

@@ -3,13 +3,11 @@ from typing import Tuple, Any
 import glfw
 import numpy as np
 
-from rendering import RenderingContext
-from rendering.game_objects import Circle
-from rendering.point import Point
-from .gl_renderable import GLRenderable
+from rendering import RenderingContext, Triangle, Color, Circle, Point, Rectangle
+from .renderable_environment import RenderableEnvironment
 
 
-class InteractiveEnvironment(GLRenderable):
+class InteractiveEnvironment(RenderableEnvironment):
     @property
     def observation_space(self):
         pass
@@ -22,9 +20,13 @@ class InteractiveEnvironment(GLRenderable):
         pass
 
     def __init__(self, rendering_context: RenderingContext):
-        GLRenderable.__init__(self, rendering_context)
-        rendering_context.clear_color = np.array([0.9, 0.9, 0.9, 1], dtype=np.float32)
-        self.circle = Circle(0.5, np.array([0.8, 0.1, 0.6, 0.5]), parent=self.game_object)
+        RenderableEnvironment.__init__(self, rendering_context)
+
+        rendering_context.clear_color = Color(0.9, 0.9, 0.9, 1)
+
+        Triangle(Point.left, Point.up, Point.right, Color.red, scale=Point.one * 0.25, parent=self.game_object)
+        Rectangle(1, 1, Color.green, scale=Point.one * 0.5, position=Point.up * 0.5, parent=self.game_object)
+        self.circle = Circle(0.5, Color(0.8, 0.1, 0.6, 0.5), parent=self.game_object)
 
     def reset(self):
         self.circle.transform.local_position = Point.zero
@@ -39,12 +41,12 @@ class InteractiveEnvironment(GLRenderable):
         elif rc.is_key_down(glfw.KEY_Q):
             self.circle.transform.local_scale -= Point.one * 0.1
 
-        elif rc.is_key_down(glfw.KEY_W):
+        if rc.is_key_down(glfw.KEY_W):
             self.circle.transform.local_position.y += 0.1
         elif rc.is_key_down(glfw.KEY_S):
             self.circle.transform.local_position.y -= 0.1
 
-        elif rc.is_key_down(glfw.KEY_A):
+        if rc.is_key_down(glfw.KEY_A):
             self.circle.transform.local_position.x -= 0.1
         elif rc.is_key_down(glfw.KEY_D):
             self.circle.transform.local_position.x += 0.1

@@ -1,23 +1,21 @@
-from enum import Enum
-
 import OpenGL.GL.shaders as S
 from OpenGL.GL import *
 
-import sys, os
+import os
+
 file_path = os.path.realpath(__file__)
-pathname = file_path[:file_path.rindex("/")]
-
-class ShaderType(str, Enum):
-    Unlit = "unlit"
-    Circle = "circle"
+base_path = file_path[:file_path.rindex("/")]
 
 
-class Shader:
-    _base = f"{pathname}"
+class ShaderProperties(type):
+    def __getattr__(self, item: str):
+        return Shader(item)
 
-    def __init__(self, shader_type: ShaderType):
-        vertex_path = f"{Shader._base}/{shader_type}/{shader_type}.vert"
-        fragment_path = f"{Shader._base}/{shader_type}/{shader_type}.frag"
+
+class Shader(metaclass=ShaderProperties):
+    def __init__(self, shader_name: str):
+        vertex_path = f"{base_path}/{shader_name}/{shader_name}.vert"
+        fragment_path = f"{base_path}/{shader_name}/{shader_name}.frag"
 
         with open(vertex_path, "r") as file:
             vertex = file.read()

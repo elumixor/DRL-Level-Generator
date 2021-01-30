@@ -23,11 +23,11 @@ class PointProperties(type):
         return Point(-1, 0)
 
     @property
-    def top(cls):
+    def up(cls):
         return Point(0, 1)
 
     @property
-    def bottom(cls):
+    def down(cls):
         return Point(0, -1)
 
 
@@ -50,6 +50,14 @@ class Point(metaclass=PointProperties):
 
     def __abs__(self):
         return Point(abs(self.x), abs(self.y))
+
+    def __mul__(self, other):
+        if isinstance(other, float):
+            return Point(self.x * other, self.y * other)
+        elif isinstance(other, Point):
+            return Point(self.x * other.x, self.y * other.y)
+
+        raise TypeError("* is unsupported for types Point and " + str(type(other)))
 
     def __iter__(self):
         yield self.x
