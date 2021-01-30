@@ -31,6 +31,10 @@ class RenderingContext:
         self._clear_color = [0.0, 0.0, 0.0, 1.0]
 
         glClearColor(0.0, 0.0, 0.0, 1.0)
+
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
         VAO = glGenVertexArrays(1)
         glBindVertexArray(VAO)
 

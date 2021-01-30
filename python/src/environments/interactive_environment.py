@@ -23,8 +23,8 @@ class InteractiveEnvironment(GLRenderable):
 
     def __init__(self, rendering_context: RenderingContext):
         GLRenderable.__init__(self, rendering_context)
-
-        self.circle = Circle(0.5, np.array([1, 0, 0, 0]), parent=self.game_object)
+        rendering_context.clear_color = np.array([0.9, 0.9, 0.9, 1], dtype=np.float32)
+        self.circle = Circle(0.5, np.array([0.8, 0.1, 0.6, 0.5]), parent=self.game_object)
 
     def reset(self):
         self.circle.transform.local_position = Point.zero
@@ -35,9 +35,15 @@ class InteractiveEnvironment(GLRenderable):
             return None, None, None, True
 
         if rc.is_key_down(glfw.KEY_E):
-            self.circle.transform.local_scale += Point.one
+            self.circle.transform.local_scale += Point.one * 0.1
         elif rc.is_key_down(glfw.KEY_Q):
-            self.circle.transform.local_scale -= Point.one
+            self.circle.transform.local_scale -= Point.one * 0.1
+
+        elif rc.is_key_down(glfw.KEY_W):
+            self.circle.transform.local_position.y += 0.1
+        elif rc.is_key_down(glfw.KEY_S):
+            self.circle.transform.local_position.y -= 0.1
+
         elif rc.is_key_down(glfw.KEY_A):
             self.circle.transform.local_position.x -= 0.1
         elif rc.is_key_down(glfw.KEY_D):
