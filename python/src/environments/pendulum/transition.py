@@ -16,7 +16,52 @@ parameters_size = state_size + static_size
 
 def transition(state: torch.tensor, action: torch.tensor,
                static_configuration: torch.tensor) -> Tuple[torch.tensor, float, bool]:
-    ...
+    switch = action > 0.5
+
+    # Interpret data
+    angle, position, angular_speed = state[:PendulumDynamicConfiguration.size]
+    enemies_count = int(state[PendulumDynamicConfiguration.size])
+
+    bob_radius, max_angle, connector_length, vertical_speed = static_configuration[:PendulumStaticConfiguration.size]
+
+    enemies_configurations = static_configuration[PendulumStaticConfiguration.size + 1:]
+
+    # Add vertical movement
+    position: torch.tensor = position + vertical_speed
+
+    # Add angular movement
+    angle: torch.tensor = angle + angular_speed
+
+    if switch:
+        angular_speed = angular_speed * -1
+
+    if angle.abs() > max_angle:
+        angle = torch.sign(angle) * (max_angle - (angle.abs() - max_angle))
+        angular_speed = angular_speed * -1
+
+    # Combine into the new state
+    new_state = torch.tensor([angle, position, angular_speed, enemies_count])
+
+    # Check collision
+    bob_center_x = position - torch.cos(angle) * connector_length
+    bob_center_y = torch.sin(angle) * connector_length
+
+    for i in range(enemies_count):
+        enemy = enemies_configurations[i * EnemyStaticConfiguration.size:(i + 1) * EnemyStaticConfiguration.size]
+        enemy_radius, enemy_x, enemy_y = enemy
+
+        distance = torch.sqrt((bob_center_x - enemy_x) ** 2 + (bob_center_y - enemy_y) ** 2)
+
+        # Collision
+        if distance <= (bob_radius + enemy_radius):
+            reward = 0
+            done = True
+            return new_state, reward, done
+
+    # No collision
+    reward = 1
+    done = False
+    return new_state, reward, done
 
 
 def interpretation2state(pendulum_configuration: PendulumDynamicConfiguration,
