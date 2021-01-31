@@ -4,7 +4,7 @@ from OpenGL.GL import *
 import os
 
 file_path = os.path.realpath(__file__)
-base_path = file_path[:file_path.rindex("/")]
+base_path = os.path.split(file_path)[0]
 
 
 class ShaderProperties(type):
