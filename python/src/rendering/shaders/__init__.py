@@ -1,15 +1,31 @@
-import OpenGL.GL.shaders as S
-from OpenGL.GL import *
+from __future__ import annotations
 
 import os
+from typing import Dict
+
+import OpenGL.GL.shaders as S
+from OpenGL.GL import *
 
 file_path = os.path.realpath(__file__)
 base_path = os.path.split(file_path)[0]
 
 
 class ShaderProperties(type):
-    def __getattr__(self, item: str):
-        return Shader(item)
+    _shader_cache: Dict[str, Shader] = dict()
+
+    @property
+    def unlit(cls):
+        return cls._try_get("unlit")
+
+    @property
+    def circle(cls):
+        return cls._try_get("circle")
+
+    def _try_get(cls, shader_name: str):
+        if shader_name in cls._shader_cache:
+            return cls._shader_cache[shader_name]
+
+        return Shader(shader_name)
 
 
 class Shader(metaclass=ShaderProperties):

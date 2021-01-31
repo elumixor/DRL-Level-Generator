@@ -7,7 +7,7 @@ from ..shaders import Shader
 
 
 class CircleRenderable(Renderable):
-    def __init__(self, radius: float, color: Color):
+    def __init__(self, color: Color, radius: float = 0.5):
         positions = np.array([
             [-radius, -radius],
             [-radius, radius],

@@ -17,7 +17,7 @@ class GameObject:
         self.children: List[GameObject] = []
         self.renderable = renderable
 
-        self._parent = None
+        self._parent: Optional[GameObject] = None
         if parent is not None:
             self.parent = parent
 
@@ -26,12 +26,14 @@ class GameObject:
         return self._parent
 
     @parent.setter
-    def parent(self, value):
+    def parent(self, value: Optional[GameObject]):
         if self._parent is not None:
             self._parent.children.remove(self)
 
         self._parent = value
-        self._parent.children.append(self)
+
+        if value is not None:
+            value.children.append(self)
 
     @property
     def global_matrix(self):
@@ -54,3 +56,11 @@ class GameObject:
         # render children
         for child in self.children:
             child.render(local_matrix)
+
+    def add_child(self, *children: GameObject):
+        for child in children:
+            child.parent = self
+
+    def remove_children(self):
+        for child in self.children:
+            child.parent = None

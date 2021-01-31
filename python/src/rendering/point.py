@@ -59,6 +59,9 @@ class Point(metaclass=PointProperties):
 
         raise TypeError("* is unsupported for types Point and " + str(type(other)))
 
+    def __rmul__(self, other):
+        return self * other
+
     def __iter__(self):
         yield self.x
         yield self.y

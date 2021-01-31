@@ -11,8 +11,8 @@ class AgentWrapper(ABC):
     torch_device = "cuda"
 
     def __init__(self, env, plotter=None):
-        self.state_size = env.observation_space.shape[0]
-        self.action_size = env.action_space.n
+        self.state_size = env.observation_size.shape[0]
+        self.action_size = env.action_size.n
         self.rollouts = []
         self.rollout_samples = []
         self.previous_state = None

@@ -21,8 +21,8 @@ class RemoteModelLocalTests(TestCase):
             torch_device = "cuda"
 
             def __init__(self, env):
-                self.state_size = env.observation_space.shape[0]
-                self.action_size = env.action_space.n
+                self.state_size = env.observation_size.shape[0]
+                self.action_size = env.action_size.n
                 self.current_trajectory = []
                 self.previous_state = None
 

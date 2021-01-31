@@ -10,11 +10,11 @@ from utilities import DotDict
 class LeftRightEnvironment(BaseEnvironment):
 
     @property
-    def action_space(self):
+    def action_size(self):
         return DotDict(n=2)
 
     @property
-    def observation_space(self):
+    def observation_size(self):
         return np.array([1])
 
     def __init__(self, positions=(-5, 5), rewards=(10, 5, -1), spawn_positions=(-0, 3), step_distance=1):

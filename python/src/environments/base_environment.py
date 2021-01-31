@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, Any
+from typing import Tuple
 
-import numpy as np
+import torch
 
 
 class BaseEnvironment(ABC):
@@ -15,16 +15,16 @@ class BaseEnvironment(ABC):
 
     @property
     @abstractmethod
-    def observation_space(self):
+    def observation_size(self) -> int:
         pass
 
     @property
     @abstractmethod
-    def action_space(self):
+    def action_size(self) -> int:
         pass
 
     @abstractmethod
-    def reset(self) -> np.ndarray:
+    def reset(self) -> torch.tensor:
         """
         Resets the environment to a starting state. Returns that starting state
         :rtype: Starting state
@@ -32,10 +32,9 @@ class BaseEnvironment(ABC):
         pass
 
     @abstractmethod
-    def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Any]:
+    def transition(self, action: torch.tensor) -> Tuple[torch.tensor, float, bool]:
         """
-        Performs a step into an environment
-        :rtype: Returns new state, reward and flag if is done,
-        and something else which I don't know that is there to be compatible with OpenAI gym API
+        Transitions from the previous state to the next state, given the agent's action
+        :returns: Next state, reward, done
         """
         pass

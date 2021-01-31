@@ -2,9 +2,9 @@ import glfw
 import numpy as np
 from OpenGL.GL import *
 
+from utilities import eprint
 from .color import Color
 from .game_objects import GameObject
-from utilities import eprint
 
 
 class RenderingContext:
@@ -50,6 +50,7 @@ class RenderingContext:
 
         def resize_callback(_, width, height):
             aspect = width / height
+            glViewport(0, 0, width, height)
             self._projection_matrix = np.array([[1, 0, 0], [0, aspect, 0], [0, 0, 1]], dtype=np.float32)
 
         glfw.set_framebuffer_size_callback(self.window, resize_callback)

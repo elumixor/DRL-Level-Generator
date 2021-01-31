@@ -37,3 +37,7 @@ class Color(metaclass=ColorProperties):
     @property
     def to_numpy(self):
         return np.array([self.r, self.g, self.b, self.a], dtype=np.float32)
+
+    @classmethod
+    def greyscale(cls, value: float, a: float = 1):
+        return Color(value, value, value, a)

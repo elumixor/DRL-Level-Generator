@@ -9,14 +9,14 @@ from .renderable_environment import RenderableEnvironment
 
 class InteractiveEnvironment(RenderableEnvironment):
     @property
-    def observation_space(self):
+    def observation_size(self):
         pass
 
     @property
-    def action_space(self):
+    def action_size(self):
         pass
 
-    def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Any]:
+    def transition(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Any]:
         pass
 
     def __init__(self, rendering_context: RenderingContext):
@@ -26,7 +26,7 @@ class InteractiveEnvironment(RenderableEnvironment):
 
         Triangle(Point.left, Point.up, Point.right, Color.red, scale=Point.one * 0.25, parent=self.game_object)
         Rectangle(1, 1, Color.green, scale=Point.one * 0.5, position=Point.up * 0.5, parent=self.game_object)
-        self.circle = Circle(0.5, Color(0.8, 0.1, 0.6, 0.5), parent=self.game_object)
+        self.circle = Circle(Color(0.8, 0.1, 0.6, 0.5), parent=self.game_object)
 
     def reset(self):
         self.circle.transform.local_position = Point.zero
