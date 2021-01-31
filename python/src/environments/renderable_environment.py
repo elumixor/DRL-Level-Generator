@@ -10,8 +10,5 @@ class RenderableEnvironment(BaseEnvironment, ABC):
 
         BaseEnvironment.__init__(self)
 
-        # Child can create objects to be reused
-        ...
-
     def render(self):
         self.rendering_context.render_frame()
