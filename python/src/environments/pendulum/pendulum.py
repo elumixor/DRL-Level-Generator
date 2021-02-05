@@ -47,7 +47,8 @@ class Pendulum(ConfigurableObject, GameObject):
 
         self.add_child(self.line, self.connector, self.attachment, self.bob)
 
-        connector_radius = configuration.bob_radius * 0.15
+        bob_radius = configuration.bob_radius * 2
+        connector_radius = bob_radius * 0.15
         connector_width = connector_radius * 0.5
         connector_height = configuration.connector_length
 
@@ -56,7 +57,7 @@ class Pendulum(ConfigurableObject, GameObject):
 
         self.attachment.transform.local_scale = connector_radius * Point.one
 
-        self.bob.transform.local_scale = configuration.bob_radius * Point.one
+        self.bob.transform.local_scale = bob_radius * Point.one
         self.bob.transform.local_position = connector_height * Point.down
 
     def update(self, configuration: PendulumDynamicConfiguration):

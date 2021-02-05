@@ -32,7 +32,7 @@ class Enemy(ConfigurableObject, Circle):
         radius, x, y = configuration
 
         self.transform.local_position = Point(x, y)
-        self.transform.local_scale = Point.one * radius
+        self.transform.local_scale = Point.one * radius * 2
 
         return EnemyDynamicConfiguration()
 

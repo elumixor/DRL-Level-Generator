@@ -43,8 +43,8 @@ def transition(state: torch.tensor, action: torch.tensor,
     new_state = torch.tensor([angle, position, angular_speed, enemies_count])
 
     # Check collision
-    bob_center_x = position + torch.sin(angle) * connector_length
-    bob_center_y = -torch.cos(angle) * connector_length
+    bob_center_x = torch.sin(angle) * connector_length
+    bob_center_y = position - torch.cos(angle) * connector_length
 
     for i in range(enemies_count):
         enemy = enemies_configurations[i * EnemyStaticConfiguration.size:(i + 1) * EnemyStaticConfiguration.size]
@@ -54,12 +54,12 @@ def transition(state: torch.tensor, action: torch.tensor,
 
         # Collision
         if distance <= (bob_radius + enemy_radius):
-            reward = 0
+            reward = 0 if not switch else -0.01
             done = True
             return new_state, reward, done
 
     # No collision
-    reward = 1
+    reward = 1 if not switch else 0.99
     done = False
     return new_state, reward, done
 
