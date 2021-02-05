@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
 from .episode import Episode
-from .utils import discounted_rewards
+from .utils import discounted_rewards, EpsilonDecay
 
 State = List[float]
 Action = List[float]

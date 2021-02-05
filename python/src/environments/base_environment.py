@@ -38,3 +38,7 @@ class BaseEnvironment(ABC):
         :returns: Next state, reward, done
         """
         pass
+
+    @abstractmethod
+    def get_observation(self, state):
+        pass

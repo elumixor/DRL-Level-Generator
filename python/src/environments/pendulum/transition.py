@@ -7,8 +7,8 @@ from .pendulum import PendulumDynamicConfiguration, PendulumStaticConfiguration
 
 max_enemies = 1
 state_size = PendulumDynamicConfiguration.size + 1 + max_enemies * EnemyDynamicConfiguration.size
-observation_size = 0
-action_size = 0
+observation_size = state_size
+action_size = 2
 
 static_size = PendulumStaticConfiguration.size + 1 + max_enemies * EnemyStaticConfiguration.size
 parameters_size = state_size + static_size
@@ -16,7 +16,7 @@ parameters_size = state_size + static_size
 
 def transition(state: torch.tensor, action: torch.tensor,
                static_configuration: torch.tensor) -> Tuple[torch.tensor, float, bool]:
-    switch = action > 0.5
+    switch = action == 1
 
     # Interpret data
     angle, position, angular_speed = state[:PendulumDynamicConfiguration.size]
@@ -43,8 +43,8 @@ def transition(state: torch.tensor, action: torch.tensor,
     new_state = torch.tensor([angle, position, angular_speed, enemies_count])
 
     # Check collision
-    bob_center_x = position - torch.cos(angle) * connector_length
-    bob_center_y = torch.sin(angle) * connector_length
+    bob_center_x = position + torch.sin(angle) * connector_length
+    bob_center_y = -torch.cos(angle) * connector_length
 
     for i in range(enemies_count):
         enemy = enemies_configurations[i * EnemyStaticConfiguration.size:(i + 1) * EnemyStaticConfiguration.size]

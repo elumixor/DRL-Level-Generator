@@ -23,15 +23,15 @@ class PendulumEnvironment(RenderableEnvironment):
         self._rendering_ready = False
 
         # We store the last state to be used for rendering
-        self._last_state: Optional[torch.tensor] = None
+        self._last_state: Optional[torch.Tensor] = None
 
         # As we re-use environment, we only declare the needed fields here
         # setup() is used when we want to update the environment parameters
         # reset() is used to reset the environment to a new trajectory
 
         # Configurations are used on reset()
-        self.static_configuration: Optional[torch.tensor] = None
-        self.starting_state: Optional[torch.tensor] = None
+        self.static_configuration: Optional[torch.Tensor] = None
+        self.starting_state: Optional[torch.Tensor] = None
 
         # Pendulum game object
         self.pendulum: Optional[Pendulum] = None
@@ -39,7 +39,6 @@ class PendulumEnvironment(RenderableEnvironment):
         # Enemies game objects
         self.enemies: Optional[List[Enemy]] = None
 
-    # We will use the with-pattern
     def __enter__(self):
         return self
 
@@ -47,6 +46,7 @@ class PendulumEnvironment(RenderableEnvironment):
         self._cleanup()
         self.game_object.parent = None
 
+    # We will use the with-pattern
     @property
     def observation_size(self):
         return observation_size
@@ -63,14 +63,15 @@ class PendulumEnvironment(RenderableEnvironment):
     def parameters_size(self):
         return parameters_size
 
-    def reset(self) -> torch.tensor:
+    def reset(self) -> torch.Tensor:
         """
         Called at the start of each trajectory
         :returns: The starting state
         """
         self._last_state = self.starting_state
+        return self._last_state
 
-    def transition(self, action: torch.tensor) -> Tuple[torch.tensor, float, bool]:
+    def transition(self, action: torch.Tensor) -> Tuple[torch.Tensor, float, bool]:
         # propagate to the transition function
         next_state, reward, done = T(self._last_state, action, self.static_configuration)
 
@@ -78,6 +79,9 @@ class PendulumEnvironment(RenderableEnvironment):
         self._last_state = next_state
 
         return next_state, reward, done
+
+    def get_observation(self, state: torch.Tensor):
+        return state.clone()
 
     def render(self):
         # Perform necessary initializations for rendering, if not rendering-ready
@@ -90,12 +94,15 @@ class PendulumEnvironment(RenderableEnvironment):
         # Render the frame
         super(PendulumEnvironment, self).render()
 
-    def setup(self, generated_parameters: torch.tensor):
+    def setup(self, generated_parameters: torch.Tensor):
         """
         Setups the environment using parameters. This should be done once for every generated environment.
         On the contrary, reset() should be called on every trajectory start
         """
         self.static_configuration, self.starting_state = interpret_generated_parameters(generated_parameters)
+
+    def set_state(self, state: torch.Tensor):
+        self._last_state = state
 
     def _initialize_for_render(self):
         # Remove already created objects
@@ -117,7 +124,7 @@ class PendulumEnvironment(RenderableEnvironment):
 
         self._rendering_ready = True
 
-    def _setup_game_objects_from_state(self, state: torch.tensor):
+    def _setup_game_objects_from_state(self, state: torch.Tensor):
         # Interpret tensor to configurations
         pendulum_configuration, enemies_configurations = interpret_state(state)
 

@@ -10,6 +10,7 @@ from RL import Trajectory, State, Action, Transition
 from common import ByteReader
 from common.memory_buffer import MemoryBuffer
 from serialization import to_bytes
+from utilities import MLP
 from .model_type import ModelType
 from .remote_model import RemoteModel, TaskType
 from .. import logging
@@ -54,12 +55,7 @@ class DQNModel(RemoteModel):
     # todo: pass parameters such as hidden size?
     def _construct_nn(self, input_size: int, output_size: int):
         hidden_size = 32
-
-        return Sequential(Linear(input_size, hidden_size),
-                          ReLU(),
-                          Linear(hidden_size, hidden_size),
-                          ReLU(),
-                          Linear(hidden_size, output_size))
+        return MLP(input_size, output_size, [hidden_size])
 
     def run_task(self, reader: ByteReader) -> bytes:
         task = TaskType(reader.read_int())

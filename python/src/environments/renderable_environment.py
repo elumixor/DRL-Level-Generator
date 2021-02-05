@@ -1,6 +1,8 @@
+import torch
+
 from rendering import RenderingContext, GameObject
 from .base_environment import BaseEnvironment
-from abc import ABC
+from abc import ABC, abstractmethod
 
 
 class RenderableEnvironment(BaseEnvironment, ABC):
@@ -12,3 +14,7 @@ class RenderableEnvironment(BaseEnvironment, ABC):
 
     def render(self):
         self.rendering_context.render_frame()
+
+    @abstractmethod
+    def set_state(self, state: torch.tensor):
+        ...

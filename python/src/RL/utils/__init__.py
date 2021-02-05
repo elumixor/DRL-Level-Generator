@@ -1,4 +1,5 @@
 import torch
+from .epsilon_decay import EpsilonDecay
 
 
 def bootstrap(rewards, last, discounting=0.99):
