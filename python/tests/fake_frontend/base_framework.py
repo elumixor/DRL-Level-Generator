@@ -2,10 +2,8 @@
 import math
 from typing import Optional
 
-from environments import BaseEnvironment
 
-
-def train(env: BaseEnvironment,
+def train(env,
           agent_class,
           epochs: int = 100,
           num_rollouts: int = 1,
@@ -63,16 +61,22 @@ def train(env: BaseEnvironment,
             total_reward = 0
 
             t = 0
+            do_render = render_frequency and global_rollout % render_frequency == 0
+            if do_render:
+                agent.eval()
             while not done and t < max_timesteps:
-                if render_frequency and global_rollout % render_frequency == 0:
+                if do_render:
                     env.render()
 
                 action = agent.get_action(state)
-                state, reward, done, _ = env.step(action)
-                agent.save_step(action, reward, state)
+                state, reward, done, *_ = env.step(action)
+                agent.save_step(action, reward, done, state)
 
                 t += 1
                 total_reward += reward
+
+            if do_render:
+                agent.train()
 
             agent.on_trajectory_finished()
 
