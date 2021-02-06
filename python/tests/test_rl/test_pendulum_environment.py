@@ -1,6 +1,6 @@
 import numpy as np
 
-from core import train, Trajectory, evaluate
+from core import train, evaluate
 from core.agents.dqn import DQNAgent
 from environments.pendulum import configurations2parameters, PendulumStaticConfiguration, EnemyStaticConfiguration, \
     PendulumDynamicConfiguration, EnemyDynamicConfiguration, PendulumEnvironment
@@ -22,5 +22,5 @@ if __name__ == '__main__':
             env.setup(generated_parameters)
 
             agent = DQNAgent(env, epsilon_iterations=100, buffer_capacity=100000)
-            train(env, agent, epochs=100, num_trajectories=5, render_frequency=25, cutoff_at=75)
+            train(env, agent, epochs=200, num_trajectories=1, render_frequency=25, cutoff_at=75)
             evaluate(env, agent, cutoff_at=75)

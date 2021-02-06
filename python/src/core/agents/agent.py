@@ -13,8 +13,14 @@ class Agent(ABC):
     def eval(self):
         ...
 
-    def print_data(self):
+    def print_progress(self):
+        pass
+
+    def plot_progress(self):
         pass
 
     def train(self):
+        pass
+
+    def log_progress(self):
         pass
