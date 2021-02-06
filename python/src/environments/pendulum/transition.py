@@ -26,18 +26,18 @@ def transition(state: torch.tensor, action: torch.tensor,
 
     enemies_configurations = static_configuration[PendulumStaticConfiguration.size + 1:]
 
-    # Add vertical movement
-    position: torch.tensor = position + vertical_speed
+    if switch:
+        angular_speed = angular_speed * -1
 
     # Add angular movement
     angle: torch.tensor = angle + angular_speed
 
-    if switch:
-        angular_speed = angular_speed * -1
-
     if angle.abs() > max_angle:
         angle = torch.sign(angle) * (max_angle - (angle.abs() - max_angle))
         angular_speed = angular_speed * -1
+
+    # Add vertical movement
+    position: torch.tensor = position + vertical_speed
 
     # Combine into the new state
     new_state = torch.tensor([angle, position, angular_speed, enemies_count])

@@ -33,22 +33,22 @@ class InteractiveEnvironment(RenderableEnvironment):
 
     def apply_action(self):
         rc = self.rendering_context
-        if rc.is_key_down(glfw.KEY_ESCAPE):
+        if rc.is_key_held(glfw.KEY_ESCAPE):
             return None, None, None, True
 
-        if rc.is_key_down(glfw.KEY_E):
+        if rc.is_key_held(glfw.KEY_E):
             self.circle.transform.local_scale += Point.one * 0.1
-        elif rc.is_key_down(glfw.KEY_Q):
+        elif rc.is_key_held(glfw.KEY_Q):
             self.circle.transform.local_scale -= Point.one * 0.1
 
-        if rc.is_key_down(glfw.KEY_W):
+        if rc.is_key_held(glfw.KEY_W):
             self.circle.transform.local_position.y += 0.1
-        elif rc.is_key_down(glfw.KEY_S):
+        elif rc.is_key_held(glfw.KEY_S):
             self.circle.transform.local_position.y -= 0.1
 
-        if rc.is_key_down(glfw.KEY_A):
+        if rc.is_key_held(glfw.KEY_A):
             self.circle.transform.local_position.x -= 0.1
-        elif rc.is_key_down(glfw.KEY_D):
+        elif rc.is_key_held(glfw.KEY_D):
             self.circle.transform.local_position.x += 0.1
 
         action = 0

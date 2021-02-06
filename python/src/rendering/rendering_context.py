@@ -48,12 +48,20 @@ class RenderingContext:
         aspect = width / height
         self._projection_matrix = np.array([[1, 0, 0], [0, aspect, 0], [0, 0, 1]], dtype=np.float32)
 
-        def resize_callback(_, width, height):
+        def resize_callback(window, width, height):
             aspect = width / height
             glViewport(0, 0, width, height)
             self._projection_matrix = np.array([[1, 0, 0], [0, aspect, 0], [0, 0, 1]], dtype=np.float32)
 
         glfw.set_framebuffer_size_callback(self.window, resize_callback)
+
+        self.keys_down = []
+
+        def on_key_event(window, key, scancode, action, mods):
+            if action == glfw.PRESS:
+                self.keys_down.append(key)
+
+        glfw.set_key_callback(self.window, on_key_event)
 
     def __enter__(self):
         return self
@@ -75,16 +83,20 @@ class RenderingContext:
         return self._main_scene
 
     def render_frame(self):
+        self.keys_down = []
         glfw.poll_events()
         glClear(GL_COLOR_BUFFER_BIT)
         self._main_scene.render(self._projection_matrix)
         glfw.swap_buffers(self.window)
 
     def render(self):
-        while not glfw.window_should_close(self.window) and not self.is_key_down(glfw.KEY_ESCAPE):
+        while not glfw.window_should_close(self.window) and not self.is_key_pressed(glfw.KEY_ESCAPE):
             self.render_frame()
 
         glfw.terminate()
 
-    def is_key_down(self, key):
+    def is_key_pressed(self, key):
+        return key in self.keys_down
+
+    def is_key_held(self, key):
         return glfw.get_key(self.window, key) == glfw.PRESS
