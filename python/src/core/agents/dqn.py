@@ -14,7 +14,7 @@ from ..trajectory import Trajectory
 
 class DQNAgent(Agent):
     def __init__(self, env: Environment, buffer_capacity=10000, hidden_sizes=None, lr=0.01, epsilon_initial=1,
-                 epsilon_end=0.01, epsilon_iterations=500, batch_size=200, discount=0.99):
+                 epsilon_end=0.1, epsilon_iterations=500, batch_size=200, discount=0.99):
         if hidden_sizes is None:
             hidden_sizes = [8, 8]
 
@@ -47,8 +47,7 @@ class DQNAgent(Agent):
             for transition in trajectory:
                 self.memory.push(transition)
 
-                # Sample transitions from the buffer
-                if not self.memory.is_full:
+                if self.memory.size < self.batch_size:
                     continue
 
                 transitions = self.memory.sample(self.batch_size)
@@ -102,4 +101,4 @@ class DQNAgent(Agent):
         return loss
 
     def print_data(self):
-        print(f"\tEpsilon: {self.epsilon}\n\tLoss: {self.loss}")
+        print(f"\tEpsilon: {self.epsilon}\n\tLoss: {self.loss}\n\tMemory: {self.memory}")

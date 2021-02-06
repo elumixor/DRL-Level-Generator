@@ -31,8 +31,10 @@ class MemoryBuffer(Generic[T]):
     def sample(self, size: int) -> List[T]:
         # If size is less than self.capacity, this will throw an error...
         # Should we train on the same samples multiple times?
-        if size >= self.size:
+        if size > self.size:
             raise RuntimeError(f'Trying to sample a batch with size: {size},'
-                               f' which is greater than the current stored number of samples: {self.size}.'
-                               f' Will return a sample of size {self.size}')
+                               f' which is greater than the current stored number of samples: {self.size}.')
         return random.sample(self.data, size)
+
+    def __repr__(self):
+        return f"[{self.size}/{self.capacity}]" + ("" if not self.is_full else "(full)")
