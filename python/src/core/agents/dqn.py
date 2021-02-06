@@ -1,3 +1,4 @@
+from typing import List
 from random import random
 
 import numpy as np
@@ -8,11 +9,12 @@ from common import MemoryBuffer
 from .agent import Agent
 from ..environments import Environment
 from ..utils import EpsilonDecay, MLP, map_transitions
+from ..trajectory import Trajectory
 
 
 class DQNAgent(Agent):
     def __init__(self, env: Environment, buffer_capacity=1000, hidden_sizes=None, lr=0.01, epsilon_initial=1,
-                 epsilon_end=0.01, epsilon_iterations=500, batches_per_train=5, batch_size=100, discount=0.99):
+                 epsilon_end=0.01, epsilon_iterations=500, batch_size=100, discount=0.99):
         if hidden_sizes is None:
             hidden_sizes = [8, 8]
 
@@ -24,7 +26,6 @@ class DQNAgent(Agent):
 
         self.memory = MemoryBuffer(capacity=buffer_capacity)
 
-        self.batches = batches_per_train
         self.batch_size = batch_size
 
         self.discount = discount
@@ -36,26 +37,27 @@ class DQNAgent(Agent):
 
         return self.Q(observation).argmax(dim=-1, keepdim=True)
 
-    def train(self, trajectories):
+    def train(self, trajectories: List[Trajectory]):
         # Add transitions to the memory buffer
+        total_rewards = []
         for trajectory in trajectories:
             for transition in trajectory:
                 self.memory.push(transition)
 
-        # Sample transitions from the buffer
-        if not self.memory.is_full:
-            print(f"memory is not yet full [{self.memory.size}/{self.memory.capacity}]")
-            return
+                # Sample transitions from the buffer
+                if not self.memory.is_full:
+                    print(f"memory is not yet full [{self.memory.size}/{self.memory.capacity}]")
+                    continue
 
-        losses = []
+                transitions = self.memory.sample(self.batch_size)
+                states, actions, rewards, done, next_states = map_transitions(transitions)
 
-        for _ in range(self.batches):
-            transitions = self.memory.sample(self.batch_size)
-            states, actions, rewards, done, next_states = map_transitions(transitions)
-            loss = self._train_batch(states, actions, rewards, done, next_states)
-            losses.append(loss.item())
+                # Main training function for the batch
+                self._train_batch(states, actions, rewards, done, next_states)
 
-        print(f"loss: {np.sum(losses):.5f} epsilon: {self.epsilon}")
+            total_rewards.append(trajectory.total_reward)
+
+        print(f"Mean total trajectory reward {np.mean(total_rewards)}")
 
         self.epsilon.decay()
 

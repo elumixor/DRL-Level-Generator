@@ -2,8 +2,8 @@ import glfw
 import numpy as np
 import torch
 
-from environments import PendulumEnvironment
-from environments.pendulum import configurations2parameters, PendulumStaticConfiguration, EnemyStaticConfiguration, \
+from environments.pendulum import PendulumEnvironment, configurations2parameters, PendulumStaticConfiguration, \
+    EnemyStaticConfiguration, \
     PendulumDynamicConfiguration, EnemyDynamicConfiguration
 from rendering import RenderingContext
 
