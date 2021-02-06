@@ -52,7 +52,7 @@ class AgentWrapper(ABC):
 
     def update(self) -> None:
         self.plot()
-        self.agent.train(self.rollouts)
+        self.agent.update(self.rollouts)
         self.rollouts = []
 
     @property

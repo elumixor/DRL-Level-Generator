@@ -21,6 +21,6 @@ if __name__ == '__main__':
                                                              enemies_dynamic_configurations)
             env.setup(generated_parameters)
 
-            agent = DQNAgent(env)
-            train(env, agent, epochs=200, num_trajectories=5, render_frequency=25, cutoff_at=50)
-            evaluate(env, agent, cutoff_at=50)
+            agent = DQNAgent(env, epsilon_iterations=100)
+            train(env, agent, epochs=100, num_trajectories=5, render_frequency=25, cutoff_at=75)
+            evaluate(env, agent, cutoff_at=75)

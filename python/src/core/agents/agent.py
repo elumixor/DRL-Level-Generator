@@ -7,9 +7,14 @@ class Agent(ABC):
         ...
 
     @abstractmethod
-    def train(self, trajectories):
+    def update(self, trajectories):
         ...
 
-    @abstractmethod
     def eval(self):
         ...
+
+    def print_data(self):
+        pass
+
+    def train(self):
+        pass

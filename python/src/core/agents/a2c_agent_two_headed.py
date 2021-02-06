@@ -33,7 +33,7 @@ class A2CAgentTwoHeaded(Agent):
     def actor(self) -> torch.nn.Module:
         return self._actor
 
-    def train(self, training_data):
+    def update(self, training_data):
         loss = 0
         total_len = 0
 

@@ -54,12 +54,12 @@ def transition(state: torch.tensor, action: torch.tensor,
 
         # Collision
         if distance <= (bob_radius + enemy_radius):
-            reward = 0 if not switch else -0.01
+            reward = 0.0 if not switch else -0.01
             done = True
             return new_state, reward, done
 
     # No collision
-    reward = 1 if not switch else 0.99
+    reward = 1.0 if not switch else 0.99
     done = False
     return new_state, reward, done
 

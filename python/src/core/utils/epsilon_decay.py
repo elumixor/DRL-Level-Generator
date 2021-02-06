@@ -24,3 +24,7 @@ class EpsilonDecay:
 
     def eval(self):
         self.epsilon = 0.0
+
+    def train(self):
+        r = max((self.iterations - self.elapsed_epochs), 0.0) / self.iterations
+        self.epsilon = (self.initial - self.end) * r + self.end
