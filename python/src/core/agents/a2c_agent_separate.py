@@ -1,8 +1,6 @@
 import torch
 from torch.optim import Adam
 
-from RL.utils import nn_from_layout, bootstrap
-from configuration.layout_configuration import LayoutConfiguration
 from .vpg_agent import VPGAgent
 
 discounting = 1

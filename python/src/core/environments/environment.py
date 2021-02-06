@@ -4,8 +4,7 @@ from typing import Tuple
 import torch
 
 
-class BaseEnvironment(ABC):
-
+class Environment(ABC):
     def seed(self, seed):
         pass
 

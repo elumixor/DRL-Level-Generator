@@ -1,5 +1,5 @@
+from core.environments import ConfigurableObject
 from rendering import GameObject, Rectangle, Color, Point, Circle
-from ..configurable_object import ConfigurableObject
 
 
 class PendulumStaticConfiguration:

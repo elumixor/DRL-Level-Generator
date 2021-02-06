@@ -1,5 +1,7 @@
 import torch
+
 from .epsilon_decay import EpsilonDecay
+from .mlp import mlp as MLP
 
 
 def bootstrap(rewards, last, discounting=0.99):
@@ -16,3 +18,15 @@ def discounted_rewards(rewards, discounting=0.99):
         last = res[i][0] = rewards[i][0] + discounting * last
 
     return res
+
+
+def map_transitions(transitions):
+    states, actions, rewards, done, next_states = zip(*transitions)
+
+    states = torch.stack(states).detach()
+    actions = torch.stack(actions).detach()
+    rewards = torch.tensor(rewards).detach()
+    done = torch.tensor(done)
+    next_states = torch.stack(next_states).detach()
+
+    return states, actions, rewards, done, next_states

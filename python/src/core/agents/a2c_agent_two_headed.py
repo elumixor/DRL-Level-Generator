@@ -1,9 +1,9 @@
 from itertools import chain
 
 import torch
-
 from RL.utils import nn_from_layout, discounted_rewards
 from configuration.layout_configuration import LayoutConfiguration
+
 from utilities import Buffer
 from .agent import Agent
 

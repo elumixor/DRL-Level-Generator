@@ -2,12 +2,12 @@ from typing import Tuple, List, Optional
 
 import torch
 
+from core.environments import RenderableEnvironment
 from rendering import RenderingContext, Color
 from .enemy import Enemy
 from .pendulum import Pendulum
 from .transition import transition as T, interpret_state, observation_size, \
     action_size, state_size, interpret_generated_parameters, parameters_size, interpret_static_configuration
-from ..renderable_environment import RenderableEnvironment
 
 
 class PendulumEnvironment(RenderableEnvironment):

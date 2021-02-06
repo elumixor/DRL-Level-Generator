@@ -1,5 +1,5 @@
+from core.environments import ConfigurableObject
 from rendering import Point, Color, Circle
-from ..configurable_object import ConfigurableObject
 
 
 class EnemyStaticConfiguration:

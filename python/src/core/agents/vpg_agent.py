@@ -1,10 +1,10 @@
 from typing import List
 
 import torch
-
 from RL import Episode
 from RL.utils import nn_from_layout, discounted_rewards
 from configuration.layout_configuration import LayoutConfiguration
+
 from .agent import Agent
 
 discounting = .99

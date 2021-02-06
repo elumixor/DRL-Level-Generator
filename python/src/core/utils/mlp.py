@@ -3,7 +3,7 @@ from typing import List
 from torch.nn import Sequential, Linear, ReLU
 
 
-def MLP(in_size: int, out_size: int, hidden_sizes: List[int]) -> Sequential:
+def mlp(in_size: int, out_size: int, hidden_sizes: List[int]) -> Sequential:
     hidden_size = hidden_sizes[0] if len(hidden_sizes) > 0 else out_size
 
     layers = [
