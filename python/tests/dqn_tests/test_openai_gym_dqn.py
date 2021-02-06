@@ -1,4 +1,3 @@
-from typing import List, Tuple
 from unittest import TestCase
 
 import gym
