@@ -1,6 +1,8 @@
+import os
+
 import numpy as np
 
-from core import train, evaluate
+from core import evaluate, train
 from core.agents.dqn import DQNAgent
 from environments.pendulum import configurations2parameters, PendulumStaticConfiguration, EnemyStaticConfiguration, \
     PendulumDynamicConfiguration, EnemyDynamicConfiguration, PendulumEnvironment
@@ -22,5 +24,12 @@ if __name__ == '__main__':
             env.setup(generated_parameters)
 
             agent = DQNAgent(env, epsilon_iterations=100, buffer_capacity=100000)
-            train(env, agent, epochs=200, num_trajectories=1, render_frequency=25, cutoff_at=75)
+            file_name = "dqn.pt"
+
+            skip_training = True
+            if not skip_training or not os.path.exists(file_name):
+                train(env, agent, epochs=10, num_trajectories=1, render_frequency=25, cutoff_at=75,
+                      validation_frequency=5, save_path="dqn.pt")
+
+            agent.load(file_name)
             evaluate(env, agent, cutoff_at=75)

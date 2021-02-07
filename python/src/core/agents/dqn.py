@@ -15,7 +15,7 @@ from ..utils import EpsilonDecay, MLP, map_transitions
 
 
 @auto_logged(plot_names=["loss", "epsilon", "mean_v_value", "mean_total_reward"],
-             print_names=["epsilon", "mean_q_value"])
+             print_names=["epsilon", "mean_v_value"])
 @auto_saved
 @auto_serialized(skip=["epsilon"], include=["_trajectories_for_v_evaluation", "_epsilon"])
 class DQNAgent(Agent, QEstimator):
@@ -50,10 +50,12 @@ class DQNAgent(Agent, QEstimator):
         return self._epsilon.value
 
     def get_action(self, observation):
-        if random() < self._epsilon.value:
+        if random() < self.epsilon:
             return torch.randint(self.action_size, [1])
 
-        return self.Q(observation).argmax(dim=-1, keepdim=True)
+        # action is saved to the memory buffer, so we need to detach it,
+        # otherwise we're getting grad_fn=<NotImplemented>
+        return self.Q(observation).argmax(dim=-1, keepdim=True).detach()
 
     def update(self, trajectories: List[Trajectory]):
         # Add transitions to the memory buffer

@@ -1,6 +1,8 @@
 import functools
 from typing import Optional, List
 
+from torch.nn import Module
+
 
 def auto_serialized(_func=None, *, skip: Optional[List[str]] = None, include: Optional[List[str]] = None):
     if skip is None:
@@ -20,7 +22,7 @@ def auto_serialized(_func=None, *, skip: Optional[List[str]] = None, include: Op
             def state_dict():
                 attributes = [attr for attr in dir(instance) if
                               not attr.startswith("_") and
-                              not callable(getattr(instance, attr)) and
+                              (not callable(getattr(instance, attr)) or isinstance(getattr(instance, attr), Module)) and
                               attr not in skip] + include
                 checkpoint = dict()
                 for attr in attributes:
@@ -41,7 +43,6 @@ def auto_serialized(_func=None, *, skip: Optional[List[str]] = None, include: Op
                 return checkpoint
 
             def load_state_dict(checkpoint: dict):
-
                 for attr, serialized in checkpoint.items():
                     value = getattr(instance, attr)
 
