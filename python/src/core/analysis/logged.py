@@ -10,8 +10,7 @@ def Logged(print_names: Optional[List[str]] = None, plot_names: Optional[List[st
     if print_names is None:
         print_names = []
 
-    all_names = plot_names + print_names
-    names = [x for i, x in enumerate(all_names) if all_names.index(x) == i]
+    all_names = list(dict.fromkeys(plot_names + print_names))
 
     class C:
         def __init__(self, func):
@@ -35,7 +34,7 @@ def Logged(print_names: Optional[List[str]] = None, plot_names: Optional[List[st
                 previous(*args, **kwargs)
 
                 logger.update(**{
-                    attribute: getattr(instance, attribute) for attribute in names
+                    attribute: getattr(instance, attribute) for attribute in all_names
                 })
 
             instance.update = update

@@ -7,14 +7,14 @@ import torch.nn.functional as F
 
 from common import MemoryBuffer
 from .agent import Agent
-from ..analysis import Logged
+from ..analysis import Logged, QEstimator
 from ..environments import Environment
 from ..trajectory import Trajectory
 from ..utils import EpsilonDecay, MLP, map_transitions
 
 
 @Logged(plot_names=["loss", "epsilon", "mean_q_value", "mean_total_reward"], print_names=["epsilon", "mean_q_value"])
-class DQNAgent(Agent):
+class DQNAgent(Agent, QEstimator):
     def __init__(self, env: Environment, buffer_capacity=10000, hidden_sizes=None, lr=0.01, epsilon_initial=1,
                  epsilon_end=0.1, epsilon_iterations=500, batch_size=200, discount=0.99,
                  trajectories_for_evaluation=20, cutoff_at=200):
@@ -85,6 +85,14 @@ class DQNAgent(Agent):
         self.Q.train()
         self._epsilon.train()
 
+    def get_state_q_values(self, state: torch.Tensor) -> torch.Tensor:
+        return self.Q(state)
+
+    def get_trajectory_values(self, trajectory: Trajectory):
+        states, *_ = map_transitions(trajectory)
+        q = self.Q.forward(states)
+        return q.max(dim=-1)[0]
+
     def _train_batch(self, states, actions, rewards, done, next_states):
         """
         Performs an update over a batch of transitions
@@ -107,10 +115,8 @@ class DQNAgent(Agent):
 
     def _update_mean_q(self):
         mean_q_values = []
-        for transitions in self._trajectories_for_q_evaluation:
-            states, *_ = map_transitions(transitions)
-            q = self.Q.forward(states)
-            mean_q = q.max(dim=-1)[0].mean().item()
+        for trajectory in self._trajectories_for_q_evaluation:
+            mean_q = self.get_trajectory_values(trajectory).mean().item()
             mean_q_values.append(mean_q)
 
         self.mean_q_value = np.mean(mean_q_values)
