@@ -10,19 +10,19 @@ class Agent(ABC):
     def update(self, trajectories):
         ...
 
-    def eval(self):
-        ...
-
     def print_progress(self):
         pass
 
     def plot_progress(self):
         pass
 
-    def train(self):
+    def log_progress(self):
         pass
 
-    def log_progress(self):
+    def eval(self):
+        pass
+
+    def train(self):
         pass
 
     def save(self, path: str):

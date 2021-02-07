@@ -6,7 +6,6 @@ from common import log
 from .agents import Agent
 from .environments import Environment, RenderableEnvironment
 from .trajectory import Trajectory
-from .utils import discounted_rewards, EpsilonDecay
 
 
 def train(env: Environment, agent: Agent, epochs=100, num_trajectories=5, render_frequency: Optional[int] = None,

@@ -34,7 +34,7 @@ def auto_logged(print_names: Optional[List[str]] = None, plot_names: Optional[Li
                 previous(*args, **kwargs)
 
                 logger.update(**{
-                    attribute: getattr(instance, attribute) for attribute in all_names
+                    attribute: float(getattr(instance, attribute)) for attribute in all_names
                 })
 
             instance.update = update

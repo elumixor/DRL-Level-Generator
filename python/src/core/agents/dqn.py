@@ -11,13 +11,14 @@ from .agent import Agent
 from ..analysis import auto_logged, QEstimator
 from ..environments import Environment
 from ..trajectory import Trajectory
-from ..utils import EpsilonDecay, MLP, map_transitions
+from ..utils import EpsilonDecay, MLP, map_transitions, auto_eval
 
 
 @auto_logged(plot_names=["loss", "epsilon", "mean_v_value", "mean_total_reward"],
              print_names=["epsilon", "mean_v_value"])
 @auto_saved
-@auto_serialized(skip=["epsilon"], include=["_trajectories_for_v_evaluation", "_epsilon"])
+@auto_serialized
+@auto_eval("Q", "epsilon")
 class DQNAgent(Agent, QEstimator):
     def __init__(self, env: Environment, buffer_capacity=2000, hidden_sizes=None, lr=0.01, epsilon_initial=1,
                  epsilon_end=0.1, epsilon_iterations=500, batch_size=100, discount=0.99,
@@ -36,21 +37,17 @@ class DQNAgent(Agent, QEstimator):
         self.batch_size = batch_size
 
         self.discount = discount
-        self._epsilon = EpsilonDecay(initial=epsilon_initial, end=epsilon_end, iterations=epsilon_iterations)
+        self.epsilon = EpsilonDecay(initial=epsilon_initial, end=epsilon_end, iterations=epsilon_iterations)
 
         self.loss = 0.0
         self.mean_total_reward = 0.0
         self.mean_v_value = 0.0
 
-        self._trajectories_for_v_evaluation = [Trajectory.sample(env, self, cutoff_at) for _ in
-                                               range(trajectories_for_evaluation)]
-
-    @property
-    def epsilon(self):
-        return self._epsilon.value
+        self.trajectories_for_v_evaluation = [Trajectory.sample(env, self, cutoff_at) for _ in
+                                              range(trajectories_for_evaluation)]
 
     def get_action(self, observation):
-        if random() < self.epsilon:
+        if random() < self.epsilon.value:
             return torch.randint(self.action_size, [1]).to("cuda")
 
         # action is saved to the memory buffer, so we need to detach it,
@@ -81,15 +78,7 @@ class DQNAgent(Agent, QEstimator):
         self.mean_total_reward = np.mean(total_rewards)
         self._update_mean_q()
 
-        self._epsilon.decay()
-
-    def eval(self):
-        self.Q.eval()
-        self._epsilon.eval()
-
-    def train(self):
-        self.Q.train()
-        self._epsilon.train()
+        self.epsilon.decay()
 
     def get_state_q_values(self, state: torch.Tensor) -> torch.Tensor:
         return self.Q(state)
@@ -121,7 +110,7 @@ class DQNAgent(Agent, QEstimator):
 
     def _update_mean_q(self):
         mean_v_values = []
-        for trajectory in self._trajectories_for_v_evaluation:
+        for trajectory in self.trajectories_for_v_evaluation:
             mean_v = self.get_trajectory_values(trajectory).mean().item()
             mean_v_values.append(mean_v)
 

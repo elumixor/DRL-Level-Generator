@@ -26,8 +26,8 @@ if __name__ == '__main__':
             agent = DQNAgent(env, epsilon_iterations=100, buffer_capacity=100000)
             file_name = "dqn.pt"
 
-            # if os.path.exists(file_name):
-            #     agent.load(file_name)
+            if os.path.exists(file_name):
+                agent.load(file_name)
 
             skip_training = False
             if not skip_training or not os.path.exists(file_name):
