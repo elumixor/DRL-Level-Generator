@@ -15,7 +15,7 @@ test_input = torch.tensor([1], dtype=torch.float, device='cuda')
 class VPGAgent(Agent):
 
     def __init__(self, actor_layout: LayoutConfiguration, lr=0.01):
-        self._actor = nn_from_layout(actor_layout).cuda()
+        self._actor = nn_from_layout(actor_layout)
         self.optimizer = torch.optim.Adam(self._actor.parameters(), lr=lr)
 
     @property

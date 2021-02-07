@@ -40,7 +40,7 @@ def transition(state: torch.tensor, action: torch.tensor,
     position: torch.tensor = position + vertical_speed
 
     # Combine into the new state
-    new_state = torch.tensor([angle, position, angular_speed, enemies_count], device="cuda")
+    new_state = torch.tensor([angle, position, angular_speed, enemies_count])
 
     # Check collision
     bob_center_x = torch.sin(angle) * connector_length
@@ -76,7 +76,7 @@ def configurations2parameters(pendulum_static_configuration: PendulumStaticConfi
         *pendulum_dynamic_configuration,
         len(enemies_dynamic_configurations),
         *[value for configuration in enemies_dynamic_configurations for value in configuration]
-    ], dtype=torch.float32, device="cuda")
+    ], dtype=torch.float32)
 
 
 def interpret_generated_parameters(generated_parameters: torch.tensor) -> Tuple[torch.tensor, torch.tensor]:

@@ -20,12 +20,12 @@ class A2CAgentTwoHeaded(Agent):
         self.epoch = 0
         self.mean_total_rewards = Buffer(100)
 
-        self.base = nn_from_layout(base_layout).cuda()
-        self.actor_head = nn_from_layout(actor_head_layout).cuda()
-        self.critic_head = nn_from_layout(critic_head_layout).cuda()
+        self.base = nn_from_layout(base_layout)
+        self.actor_head = nn_from_layout(actor_head_layout)
+        self.critic_head = nn_from_layout(critic_head_layout)
 
-        self._actor = torch.nn.Sequential(self.base, self.actor_head).cuda()
-        self.critic = torch.nn.Sequential(self.base, self.critic_head).cuda()
+        self._actor = torch.nn.Sequential(self.base, self.actor_head)
+        self.critic = torch.nn.Sequential(self.base, self.critic_head)
 
         self.optim = torch.optim.Adam(chain(self.actor.parameters(), self.critic_head.parameters()), lr=lr)
 

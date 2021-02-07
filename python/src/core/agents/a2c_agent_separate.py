@@ -12,7 +12,7 @@ class A2CAgentSeparate(VPGAgent):
 
     def __init__(self, actor_layout: LayoutConfiguration, critic_layout: LayoutConfiguration, lr_actor=0.01, lr_critic=0.005):
         super().__init__(actor_layout, lr_actor)
-        self.critic = nn_from_layout(critic_layout).cuda()
+        self.critic = nn_from_layout(critic_layout)
         self.optim_critic = Adam(self.critic.parameters(), lr=lr_critic)
 
     def update(self, training_data):

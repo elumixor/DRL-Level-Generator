@@ -18,7 +18,7 @@ from ..utils import EpsilonDecay, MLP, map_transitions, auto_eval
              print_names=["epsilon", "mean_v_value"])
 @auto_saved
 @auto_serialized
-@auto_eval("Q", "epsilon")
+@auto_eval("actor", "epsilon")
 class DQNAgent(Agent, QEstimator):
     def __init__(self, env: Environment, buffer_capacity=2000, hidden_sizes=None, lr=0.01, epsilon_initial=1,
                  epsilon_end=0.1, epsilon_iterations=500, batch_size=100, discount=0.99,
@@ -75,9 +75,19 @@ class DQNAgent(Agent, QEstimator):
 
             total_rewards.append(trajectory.total_reward)
 
+        # Update mean total reward
         self.mean_total_reward = np.mean(total_rewards)
-        self._update_mean_q()
 
+        # Update mean V-value
+        mean_v_values = []
+
+        for trajectory in self.trajectories_for_v_evaluation:
+            mean_v = self.get_trajectory_values(trajectory).mean().item()
+            mean_v_values.append(mean_v)
+
+        self.mean_v_value = np.mean(mean_v_values)
+
+        # Update epsilon
         self.epsilon.decay()
 
     def get_state_q_values(self, state: torch.Tensor) -> torch.Tensor:
@@ -107,11 +117,3 @@ class DQNAgent(Agent, QEstimator):
         self.optim.step()
 
         return loss
-
-    def _update_mean_q(self):
-        mean_v_values = []
-        for trajectory in self.trajectories_for_v_evaluation:
-            mean_v = self.get_trajectory_values(trajectory).mean().item()
-            mean_v_values.append(mean_v)
-
-        self.mean_v_value = np.mean(mean_v_values)
