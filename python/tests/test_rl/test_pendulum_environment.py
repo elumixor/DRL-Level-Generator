@@ -26,10 +26,13 @@ if __name__ == '__main__':
             agent = DQNAgent(env, epsilon_iterations=100, buffer_capacity=100000)
             file_name = "dqn.pt"
 
-            skip_training = True
+            # if os.path.exists(file_name):
+            #     agent.load(file_name)
+
+            skip_training = False
             if not skip_training or not os.path.exists(file_name):
-                train(env, agent, epochs=10, num_trajectories=1, render_frequency=25, cutoff_at=75,
-                      validation_frequency=5, save_path="dqn.pt")
+                train(env, agent, epochs=500, num_trajectories=1, render_frequency=25, cutoff_at=75,
+                      validation_frequency=10, save_path=file_name, validation_save="dqn_best.pt", save_frequency=25)
 
             agent.load(file_name)
             evaluate(env, agent, cutoff_at=75)

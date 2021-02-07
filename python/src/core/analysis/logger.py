@@ -16,7 +16,7 @@ def nice_plot_layout(num_items):
 
 
 class Logger:
-    def __init__(self, print_names, plot_names, capacity=100, plot_columns=3):
+    def __init__(self, print_names, plot_names, capacity=100, plot_columns=3, row_size=5, col_size=3):
         self.capacity = capacity
         self.epoch = 1
         self.max_allowed_columns = plot_columns
@@ -32,7 +32,7 @@ class Logger:
             num_plots = len(self.plot_names)
             rows, columns = nice_plot_layout(num_plots)
 
-            fig, axs = plt.subplots(nrows=rows, ncols=columns, figsize=(rows * 7, columns * 5))
+            fig, axs = plt.subplots(nrows=rows, ncols=columns, figsize=(rows * row_size, columns * col_size))
             self.plots = [axs] if len(self.plot_names) == 1 else axs.flatten()
 
     def update(self, **kwargs):

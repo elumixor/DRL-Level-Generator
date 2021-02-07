@@ -23,10 +23,10 @@ def discounted_rewards(rewards, discounting=0.99):
 def map_transitions(transitions):
     states, actions, rewards, done, next_states = zip(*transitions)
 
-    states = torch.stack(states).detach()
-    actions = torch.stack(actions).detach()
-    rewards = torch.tensor(rewards).detach()
-    done = torch.tensor(done)
-    next_states = torch.stack(next_states).detach()
+    states = torch.stack(states).detach().cuda()
+    actions = torch.stack(actions).detach().cuda()
+    rewards = torch.tensor(rewards).detach().cuda()
+    done = torch.tensor(done).cuda()
+    next_states = torch.stack(next_states).detach().cuda()
 
     return states, actions, rewards, done, next_states
