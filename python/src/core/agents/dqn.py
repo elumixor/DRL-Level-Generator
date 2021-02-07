@@ -6,14 +6,18 @@ import torch
 import torch.nn.functional as F
 
 from common import MemoryBuffer
+from serialization import auto_serialized, auto_saved
 from .agent import Agent
-from ..analysis import Logged, QEstimator
+from ..analysis import auto_logged, QEstimator
 from ..environments import Environment
 from ..trajectory import Trajectory
 from ..utils import EpsilonDecay, MLP, map_transitions
 
 
-@Logged(plot_names=["loss", "epsilon", "mean_q_value", "mean_total_reward"], print_names=["epsilon", "mean_q_value"])
+@auto_logged(plot_names=["loss", "epsilon", "mean_v_value", "mean_total_reward"],
+             print_names=["epsilon", "mean_q_value"])
+@auto_saved
+@auto_serialized(skip=["epsilon"], include=["_trajectories_for_v_evaluation", "_epsilon"])
 class DQNAgent(Agent, QEstimator):
     def __init__(self, env: Environment, buffer_capacity=10000, hidden_sizes=None, lr=0.01, epsilon_initial=1,
                  epsilon_end=0.1, epsilon_iterations=500, batch_size=200, discount=0.99,
@@ -36,9 +40,9 @@ class DQNAgent(Agent, QEstimator):
 
         self.loss = 0.0
         self.mean_total_reward = 0.0
-        self.mean_q_value = 0.0
+        self.mean_v_value = 0.0
 
-        self._trajectories_for_q_evaluation = [Trajectory.sample(env, self, cutoff_at) for _ in
+        self._trajectories_for_v_evaluation = [Trajectory.sample(env, self, cutoff_at) for _ in
                                                range(trajectories_for_evaluation)]
 
     @property
@@ -114,9 +118,9 @@ class DQNAgent(Agent, QEstimator):
         return loss
 
     def _update_mean_q(self):
-        mean_q_values = []
-        for trajectory in self._trajectories_for_q_evaluation:
-            mean_q = self.get_trajectory_values(trajectory).mean().item()
-            mean_q_values.append(mean_q)
+        mean_v_values = []
+        for trajectory in self._trajectories_for_v_evaluation:
+            mean_v = self.get_trajectory_values(trajectory).mean().item()
+            mean_v_values.append(mean_v)
 
-        self.mean_q_value = np.mean(mean_q_values)
+        self.mean_v_value = np.mean(mean_v_values)

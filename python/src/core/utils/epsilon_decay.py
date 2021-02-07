@@ -1,3 +1,7 @@
+from serialization import auto_serialized
+
+
+@auto_serialized
 class EpsilonDecay:
     def __init__(self, initial=1, end=0.01, iterations=500):
         self.initial = initial

@@ -24,3 +24,9 @@ class Agent(ABC):
 
     def log_progress(self):
         pass
+
+    def save(self, path: str):
+        pass
+
+    def load(self, path: str):
+        pass

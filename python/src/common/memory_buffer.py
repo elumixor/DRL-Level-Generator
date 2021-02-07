@@ -1,9 +1,12 @@
 import random
 from typing import Union, TypeVar, Generic, List
 
+from serialization import auto_serialized
+
 T = TypeVar('T')
 
 
+@auto_serialized
 class MemoryBuffer(Generic[T]):
 
     def __init__(self, capacity: Union[int, None] = None):

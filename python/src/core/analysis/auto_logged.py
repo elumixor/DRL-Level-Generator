@@ -3,8 +3,8 @@ from typing import List, Optional
 from .logger import Logger
 
 
-def Logged(print_names: Optional[List[str]] = None, plot_names: Optional[List[str]] = None,
-           capacity=100, plot_columns=3):
+def auto_logged(print_names: Optional[List[str]] = None, plot_names: Optional[List[str]] = None,
+                capacity=100, plot_columns=3):
     if plot_names is None:
         plot_names = []
     if print_names is None:
