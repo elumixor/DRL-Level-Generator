@@ -11,14 +11,14 @@ from .agent import Agent
 from ..analysis import auto_logged, QEstimator
 from ..environments import Environment
 from ..trajectory import Trajectory
-from ..utils import EpsilonDecay, MLP, map_transitions, auto_eval
+from ..utils import EpsilonDecay, MLP, map_transitions, auto_eval, bootstrap
 
 
 @auto_logged(plot_names=["loss", "epsilon", "mean_v_value", "mean_total_reward"],
              print_names=["epsilon", "mean_v_value"])
 @auto_saved
 @auto_serialized
-@auto_eval("actor", "epsilon")
+@auto_eval("Q", "epsilon")
 class DQNAgent(Agent, QEstimator):
     def __init__(self, env: Environment, buffer_capacity=2000, hidden_sizes=None, lr=0.01, epsilon_initial=1,
                  epsilon_end=0.1, epsilon_iterations=500, batch_size=100, discount=0.99,
@@ -29,7 +29,7 @@ class DQNAgent(Agent, QEstimator):
         observation_size = env.observation_size
         self.action_size = env.action_size
 
-        self.Q = MLP(observation_size, self.action_size, hidden_sizes).to("cuda")
+        self.Q = MLP(observation_size, self.action_size, hidden_sizes)
         self.optim = torch.optim.Adam(self.Q.parameters(), lr=lr)
 
         self.memory = MemoryBuffer(capacity=buffer_capacity)
@@ -47,12 +47,11 @@ class DQNAgent(Agent, QEstimator):
                                               range(trajectories_for_evaluation)]
 
     def get_action(self, observation):
-        if random() < self.epsilon.value:
-            return torch.randint(self.action_size, [1]).to("cuda")
+        with torch.no_grad():
+            if random() < self.epsilon.value:
+                return torch.randint(self.action_size, [1])
 
-        # action is saved to the memory buffer, so we need to detach it,
-        # otherwise we're getting grad_fn=<NotImplemented>
-        return self.Q(observation).argmax(dim=-1, keepdim=True).detach()
+            return self.Q(observation).argmax(dim=-1, keepdim=True)
 
     def update(self, trajectories: List[Trajectory]):
         # Add transitions to the memory buffer
@@ -90,24 +89,27 @@ class DQNAgent(Agent, QEstimator):
         # Update epsilon
         self.epsilon.decay()
 
+    def V(self, state: torch.Tensor):
+        return self.Q(state).max(dim=-1)[0]
+
     def get_state_q_values(self, state: torch.Tensor) -> torch.Tensor:
         return self.Q(state)
 
     def get_trajectory_values(self, trajectory: Trajectory):
         states, *_ = map_transitions(trajectory)
-        q = self.Q.forward(states)
-        return q.max(dim=-1)[0]
+        return self.V(states)
 
     def _train_batch(self, states, actions, rewards, done, next_states):
         """
         Performs an update over a batch of transitions
         :returns: Loss of the batch
         """
-        v_next = self.Q.forward(next_states).max(dim=1)[0]
-        q = self.Q.forward(states)
+        v_next = self.V(next_states)
+        q = self.Q(states)
         q_current = q[range(actions.shape[0]), actions.flatten()].flatten()
 
-        y = rewards + self.discount * v_next
+        # fixme: we are bootstrapping unrelated rewards!
+        y = bootstrap(rewards, v_next, 10, self.discount)
         y = torch.where(done, rewards, y)
 
         loss = F.mse_loss(q_current, y)

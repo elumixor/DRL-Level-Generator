@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 
 from serialization import auto_serialized, auto_saved
@@ -7,12 +6,11 @@ from ..analysis import auto_logged
 from ..utils import MLP, map_transitions, discounted_rewards
 
 
-@auto_logged(plot_names=["mean_total_reward"], print_names=["mean_total_reward"])
+@auto_logged(plot_names=["mean_total_reward", "loss"], print_names=["mean_total_reward"])
 @auto_saved
 @auto_serialized
 class VPGAgent(Agent):
-    def __init__(self, env, hidden_sizes=None, lr=0.01,
-                 discount=0.99):
+    def __init__(self, env, hidden_sizes=None, lr=0.01, discount=0.99):
         if hidden_sizes is None:
             hidden_sizes = [8, 8]
 
@@ -24,29 +22,30 @@ class VPGAgent(Agent):
 
         self.discount = discount
         self.mean_total_reward = 0.0
+        self.loss = 0.0
 
     def get_action(self, observation):
-        logits = self.actor(observation)
-        distribution = torch.distributions.Categorical(logits=logits)
-        action = distribution.sample([1]).detach()
-        return action
+        with torch.no_grad():
+            logits = self.actor(observation)
+            distribution = torch.distributions.Categorical(logits=logits)
+            action = distribution.sample([1])
+            return action
 
     def update(self, trajectories):
-        loss = 0
+        loss = 0.0
         total_len = 0
-        total_rewards = []
+        total_reward = 0.0
 
         for transitions in trajectories:
             states, actions, rewards, done, next_states = map_transitions(transitions)
-
-            weights = discounted_rewards(rewards, self.discount).flatten()
+            _discounted_rewards = discounted_rewards(rewards, self.discount).flatten()
 
             probabilities = self.actor(states).softmax(-1)
             probabilities = probabilities[range(states.shape[0]), actions.flatten()]
-            loss = loss + (-probabilities.log() * weights).sum()
-            total_len += weights.shape[0]
+            loss = loss - (probabilities.log() * _discounted_rewards).sum()
 
-            total_rewards.append(rewards.sum().item())
+            total_len += _discounted_rewards.shape[0]
+            total_reward += rewards.sum().item()
 
         loss = loss / total_len
 
@@ -54,4 +53,6 @@ class VPGAgent(Agent):
         loss.backward()
         self.optim.step()
 
-        self.mean_total_reward = np.mean(total_rewards)
+        self.mean_total_reward = total_reward / len(trajectories)
+
+        self.loss = loss.item()

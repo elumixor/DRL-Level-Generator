@@ -4,7 +4,7 @@ import time
 
 import numpy as np
 
-from .agents import Agent
+from .agents.agent import Agent
 from .environments import Environment, RenderableEnvironment
 
 

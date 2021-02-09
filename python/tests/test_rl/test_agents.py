@@ -1,7 +1,7 @@
 import numpy as np
 
 from core import evaluate, train
-from core.agents import VPGAgent
+from core.agents import A2CAgent
 from environments.pendulum import configurations2parameters, PendulumStaticConfiguration, EnemyStaticConfiguration, \
     PendulumDynamicConfiguration, EnemyDynamicConfiguration, PendulumEnvironment
 from rendering import RenderingContext
@@ -21,6 +21,8 @@ if __name__ == '__main__':
                                                              enemies_dynamic_configurations)
             env.setup(generated_parameters)
 
-            agent = VPGAgent(env)
-            train(env, agent, epochs=500, num_trajectories=10, render_frequency=25, cutoff_at=75)
+            AgentClass = A2CAgent
+
+            agent = AgentClass(env)
+            train(env, agent, epochs=500, num_trajectories=1, render_frequency=25, cutoff_at=75)
             evaluate(env, agent, cutoff_at=75)

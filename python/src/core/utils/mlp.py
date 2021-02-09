@@ -1,10 +1,14 @@
-from typing import List
-
-from torch.nn import Sequential, Linear, ReLU
+from torch.nn import Sequential, Linear, ReLU, Module
 
 
-def mlp(in_size: int, out_size: int, hidden_sizes: List[int]) -> Sequential:
-    hidden_size = hidden_sizes[0] if len(hidden_sizes) > 0 else out_size
+def mlp(in_size: int, out_size: int, hidden_sizes=None) -> Module:
+    if hidden_sizes is None:
+        hidden_sizes = []
+
+    if len(hidden_sizes) == 0:
+        return Linear(in_size, out_size)
+
+    hidden_size = hidden_sizes[0]
 
     layers = [
         Linear(in_size, hidden_size),
