@@ -1,6 +1,7 @@
 import itertools
 
 import torch
+from torch.nn import Identity, Linear, Sequential, ReLU
 
 from serialization import auto_saved, auto_serialized
 from .agent import Agent
@@ -20,27 +21,24 @@ class A2CAgent(Agent):
         observation_size = env.observation_size
         self.action_size = env.action_size
 
-        # last_size = observation_size
-        # if len(hidden_sizes) > 0:
-        #     last_size = hidden_sizes[-1]
-        #     self.base = MLP(observation_size, last_size, hidden_sizes[:-1])
-        # else:
-        #     self.base = Identity()
-        #
-        # self.actor_head = Linear(last_size, self.action_size)
-        # self.critic_head = Linear(last_size, 1)
-        #
-        # self.actor = Sequential(self.base, ReLU(), self.actor_head)
-        # self.critic = Sequential(self.base, ReLU(), self.critic_head)
-        #
-        # print(self.actor)
-        # print(self.critic)
-        #
-        # self.optim = torch.optim.Adam(itertools.chain(self.actor.parameters(), self.critic_head.parameters()), lr=lr)
+        last_size = observation_size
+        if len(hidden_sizes) > 0:
+            last_size = hidden_sizes[-1]
+            self.base = MLP(observation_size, last_size, hidden_sizes[:-1])
+        else:
+            self.base = Identity()
 
-        self.actor = MLP(observation_size, self.action_size, [8, 8])
-        self.critic = MLP(observation_size, 1, [8, 8])
-        self.optim = torch.optim.Adam(itertools.chain(self.actor.parameters(), self.critic.parameters()), lr=lr)
+        self.actor_head = Linear(last_size, self.action_size)
+        self.critic_head = Linear(last_size, 1)
+
+        self.actor = Sequential(self.base, ReLU(), self.actor_head)
+        self.critic = Sequential(self.base, ReLU(), self.critic_head)
+
+        self.optim = torch.optim.Adam(itertools.chain(self.actor.parameters(), self.critic_head.parameters()), lr=lr)
+
+        # self.actor = MLP(observation_size, self.action_size, [8, 8])
+        # self.critic = MLP(observation_size, 1, [8, 8])
+        # self.optim = torch.optim.Adam(itertools.chain(self.actor.parameters(), self.critic.parameters()), lr=lr)
 
         self.discount = discount
         self.critic_loss_weight = 1

@@ -33,7 +33,7 @@ class Logger:
         if len(plot_names) != 0:
             num_plots = len(self.plot_names)
             rows, columns = nice_plot_layout(num_plots)
-            fig, axs = plt.subplots(nrows=rows, ncols=columns, figsize=(rows * row_size, columns * col_size))
+            self.fig, axs = plt.subplots(nrows=rows, ncols=columns, figsize=(rows * row_size, columns * col_size))
             self.plots = [axs] if len(self.plot_names) == 1 else axs.flatten()
 
         self.plots = [(plot_names[i], self.plots[i]) for i in range(len(plot_names))]
@@ -77,9 +77,10 @@ class Logger:
             ax.plot(epochs, [*value])
             ax.grid(color='black', linestyle='-', linewidth=.1)
 
-        plt.draw()
-        plt.tight_layout()
-        plt.pause(0.001)
+            ax.relim()
+            ax.autoscale_view()
+
+        self.fig.canvas.flush_events()
 
     def _initialize(self, **kwargs):
         self.names = [name for name in kwargs]
