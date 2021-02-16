@@ -14,7 +14,8 @@ from ..utils import MLP, map_transitions, bootstrap
 @auto_saved
 @auto_serialized(skip=["base", "actor_head", "critic_head"])
 class A2CAgent(Agent):
-    def __init__(self, env, hidden_sizes=None, lr=0.01, discount=0.99):
+    def __init__(self, env, hidden_sizes=None, lr=0.01, discount=0.99, time_delay=10, critic_loss_weight=0.5,
+                 entropy_loss_weight=0.01):
         if hidden_sizes is None:
             hidden_sizes = [8, 6]
 
@@ -41,8 +42,9 @@ class A2CAgent(Agent):
         # self.optim = torch.optim.Adam(itertools.chain(self.actor.parameters(), self.critic.parameters()), lr=lr)
 
         self.discount = discount
-        self.critic_loss_weight = 1
-        self.entropy_loss_weight = 0.01
+        self.time_delay = time_delay
+        self.critic_loss_weight = critic_loss_weight
+        self.entropy_loss_weight = entropy_loss_weight
 
         self.mean_total_reward = 0.0
         self.loss_actor = 0.0
@@ -70,7 +72,7 @@ class A2CAgent(Agent):
             v = self.critic(states).flatten()
             v_next = self.critic(next_states).flatten()
 
-            y = bootstrap(rewards, v_next, 10, self.discount)
+            y = bootstrap(rewards, v_next, self.time_delay, self.discount)
             advantages = y - v
             loss_critic = loss_critic + (advantages ** 2).sum()
 

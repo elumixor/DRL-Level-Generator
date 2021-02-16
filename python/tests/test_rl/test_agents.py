@@ -1,10 +1,8 @@
-import cProfile
-import pstats
-
 import numpy as np
 
 from core import train
 from core.agents import A2CAgent
+from core.analysis import timed
 from environments.pendulum import configurations2parameters, PendulumStaticConfiguration, EnemyStaticConfiguration, \
     PendulumDynamicConfiguration, EnemyDynamicConfiguration, PendulumEnvironment
 from rendering import RenderingContext
@@ -24,14 +22,9 @@ if __name__ == '__main__':
                                                              enemies_dynamic_configurations)
             env.setup(generated_parameters)
 
-            AgentClass = A2CAgent
+            agent = A2CAgent(env, time_delay=10)
 
-            agent = AgentClass(env)
-
-            profiler = cProfile.Profile()
-            profiler.enable()
-            train(env, agent, epochs=50, num_trajectories=10, render_frequency=25, cutoff_at=75)
-            profiler.disable()
-            pstats.Stats(profiler).sort_stats('tottime').print_stats()
+            with timed():
+                train(env, agent, epochs=500, num_trajectories=10, render_frequency=25, cutoff_at=75)
 
             # evaluate(env, agent, cutoff_at=75)
