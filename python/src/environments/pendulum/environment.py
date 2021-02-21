@@ -13,7 +13,8 @@ from .transition import transition
 
 
 class PendulumEnvironment(RenderableEnvironment):
-    def __init__(self, rendering_context: RenderingContext, generator: PendulumGenerator):
+    def __init__(self, rendering_context: RenderingContext, generator: PendulumGenerator,
+                 difficulty: Optional[float] = None):
         super().__init__(rendering_context)
 
         self.generator = generator
@@ -39,6 +40,9 @@ class PendulumEnvironment(RenderableEnvironment):
         # Enemies game objects
         self.enemy: Optional[Enemy] = None
 
+        # Difficulty with which the generator gets called
+        self.difficulty = difficulty
+
     def __enter__(self):
         return self
 
@@ -48,7 +52,7 @@ class PendulumEnvironment(RenderableEnvironment):
 
     @property
     def state_size(self):
-        return PendulumState.size
+        return len(PendulumState)
 
     @property
     def observation_size(self):
@@ -58,13 +62,20 @@ class PendulumEnvironment(RenderableEnvironment):
     def action_size(self):
         return 2
 
-    def reset(self, difficulty: float, seed=None) -> PendulumState:
-        """
-        Called at the start of each trajectory
-        :returns: The starting state
-        """
+    def reset(self, difficulty: Optional[float] = None, seed: Optional[float] = None) -> PendulumState:
+        # Generate random seed randomly, if not specified
         if seed is None:
             seed = random.random()
+
+        # Use the last difficulty, if none specified
+        # Otherwise store the new difficulty
+        if difficulty is None:
+            difficulty = self.difficulty
+        else:
+            self.difficulty = difficulty
+
+        if difficulty is None:
+            raise ValueError("Difficulty should be specified at least once")
 
         # Generate new starting state, internally split into the static configuration and state
         self.state = self.generator.generate(difficulty, seed)
@@ -77,13 +88,10 @@ class PendulumEnvironment(RenderableEnvironment):
         # Save the state for rendering
         self.state = next_state
 
-        return next_state, reward, done
+        return self.get_observation(next_state), reward, done
 
-    def get_observation(self, state: torch.Tensor):
-        return state.clone()
-
-    def set_state(self, state: torch.Tensor):
-        self.state = state
+    def get_observation(self, state: PendulumState):
+        return state
 
     def render(self):
         # Perform necessary initializations for rendering, if not rendering-ready

@@ -1,10 +1,10 @@
 import torch
-
 from RL.agents import VPGAgent, A2CAgentSeparate, A2CAgentTwoHeaded
 from configuration.nn import LayerName, IntParameter
+
+from environments import LeftRightEnvironment
 from fake_frontend.agent_wrapper import AgentWrapper
 from fake_frontend.base_framework import train
-from environments import LeftRightEnvironment
 from utilities import DotDict, np
 from utilities.logging.left_right_plotter import LeftRightPlotter
 
@@ -39,7 +39,7 @@ def vpg():
             x = np.linspace(-5, 5, 100)
             p_left_x = self.agent.actor(torch.from_numpy(x).float().unsqueeze(-1)) \
                            .softmax(-1)[:, 0].detach().numpy()
-            self.plotter.update(self.rollouts, p_left_x=(x, p_left_x))
+            self.plotter.train(self.rollouts, p_left_x=(x, p_left_x))
 
     train(env, Wrapper, epochs=2000, num_rollouts=5, render_frequency=False, max_timesteps=20)
 
@@ -77,7 +77,7 @@ def a2c_separate():
             x = np.linspace(-5, 5, 100)
             p_left_x = self.agent.actor(torch.from_numpy(x).float().unsqueeze(-1)) \
                            .softmax(-1)[:, 0].detach().numpy()
-            self.plotter.update(self.rollouts, p_left_x=(x, p_left_x))
+            self.plotter.train(self.rollouts, p_left_x=(x, p_left_x))
 
     # Train, provide an env, function to get an action from state, and training function that accepts rollouts
     train(env, Wrapper, epochs=2000, num_rollouts=5, render_frequency=False, max_timesteps=20)
@@ -120,7 +120,7 @@ def a2c_two_headed():
             x = np.linspace(-5, 5, 100)
             p_left_x = self.agent.actor(torch.from_numpy(x).float().unsqueeze(-1)) \
                            .softmax(-1)[:, 0].detach().numpy()
-            self.plotter.update(self.rollouts, p_left_x=(x, p_left_x))
+            self.plotter.train(self.rollouts, p_left_x=(x, p_left_x))
 
     # Train, provide an env, function to get an action from state, and training function that accepts rollouts
     train(env, Wrapper,

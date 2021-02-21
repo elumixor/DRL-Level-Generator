@@ -6,7 +6,7 @@ from ..analysis import auto_logged
 from ..utils import MLP, map_transitions, discounted_rewards
 
 
-@auto_logged(plot_names=["mean_total_reward", "loss"], print_names=["mean_total_reward"])
+@auto_logged("train", plot_names=["total_reward", "loss"], print_names=["total_reward"])
 @auto_saved
 @auto_serialized
 class VPGAgent(Agent):
@@ -31,7 +31,7 @@ class VPGAgent(Agent):
             action = distribution.sample([1])
             return action
 
-    def update(self, trajectories):
+    def train(self, trajectories):
         loss = 0.0
         total_len = 0
         total_reward = 0.0

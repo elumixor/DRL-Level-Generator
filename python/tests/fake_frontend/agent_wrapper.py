@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
 import torch
+from RL.agents import Agent
 from torch.distributions import Categorical
 
-from RL.agents import Agent
 from utilities import Plotter
 
 
@@ -52,7 +52,7 @@ class AgentWrapper(ABC):
 
     def update(self) -> None:
         self.plot()
-        self.agent.update(self.rollouts)
+        self.agent.train(self.rollouts)
         self.rollouts = []
 
     @property

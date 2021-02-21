@@ -9,8 +9,8 @@ from ..analysis import auto_logged
 from ..utils import MLP, map_transitions, bootstrap
 
 
-@auto_logged(plot_names=["mean_total_reward", "loss_actor", "loss_critic", "loss_entropy"],
-             print_names=["mean_total_reward"])
+@auto_logged("train", plot_names=["total_reward", "loss_actor", "loss_critic", "loss_entropy"],
+             print_names=["total_reward"])
 @auto_saved
 @auto_serialized(skip=["base", "actor_head", "critic_head"])
 class A2CAgent(Agent):
@@ -58,7 +58,7 @@ class A2CAgent(Agent):
             action = distribution.sample([1])
             return action
 
-    def update(self, trajectories):
+    def train(self, trajectories):
         loss_actor = 0.0
         loss_critic = 0.0
         entropy_loss = 0.0

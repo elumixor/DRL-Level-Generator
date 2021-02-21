@@ -86,4 +86,4 @@ def train(env,
             rollout_rewards.append(total_reward)
             global_rollout += 1
 
-        agent.update()
+        agent.train()

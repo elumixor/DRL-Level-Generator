@@ -24,7 +24,7 @@ if __name__ == '__main__':
                                                              enemies_dynamic_configurations)
             env.setup(generated_parameters)
 
-            agent = DQNAgent(env, epsilon_iterations=100, buffer_capacity=100000)
+            agent = DQNAgent(env, buffer_capacity=100000)
             file_name = "dqn.pt"
             agent.load(file_name)
 

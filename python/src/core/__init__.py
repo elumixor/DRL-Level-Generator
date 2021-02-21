@@ -16,7 +16,7 @@ def train(env: Environment, agent: Agent, epochs=100, num_trajectories=5, render
     for epoch in range(epochs):
         agent.train()
         trajectories = [Trajectory.sample(env, agent, cutoff_at=cutoff_at) for _ in range(num_trajectories)]
-        agent.update(trajectories)
+        agent.train(trajectories)
 
         if print_frequency is not None and (epoch + 1) % print_frequency == 0:
             agent.print_progress()

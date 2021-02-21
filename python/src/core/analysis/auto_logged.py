@@ -3,7 +3,7 @@ from typing import List, Optional
 from .logger import Logger
 
 
-def auto_logged(print_names: Optional[List[str]] = None, plot_names: Optional[List[str]] = None,
+def auto_logged(train_method_name: str, print_names: Optional[List[str]] = None, plot_names: Optional[List[str]] = None,
                 capacity=100, plot_columns=3):
     if plot_names is None:
         plot_names = []
@@ -28,16 +28,18 @@ def auto_logged(print_names: Optional[List[str]] = None, plot_names: Optional[Li
 
             instance.print_progress = print_progress
             instance.plot_progress = plot_progress
-            previous = instance.update
+            previous = getattr(instance, train_method_name)
 
             def update(*args, **kwargs):
-                previous(*args, **kwargs)
+                result = previous(*args, **kwargs)
 
                 logger.update(**{
                     attribute: float(getattr(instance, attribute)) for attribute in all_names
                 })
 
-            instance.update = update
+                return result
+
+            setattr(instance, train_method_name, update)
 
             return instance
 

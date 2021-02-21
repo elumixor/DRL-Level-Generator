@@ -1,7 +1,7 @@
 import gym
-
 from RL.agents import VPGAgent, A2CAgentSeparate, A2CAgentTwoHeaded
 from configuration.nn import LayerName, IntParameter
+
 from fake_frontend.agent_wrapper import AgentWrapper
 from fake_frontend.base_framework import train
 from utilities import DotDict
@@ -62,7 +62,7 @@ def a2c_separate():
             return self._agent
 
         def plot(self):
-            self.plotter.update(self.rollouts)
+            self.plotter.train(self.rollouts)
 
     train(gym.make('CartPole-v0'), Wrapper, epochs=2000, num_rollouts=5, render_frequency=None)
 
@@ -97,7 +97,7 @@ def a2c_two_headed():
             return self._agent
 
         def plot(self):
-            self.plotter.update(self.rollouts)
+            self.plotter.train(self.rollouts)
 
     train(gym.make('CartPole-v0'), Wrapper, epochs=2000, num_rollouts=5, render_frequency=None)
 

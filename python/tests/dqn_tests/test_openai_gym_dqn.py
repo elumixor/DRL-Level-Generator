@@ -39,7 +39,7 @@ class RemoteModelLocalTests(TestCase):
                 return self.agent.get_action(self.previous_state).item()
 
             def update(self) -> None:
-                self.agent.update([self.current_trajectory])
+                self.agent.train([self.current_trajectory])
                 self.current_trajectory = Trajectory()
 
             def eval(self):

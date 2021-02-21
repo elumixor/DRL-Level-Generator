@@ -15,7 +15,7 @@ class A2CAgentSeparate(VPGAgent):
         self.critic = nn_from_layout(critic_layout)
         self.optim_critic = Adam(self.critic.parameters(), lr=lr_critic)
 
-    def update(self, training_data):
+    def train(self, training_data):
         loss_actor = 0
         loss_critic = 0
         total_len = 0

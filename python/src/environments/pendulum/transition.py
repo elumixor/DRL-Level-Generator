@@ -34,14 +34,14 @@ def transition(state: PendulumState, action: torch.tensor) -> Tuple[torch.tensor
     bob_center_x = torch.sin(angle) * connector_length
     bob_center_y = position - torch.cos(angle) * connector_length
 
-    reward = 1.0 if not switch else -1.0
+    reward = 1.0 if not switch else 0.9
 
     distance = torch.sqrt((bob_center_x - enemy_x) ** 2 + (bob_center_y - enemy_y) ** 2)
 
     # Collision
     if distance <= (bob_radius + enemy_radius):
         done = True
-        reward = 0.0 if not switch else -1.0
+        reward = 0.0 if not switch else -0.1
         return new_state, reward, done
 
     # No collision

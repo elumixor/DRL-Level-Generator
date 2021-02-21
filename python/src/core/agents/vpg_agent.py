@@ -22,7 +22,7 @@ class VPGAgent(Agent):
     def actor(self) -> torch.nn.Module:
         return self._actor
 
-    def update(self, training_data: List[Episode]):
+    def train(self, training_data: List[Episode]):
         loss_actor = 0
         total_len = 0
 
