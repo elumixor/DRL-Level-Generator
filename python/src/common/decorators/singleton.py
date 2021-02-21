@@ -1,7 +1,7 @@
 from functools import update_wrapper
 
 
-# Used as a decorator
+# noinspection PyPep8Naming
 class singleton:
     def __init__(self, ctor):
         update_wrapper(self, ctor)
@@ -11,12 +11,5 @@ class singleton:
     def __call__(self, *args, **kwargs):
         if self._instance is None:
             self._instance = self.ctor(*args, **kwargs)
-
-        return self._instance
-
-    @property
-    def instance(self):
-        if self._instance is None:
-            self._instance = self.ctor()
 
         return self._instance

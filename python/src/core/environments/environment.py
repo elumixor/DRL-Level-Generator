@@ -23,7 +23,7 @@ class Environment(ABC):
         pass
 
     @abstractmethod
-    def reset(self) -> torch.tensor:
+    def reset(self, difficulty: float, seed=None) -> torch.Tensor:
         """
         Resets the environment to a starting state. Returns that starting state
         :rtype: Starting state

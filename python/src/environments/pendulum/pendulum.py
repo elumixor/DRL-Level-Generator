@@ -1,35 +1,6 @@
 from core.environments import ConfigurableObject
 from rendering import GameObject, Rectangle, Color, Point, Circle
-
-
-class PendulumStaticConfiguration:
-    size = 4
-
-    def __init__(self, bob_radius: float, max_angle: float, connector_length: float, vertical_speed: float):
-        self.bob_radius = bob_radius
-        self.max_angle = max_angle
-        self.connector_length = connector_length
-        self.vertical_speed = vertical_speed
-
-    def __iter__(self):
-        yield self.bob_radius
-        yield self.max_angle
-        yield self.connector_length
-        yield self.vertical_speed
-
-
-class PendulumDynamicConfiguration:
-    size = 3
-
-    def __init__(self, angle: float, position: float, angular_speed: float):
-        self.angle = angle
-        self.position = position
-        self.angular_speed = angular_speed
-
-    def __iter__(self):
-        yield self.angle
-        yield self.position
-        yield self.angular_speed
+from .pendulum_state import PendulumState
 
 
 class Pendulum(ConfigurableObject, GameObject):
@@ -37,7 +8,7 @@ class Pendulum(ConfigurableObject, GameObject):
     bob_color = Color.greyscale(0.5)
     line_color = Color.greyscale(0.05)
 
-    def __init__(self, configuration: PendulumStaticConfiguration):
+    def __init__(self, configuration: PendulumState):
         super().__init__()
 
         self.line = Rectangle(0.01, 10, Pendulum.line_color)
@@ -60,7 +31,7 @@ class Pendulum(ConfigurableObject, GameObject):
         self.bob.transform.local_scale = bob_radius * Point.one
         self.bob.transform.local_position = connector_height * Point.down
 
-    def update(self, configuration: PendulumDynamicConfiguration):
+    def update(self, configuration: PendulumState):
         self.transform.rotation = configuration.angle
         self.line.transform.rotation = -configuration.angle
         self.transform.local_position = configuration.position * Point.up
