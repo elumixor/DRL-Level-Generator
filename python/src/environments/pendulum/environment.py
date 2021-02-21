@@ -6,14 +6,10 @@ import torch
 from core.environments import RenderableEnvironment
 from rendering import RenderingContext, Color
 from .enemy import Enemy
+from .generator import PendulumGenerator
 from .pendulum import Pendulum
-from .pendulum_state import PendulumState
+from .state import PendulumState
 from .transition import transition
-
-
-class PendulumGenerator:
-    def generate(self, difficulty: float, seed: float) -> PendulumState:
-        ...
 
 
 class PendulumEnvironment(RenderableEnvironment):

@@ -52,12 +52,10 @@ class Point(metaclass=PointProperties):
         return Point(abs(self.x), abs(self.y))
 
     def __mul__(self, other):
-        if isinstance(other, float) or isinstance(other, int):
-            return Point(self.x * other, self.y * other)
-        elif isinstance(other, Point):
+        if isinstance(other, Point):
             return Point(self.x * other.x, self.y * other.y)
 
-        raise TypeError("* is unsupported for types Point and " + str(type(other)))
+        return Point(self.x * other, self.y * other)
 
     def __rmul__(self, other):
         return self * other

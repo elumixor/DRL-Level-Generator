@@ -1,6 +1,6 @@
 from core.environments import ConfigurableObject
 from rendering import GameObject, Rectangle, Color, Point, Circle
-from .pendulum_state import PendulumState
+from .state import PendulumState
 
 
 class Pendulum(ConfigurableObject, GameObject):
@@ -32,6 +32,6 @@ class Pendulum(ConfigurableObject, GameObject):
         self.bob.transform.local_position = connector_height * Point.down
 
     def update(self, configuration: PendulumState):
-        self.transform.rotation = configuration.angle
-        self.line.transform.rotation = -configuration.angle
+        self.transform.rotation = configuration.current_angle
+        self.line.transform.rotation = -configuration.current_angle
         self.transform.local_position = configuration.position * Point.up

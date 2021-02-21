@@ -21,7 +21,7 @@ class RemoteModelLocalTests(TestCase):
                 env.action_size = self.action_size
                 self.current_trajectory = Trajectory()
                 self.previous_state = None
-                self.agent = DQNAgent(env)
+                self.agent = DQNAgent(env, trajectories_for_evaluation=0)
 
             def on_trajectory_started(self, state):
                 pass
@@ -31,7 +31,8 @@ class RemoteModelLocalTests(TestCase):
 
             def save_step(self, action: int, reward: float, done, next_state) -> None:
                 self.current_trajectory.append(
-                    (self.previous_state, torch.tensor([action]), reward, done, torch.from_numpy(next_state).to(torch.float32)))
+                    (self.previous_state, torch.tensor([action]), reward, done,
+                     torch.from_numpy(next_state).to(torch.float32)))
 
             def get_action(self, state) -> int:
                 self.previous_state = torch.from_numpy(state).to(torch.float32)
@@ -39,7 +40,6 @@ class RemoteModelLocalTests(TestCase):
 
             def update(self) -> None:
                 self.agent.update([self.current_trajectory])
-                print(self.current_trajectory.total_reward)
                 self.current_trajectory = Trajectory()
 
             def eval(self):
@@ -48,4 +48,10 @@ class RemoteModelLocalTests(TestCase):
             def train(self):
                 self.agent.train()
 
-        train(gym.make('CartPole-v0'), DQNAgentWrapper, epochs=2000, num_rollouts=5, render_frequency=150)
+            def plot_progress(self):
+                self.agent.plot_progress()
+
+            def print_progress(self):
+                self.agent.print_progress()
+
+        train(gym.make('CartPole-v0'), DQNAgentWrapper, epochs=2000, num_rollouts=5, render_frequency=50)

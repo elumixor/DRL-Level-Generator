@@ -1,4 +1,3 @@
-from .enemy import EnemyStaticConfiguration, EnemyDynamicConfiguration
-from .pendulum import PendulumStaticConfiguration, PendulumDynamicConfiguration
-from .pendulum_environment import PendulumEnvironment
-from .transition import configurations2parameters
+from .environment import PendulumEnvironment
+from .generator import PendulumGenerator
+from .state import PendulumState

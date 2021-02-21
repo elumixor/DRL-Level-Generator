@@ -61,7 +61,7 @@ def train(env,
             total_reward = 0
 
             t = 0
-            do_render = render_frequency and global_rollout % render_frequency == 0
+            do_render = render_frequency and global_rollout != 0 and global_rollout % render_frequency == 0
             if do_render:
                 agent.eval()
             while not done and t < max_timesteps:
@@ -76,6 +76,9 @@ def train(env,
                 total_reward += reward
 
             if do_render:
+                print(total_reward)
+                agent.print_progress()
+                agent.plot_progress()
                 agent.train()
 
             agent.on_trajectory_finished()

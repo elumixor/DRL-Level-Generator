@@ -7,7 +7,7 @@ from common import tensored
 class PendulumState(torch.Tensor):
     # Define init for static code checking
     def __init__(self, bob_radius, max_angle, connector_length, vertical_speed,
-                 enemy_x, enemy_y, enemy_radius, angle, position, angular_speed):
+                 enemy_x, enemy_y, enemy_radius, current_angle, position, angular_speed):
         ...
 
     # Define fields for access
@@ -20,6 +20,6 @@ class PendulumState(torch.Tensor):
     enemy_y: torch.Tensor
     enemy_radius: torch.Tensor
 
-    angle: torch.Tensor
+    current_angle: torch.Tensor
     position: torch.Tensor
     angular_speed: torch.Tensor

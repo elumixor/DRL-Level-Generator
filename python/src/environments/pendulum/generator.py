@@ -1,4 +1,5 @@
 import random
+from abc import abstractmethod, ABC
 from enum import Enum
 from typing import Optional
 
@@ -6,7 +7,7 @@ import numpy as np
 import torch
 
 from core.utils import MLP
-from environments.pendulum.transition import parameters_size
+from .state import PendulumState
 
 
 class I(int, Enum):
@@ -42,6 +43,12 @@ class Constraints:
 
     position = torch.tensor([0, 0])
     angular_speed = torch.tensor([-1, 1])
+
+
+class PendulumGenerator(ABC):
+    @abstractmethod
+    def generate(self, difficulty: float, seed: float) -> PendulumState:
+        ...
 
 
 class Generator:

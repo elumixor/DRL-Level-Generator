@@ -1,8 +1,7 @@
 import numpy as np
 
 from core import train
-from core.agents import A2CAgent
-from core.analysis import timed
+from core.agents import DQNAgent
 from environments.pendulum import configurations2parameters, PendulumStaticConfiguration, EnemyStaticConfiguration, \
     PendulumDynamicConfiguration, EnemyDynamicConfiguration, PendulumEnvironment
 from rendering import RenderingContext
@@ -22,9 +21,9 @@ if __name__ == '__main__':
                                                              enemies_dynamic_configurations)
             env.setup(generated_parameters)
 
-            agent = A2CAgent(env, time_delay=10)
+            agent = DQNAgent(env, cutoff_at=75)
 
-            with timed():
-                train(env, agent, epochs=500, num_trajectories=10, render_frequency=25, cutoff_at=75)
+            train(env, agent, epochs=100, num_trajectories=1, render_frequency=25, cutoff_at=75,
+                  validation_frequency=10, num_validation_trajectories=25)
 
             # evaluate(env, agent, cutoff_at=75)
