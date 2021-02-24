@@ -43,7 +43,7 @@ class Environment(ABC):
         """
 
     @abstractmethod
-    def transition(self, action: torch.tensor) -> Tuple[torch.tensor, float, bool]:
+    def transition(self, action: torch.Tensor) -> Tuple[torch.Tensor, float, bool]:
         """
         Transitions from the previous state to the next state, given the agent's action
 

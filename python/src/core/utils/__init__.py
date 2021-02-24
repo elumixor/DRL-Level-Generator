@@ -87,7 +87,7 @@ def map_transitions(transitions):
     states = torch.stack(states).detach()
     actions = torch.stack(actions).detach()
     rewards = torch.tensor(rewards).detach()
-    done = torch.tensor(done)
+    done = torch.tensor(done).detach()
     next_states = torch.stack(next_states).detach()
 
     return states, actions, rewards, done, next_states

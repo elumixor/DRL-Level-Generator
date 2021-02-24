@@ -20,6 +20,10 @@ class EpsilonDecay:
     def value(self):
         return float(self)
 
+    @property
+    def data(self):
+        return {"initial": self.initial, "end": self.end, "iterations": self.iterations}
+
     def __float__(self):
         return self.epsilon
 

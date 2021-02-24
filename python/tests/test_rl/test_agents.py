@@ -15,6 +15,7 @@ if __name__ == '__main__':
                 vertical_speed = 0.02
 
                 enemy_radius = 0.1
+                enemy_x = -0.25 * seed + 0.25 * (1 - seed)
                 enemy_x = 0.25
                 enemy_y = 0.25
 

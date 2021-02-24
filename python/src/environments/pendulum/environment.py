@@ -79,6 +79,7 @@ class PendulumEnvironment(RenderableEnvironment):
 
         # Generate new starting state, internally split into the static configuration and state
         self.state = self.generator.generate(difficulty, seed)
+        self.cleanup()
         return self.state
 
     def transition(self, action: torch.Tensor) -> Tuple[torch.Tensor, float, bool]:
@@ -130,3 +131,4 @@ class PendulumEnvironment(RenderableEnvironment):
         self.game_object.remove_children()
         self.pendulum = None
         self.enemy = None
+        self._rendering_ready = False

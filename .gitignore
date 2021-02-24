@@ -153,4 +153,4 @@ __pycache__/
 **/InitTestScene*.unity.meta
 **/dqn_model.m
 
-
+wandb/

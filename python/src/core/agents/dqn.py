@@ -4,25 +4,24 @@ from typing import List, Optional
 import numpy as np
 import torch
 import torch.nn.functional as F
+import wandb
 
 from common import MemoryBuffer, setter, log
 from serialization import auto_serialized, auto_saved
 from .agent import Agent
-from ..analysis import auto_logged, QEstimator
+from ..analysis import QEstimator
 from ..environments import Environment, RenderableEnvironment
 from ..trajectory import Trajectory
 from ..utils import EpsilonDecay, MLP, map_transitions
 
 
-@auto_logged("train_trajectory",
-             plot_names=["loss", "epsilon", "mean_v_value", "total_reward"],
-             print_names=["epsilon", "mean_v_value"])
 @auto_saved
 @auto_serialized
 class DQNAgent(Agent, QEstimator):
-    def __init__(self, env: Environment, buffer_capacity=10000, hidden_layers: Optional[List[int]] = None, lr=0.0001,
+    def __init__(self, env: Environment, buffer_capacity=10000, hidden_layers: Optional[List[int]] = None, lr=0.001,
                  epsilon_decay: Optional[EpsilonDecay] = None, batch_size=200, discounting=0.99,
-                 trajectories_for_evaluation=20, maximum_length=200, copy_frequency=1000):
+                 trajectories_for_evaluation=20, maximum_length=200, copy_frequency=1000,
+                 gradient_clip=float("inf")):
         """
         DQN agent
 
@@ -51,6 +50,8 @@ class DQNAgent(Agent, QEstimator):
         self.discount = discounting
         self.copy_frequency = copy_frequency
         self.maximum_length = maximum_length
+        self.lr = lr
+        self.gradient_clip = gradient_clip
 
         self.Q = MLP(observation_size, self.action_size, hidden_layers)
         self.target_Q = MLP(observation_size, self.action_size, hidden_layers)
@@ -60,10 +61,6 @@ class DQNAgent(Agent, QEstimator):
 
         self.memory = MemoryBuffer(capacity=buffer_capacity)
         self.epsilon = epsilon_decay
-
-        self.loss = 0.0
-        self.total_reward = 0.0
-        self.mean_v_value = 0.0
 
         self.eval_trajectories = [self.sample_trajectory(maximum_length) for _ in range(trajectories_for_evaluation)]
 
@@ -99,16 +96,9 @@ class DQNAgent(Agent, QEstimator):
             self.eval = False
 
             # Perform a training on trajectory and return the total reward
-            self.total_reward = self.train_trajectory()
+            self.train_trajectory()
 
             # Print, validate, render, save regarding the frequency
-
-            if print_frequency is not None and (epoch + 1) % print_frequency == 0:
-                self.print_progress()
-
-            if plot_frequency is not None and (epoch + 1) % plot_frequency == 0:
-                self.plot_progress()
-
             if render_frequency is not None and (epoch + 1) % render_frequency == 0 and \
                     isinstance(self.env, RenderableEnvironment):
                 self.sample_trajectory(maximum_length=self.maximum_length).render(self.env)
@@ -123,12 +113,14 @@ class DQNAgent(Agent, QEstimator):
                     mean_v = self.get_trajectory_values(trajectory).mean().item()
                     mean_v_values.append(mean_v)
 
-                self.mean_v_value = np.mean(mean_v_values)
+                wandb.log({"mean V": np.mean(mean_v_values)})
 
                 validation_trajectories = [self.sample_trajectory(maximum_length=self.maximum_length) for _ in
                                            range(num_validation_trajectories)]
                 mean_total_reward = np.mean([t.total_reward for t in validation_trajectories])
                 log.reward(mean_total_reward, "validation mean total reward")
+
+                wandb.log({"validation total reward": mean_total_reward})
 
                 if validation_save is not None and mean_total_reward > best_total_reward:
                     log.good(f"Better than the previous result")
@@ -140,6 +132,8 @@ class DQNAgent(Agent, QEstimator):
 
             if save_path is not None and (epoch + 1) % save_frequency == 0:
                 self.save(save_path)
+
+            wandb.log({"epoch": epoch})
 
     def train_trajectory(self):
         state = self.env.reset()
@@ -158,13 +152,18 @@ class DQNAgent(Agent, QEstimator):
 
             # Perform the training step if the memory is full
             if self.memory.size >= self.batch_size:
-                self.loss = self.train_batch()
+                loss = self.train_batch()
+            else:
+                loss = 0
+
+            wandb.log({"loss": loss, "epsilon": self.epsilon.value})
 
             total_reward += reward
             observation = next_observation
             i += 1
 
-        return total_reward
+        wandb.log({"Episode reward": total_reward})
+        wandb.log({"Buffer size": self.memory.size})
 
     def train_batch(self):
         # Sample a batch of transitions from the memory buffer
@@ -180,11 +179,35 @@ class DQNAgent(Agent, QEstimator):
         loss = F.mse_loss(q_selected, y)
 
         self.optim.zero_grad()
+        # Compute the gradients
         loss.backward()
-        self.optim.step()
 
-        # Update the loss for logging
-        self.loss = loss
+        # Compute the gradients' norm
+        norms = []
+        for p in self.Q.parameters():
+            norms.append(p.grad.data.norm(2).cpu().item())
+
+        wandb.log({
+            "gradient norm (average)": np.mean(norms),
+            "gradient norm (sum)": sum(norms),
+            "gradient norm (max)": max(norms)
+        })
+
+        # Clip the norm
+        torch.nn.utils.clip_grad_norm_(self.Q.parameters(), self.gradient_clip)
+
+        # Compute the gradients' norm
+        norms = []
+        for p in self.Q.parameters():
+            norms.append(p.grad.data.norm(2).cpu().item())
+
+        wandb.log({
+            "gradient norm [clipped] (average)": np.mean(norms),
+            "gradient norm [clipped] (sum)": sum(norms),
+            "gradient norm [clipped] (max)": max(norms)
+        })
+
+        self.optim.step()
 
         # Copy the parameters to the target network
         if self.frame % self.copy_frequency == 0:
@@ -192,6 +215,7 @@ class DQNAgent(Agent, QEstimator):
 
         # Update epsilon
         self.epsilon.decay()
+        self.frame += 1
 
         return loss.item()
 

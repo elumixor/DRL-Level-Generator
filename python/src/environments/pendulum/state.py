@@ -3,7 +3,7 @@ import torch
 from common import tensored
 
 
-@tensored
+@tensored()
 class PendulumState(torch.Tensor):
     # Define init for static code checking
     def __init__(self, bob_radius, max_angle, connector_length, vertical_speed,
