@@ -40,13 +40,13 @@ class Point(metaclass=PointProperties):
         return f"({self.x:.2f} {self.y:.2f})"
 
     def __eq__(self, other):
-        return other is Point and approx(self.x, other.x) and approx(self.y, other.y)
+        return other is Point and approx(self.x, other.enemy_x) and approx(self.y, other.y)
 
     def __add__(self, other):
-        return Point(self.x + other.x, self.y + other.y)
+        return Point(self.x + other.enemy_x, self.y + other.y)
 
     def __sub__(self, other):
-        return Point(self.x - other.x, self.y - other.y)
+        return Point(self.x - other.enemy_x, self.y - other.y)
 
     def __abs__(self):
         return Point(abs(self.x), abs(self.y))

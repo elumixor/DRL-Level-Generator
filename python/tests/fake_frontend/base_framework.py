@@ -17,7 +17,7 @@ def train(env,
 
     For each epoch, creates several rollouts (trajectories) of the given environment.
 
-    Requires get_action(state) function to determine an action for the given state and let an agent act in the
+    Requires get_action(observation) function to determine an action for the given observation and let an agent act in the
     environment, and update_agent(trajectories), that is called at the end of an epoch - when all rollouts have finished
     to train an agent.
 

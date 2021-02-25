@@ -64,6 +64,6 @@ class RemoteModelLocalTests(TestCase):
 
         self.assertTrue(y1.equal(y2))
 
-        # TODO: assert state dict equality
+        # TODO: assert observation dict equality
         s1 = model.nn.state_dict()
         s2 = restored.nn.state_dict()

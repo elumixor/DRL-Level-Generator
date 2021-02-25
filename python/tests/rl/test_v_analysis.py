@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
                     if ctx.is_key_held(glfw.KEY_LEFT):
                         if i == 0:
-                            print("Is at starting state")
+                            print("Is at starting observation")
                             continue
 
                         i -= 1
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
                     elif ctx.is_key_held(glfw.KEY_RIGHT):
                         if i == len(t):
-                            print("Is at last state")
+                            print("Is at last observation")
                             continue
 
                         elif i == (len(t) - 1):

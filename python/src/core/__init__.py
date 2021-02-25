@@ -3,6 +3,7 @@ from typing import Optional
 import numpy as np
 
 from common import log
+from .actor import Actor
 from .agents import Agent
 from .environments import Environment, RenderableEnvironment
 from .trajectory import Trajectory

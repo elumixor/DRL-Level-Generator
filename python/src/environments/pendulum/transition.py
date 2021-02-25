@@ -26,7 +26,7 @@ def transition(state: PendulumState, action: torch.tensor) -> Tuple[torch.tensor
     # Add vertical movement
     position: torch.tensor = position + vertical_speed
 
-    # Combine into the new state
+    # Combine into the new observation
     new_state = PendulumState(bob_radius, max_angle, connector_length, vertical_speed, enemy_x, enemy_y, enemy_radius,
                               angle, position, angular_speed)
 

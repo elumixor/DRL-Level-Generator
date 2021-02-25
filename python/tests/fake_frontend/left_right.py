@@ -79,7 +79,7 @@ def a2c_separate():
                            .softmax(-1)[:, 0].detach().numpy()
             self.plotter.train(self.rollouts, p_left_x=(x, p_left_x))
 
-    # Train, provide an env, function to get an action from state, and training function that accepts rollouts
+    # Train, provide an env, function to get an action from observation, and training function that accepts rollouts
     train(env, Wrapper, epochs=2000, num_rollouts=5, render_frequency=False, max_timesteps=20)
 
 
@@ -122,7 +122,7 @@ def a2c_two_headed():
                            .softmax(-1)[:, 0].detach().numpy()
             self.plotter.train(self.rollouts, p_left_x=(x, p_left_x))
 
-    # Train, provide an env, function to get an action from state, and training function that accepts rollouts
+    # Train, provide an env, function to get an action from observation, and training function that accepts rollouts
     train(env, Wrapper,
           epochs=2000, num_rollouts=5, render_frequency=False, max_timesteps=20)
 

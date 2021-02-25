@@ -48,7 +48,7 @@ if __name__ == '__main__':
                 # epochs = 5000
                 #
                 # run = wandb.init(project="Pendulum", config={
-                #     "generator.x": 0.25,
+                #     "generator.enemy_x": 0.25,
                 #     "env": env_name,
                 #     "seed": seed,
                 #     "epochs": epochs,
@@ -66,7 +66,7 @@ if __name__ == '__main__':
                 # epochs = 5000
                 #
                 # run = wandb.init(project="Pendulum", config={
-                #     "generator.x": 0.25,
+                #     "generator.enemy_x": 0.25,
                 #     "env": env_name,
                 #     "seed": seed,
                 #     "epochs": epochs,
@@ -84,7 +84,7 @@ if __name__ == '__main__':
                 epochs = 1000
 
                 run = wandb.init(project="Pendulum", config={
-                    "generator.x": 0.25,
+                    "generator.enemy_x": 0.25,
                     "epsilon": agent.epsilon,
                     "env": env_name,
                     "seed": seed,

@@ -19,3 +19,7 @@ def log_call(func):
         func(*args, **kwargs)
 
     return wrapper
+
+
+def clamp(value, _min, _max):
+    return max(_min, min(value, _max))

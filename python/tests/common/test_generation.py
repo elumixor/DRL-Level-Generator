@@ -1,7 +1,7 @@
 import glfw
+from environments.pendulum.generator import Generator
 
 from environments.pendulum import PendulumEnvironment
-from environments.pendulum.generator import Generator
 from rendering import RenderingContext
 
 if __name__ == '__main__':

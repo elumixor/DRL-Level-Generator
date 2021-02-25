@@ -82,7 +82,7 @@ def register(model_id: int, options: LogOptions):
 
 
 def show(model_id: int, data: LogData):
-    """Renders current logging data to the plot. Does not update internal state"""
+    """Renders current logging data to the plot. Does not update internal observation"""
     global _wrapper
     if _wrapper is None:
         _wrapper = _LoggerWrapper()
@@ -91,7 +91,7 @@ def show(model_id: int, data: LogData):
 
 
 def update(model_id: int, data: LogData):
-    """Same as show, but also updates internal state of the logger (epochs)"""
+    """Same as show, but also updates internal observation of the logger (epochs)"""
     global _wrapper
     if _wrapper is None:
         _wrapper = _LoggerWrapper()

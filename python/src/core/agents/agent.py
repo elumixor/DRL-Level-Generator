@@ -1,25 +1,19 @@
 from abc import abstractmethod, ABC
 
 import numpy as np
-import torch
 
 from common import setter
+from ..actor import Actor
 from ..environments import Environment
 from ..trajectory import Trajectory
 
 
-class Agent(ABC):
+class Agent(Actor, ABC):
     def __init__(self, env: Environment):
         """
         Agent can operate only in a given environment
         """
         self.env = env
-
-    @abstractmethod
-    def get_action(self, observation) -> torch.Tensor:
-        """
-        Use the agent to infer an action, given the observation
-        """
 
     @abstractmethod
     def train(self, *args, **kwargs):

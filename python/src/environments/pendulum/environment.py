@@ -6,7 +6,7 @@ import torch
 from core.environments import RenderableEnvironment
 from rendering import RenderingContext, Color
 from .enemy import Enemy
-from .generator import PendulumGenerator
+from .generators import PendulumGenerator
 from .pendulum import Pendulum
 from .state import PendulumState
 from .transition import transition
@@ -21,13 +21,13 @@ class PendulumEnvironment(RenderableEnvironment):
 
         # Our environments serve two purposes: to sample the trajectory, and two render them
         #
-        # As we don't always want to render every state or trajectory, we will skip the overhead
+        # As we don't always want to render every observation or trajectory, we will skip the overhead
         # of creating a new environment every time. We will instead perform a lazy rendering on-demand
         #
         # We use the following flag to indicate whether the rendering-required actions should be performed
         self._rendering_ready = False
 
-        # We store the last state to be used for rendering
+        # We store the last observation to be used for rendering
         self.state: Optional[PendulumState] = None
 
         # As we re-use environment, we only declare the needed fields here
@@ -77,7 +77,7 @@ class PendulumEnvironment(RenderableEnvironment):
         if difficulty is None:
             raise ValueError("Difficulty should be specified at least once")
 
-        # Generate new starting state, internally split into the static configuration and state
+        # Generate new starting observation, internally split into the static configuration and observation
         self.state = self.generator.generate(difficulty, seed)
         self.cleanup()
         return self.state
@@ -86,7 +86,7 @@ class PendulumEnvironment(RenderableEnvironment):
         # propagate to the transition function
         next_state, reward, done = transition(self.state, action)
 
-        # Save the state for rendering
+        # Save the observation for rendering
         self.state = next_state
 
         return self.get_observation(next_state), reward, done
@@ -99,7 +99,7 @@ class PendulumEnvironment(RenderableEnvironment):
         if not self._rendering_ready:
             self.initialize_for_render()
 
-        # Put everything in place, regarding to the state
+        # Put everything in place, regarding to the observation
         self.setup_game_objects_from_state(self.state)
 
         # Render the frame

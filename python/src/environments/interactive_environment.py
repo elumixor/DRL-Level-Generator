@@ -47,15 +47,15 @@ class InteractiveEnvironment(RenderableEnvironment):
             self.circle.transform.local_position.y -= 0.1
 
         if rc.is_key_held(glfw.KEY_A):
-            self.circle.transform.local_position.x -= 0.1
+            self.circle.transform.local_position.enemy_x -= 0.1
         elif rc.is_key_held(glfw.KEY_D):
-            self.circle.transform.local_position.x += 0.1
+            self.circle.transform.local_position.enemy_x += 0.1
 
         action = 0
         reward = 1
 
         rc.render_frame()
 
-        next_state = self.circle.transform.local_scale.x
+        next_state = self.circle.transform.local_scale.enemy_x
 
         return action, reward, next_state, False
