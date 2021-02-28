@@ -1,3 +1,4 @@
+import random
 from typing import Optional
 
 import torch
@@ -13,8 +14,12 @@ class HeuristicsPlayer(Actor):
             action_distance = torch.tensor(0.1)
 
         self.action_distance = action_distance
+        self.randomness = 0
 
     def get_action(self, observation: PendulumState) -> torch.Tensor:
+        if self.randomness > 0 and random.random() < self.randomness:
+            return ACTION_NOP if random.random() > 0.5 else ACTION_SWITCH
+
         y = observation.position
         connector_length = observation.connector_length
 
