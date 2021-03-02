@@ -15,13 +15,15 @@ if __name__ == '__main__':
         with PendulumEnvironment(ctx, generator, difficulty=0.5) as env:
             actor = HeuristicsPlayer()
 
+            R_best = float("-inf")
+            R_worst = float("inf")
+
+            position_total_rewards = []
+
             # We'll test different x positions of the enemy
             for x in np.linspace(-0.25, 0.25, 11):
                 log(f"x={x:.2f}", bold=True, r=100)
                 generator.enemy_x = x
-
-                R_best = float("-inf")
-                R_worst = float("inf")
 
                 policies_total_rewards = []
 
@@ -63,7 +65,12 @@ if __name__ == '__main__':
 
                     policies_total_rewards.append(policy_reward)
 
+                position_total_rewards.append(policies_total_rewards)
+
+            for policies_total_rewards, x in zip(position_total_rewards, np.linspace(-0.25, 0.25, 11)):
+                generator.enemy_x = x
                 run = wandb.init(project="Heuristic", name=f"Enemy X {x:.2f}", config={
+                    "Share": True,
                     "R best": R_best,
                     "R worst": R_worst,
                     **generator.config
