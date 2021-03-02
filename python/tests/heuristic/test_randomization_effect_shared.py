@@ -57,7 +57,7 @@ if __name__ == '__main__':
                         i += 1
 
                     if t % (trajectories // 10) == 0:
-                        print(f"{t / trajectories * 10:5.2}%")
+                        print(f"{t / trajectories * 10:5.2f}%")
 
                     total_rewards[r][t] = total_reward
 

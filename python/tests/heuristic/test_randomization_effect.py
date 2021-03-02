@@ -71,6 +71,6 @@ if __name__ == '__main__':
                     })
 
                     if t % (trajectories // 10) == 0:
-                        print(f"{t / trajectories * 100:.2}%")
+                        print(f"{t / trajectories * 100:.2f}%")
 
                 run.finish()
