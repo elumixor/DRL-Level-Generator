@@ -25,7 +25,7 @@ if __name__ == '__main__':
     for alpha, mu, sigma in zip([-2, -1, 0, 1, 2], [-0.25, 0, 0.25, 0.5, 0.75], [1, 1, 0.5, 0.5, 0.25]):
         y = truncated_skew(x, alpha, a, b, loc=mu, scale=sigma)
 
-        run = wandb.init(project="Heuristic", name=f"alpha={alpha} mu={mu} sigma={sigma}",
+        run = wandb.init(project="Heuristic", name=f"Distribution",
                          tags=["Difficulty comparison", "Distributions"],
                          config={
                              "alpha": alpha,
