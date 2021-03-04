@@ -1,4 +1,7 @@
 import wandb
+from scipy.stats import skewnorm
+
+from common import log
 
 if __name__ == '__main__':
     api = wandb.Api()
@@ -13,18 +16,14 @@ if __name__ == '__main__':
 
     difficulties_per_positions = {}
 
-
-    def get_weight(randomness):
-        return 1
-
-
+    # region Uniform
     for x, entries in enemy_positions:
         weighted_difficulty = 0
         weights_sum = 0
 
         for entry in entries:
             difficulty, randomness = entry["Difficulty"], entry["Randomness"]
-            weight = get_weight(randomness)
+            weight = 1
             weights_sum += weight
             weighted_difficulty += weight * difficulty
 
@@ -36,6 +35,39 @@ if __name__ == '__main__':
     run = wandb.init(project="Heuristic", name="Uniform", tags=["Difficulty comparison", "Weighting"])
 
     for key, value in difficulties_per_positions.items():
-        wandb.log({"x": key, "Difficulty (aggregated)": value})
+        wandb.log({"x": key, "Difficulty": value})
 
     run.finish()
+    # endregion
+
+    # region Skew Normal
+    for i, alpha, mu, sigma in zip(range(5), [-2, -1, 0, 1, 2], [-0.25, 0, 0.25, 0.5, 0.75], [1, 1, 0.5, 0.5, 0.25]):
+        log.good(f"alpha={alpha}, mu={mu}, sigma={sigma}")
+
+        for x, entries in enemy_positions:
+            weighted_difficulty = 0
+            weights_sum = 0
+
+            for entry in entries:
+                difficulty, randomness = entry["Difficulty"], entry["Randomness"]
+                weight = skewnorm.pdf(randomness, alpha, loc=mu, scale=sigma)
+                weights_sum += weight
+                weighted_difficulty += weight * difficulty
+
+            weighted_difficulty /= weights_sum
+
+            print(f"Weighted difficulty for enemy x {x}, {weighted_difficulty}")
+            difficulties_per_positions[x] = weighted_difficulty
+
+        run = wandb.init(project="Heuristic", name=f"Skew-{i}", tags=["Difficulty comparison", "Weighting", "Skew"],
+                         config={
+                             "alpha": alpha,
+                             "mu": mu,
+                             "sigma": sigma,
+                         })
+
+        for key, value in difficulties_per_positions.items():
+            wandb.log({"x": key, "Difficulty": value})
+
+        run.finish()
+    # endregion
