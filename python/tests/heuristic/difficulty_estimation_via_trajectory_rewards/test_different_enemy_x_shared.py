@@ -1,6 +1,6 @@
 import numpy as np
-
 import wandb
+
 from common import log
 from environments.pendulum import PendulumEnvironment
 from environments.pendulum.generators.draggable import DraggableGenerator

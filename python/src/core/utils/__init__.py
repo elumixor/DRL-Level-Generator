@@ -2,7 +2,6 @@ import torch
 
 from .auto_eval import auto_eval
 from .epsilon_decay import EpsilonDecay
-from .mlp import mlp as MLP
 
 
 # @lru_cache(maxsize=128, typed=False)

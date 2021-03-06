@@ -5,12 +5,12 @@ import numpy as np
 import torch
 import wandb
 
-from common import log
+from common import log, MLP
 from serialization import auto_saved, auto_serialized
 from .agent import Agent
 from ..environments import RenderableEnvironment
 from ..trajectory import Trajectory
-from ..utils import MLP, map_transitions
+from ..utils import map_transitions
 
 
 @auto_saved

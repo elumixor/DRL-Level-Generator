@@ -4,11 +4,11 @@ import torch
 import wandb
 from wandb.util import np
 
-from common import log
+from common import log, MLP
 from serialization import auto_serialized, auto_saved
 from .agent import Agent
 from ..environments import Environment, RenderableEnvironment
-from ..utils import MLP, map_transitions, discounted_rewards
+from ..utils import map_transitions, discounted_rewards
 
 
 @auto_saved

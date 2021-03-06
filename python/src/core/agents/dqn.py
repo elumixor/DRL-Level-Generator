@@ -6,13 +6,13 @@ import torch
 import torch.nn.functional as F
 import wandb
 
-from common import MemoryBuffer, setter, log
+from common import MemoryBuffer, setter, log, MLP
 from serialization import auto_serialized, auto_saved
 from .agent import Agent
 from ..analysis import QEstimator
 from ..environments import Environment, RenderableEnvironment
 from ..trajectory import Trajectory
-from ..utils import EpsilonDecay, MLP, map_transitions
+from ..utils import EpsilonDecay, map_transitions
 
 
 @auto_saved

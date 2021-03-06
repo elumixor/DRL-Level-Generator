@@ -1,6 +1,6 @@
 import torch
 
-from .utils import MLP
+from common import MLP
 
 
 class Generator:
