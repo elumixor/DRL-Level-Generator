@@ -41,7 +41,7 @@ if __name__ == '__main__':
         epochs = 1000
         batch_size = 250
 
-        run = wandb.init(project="Heuristic", name="Training Heuristic 1 with diversity", config={
+        run = wandb.init(project="Heuristic", name="Training Heuristic 1", tags=["Diversity"], config={
             "epochs": epochs,
             "batch size": batch_size,
             **generator.config
