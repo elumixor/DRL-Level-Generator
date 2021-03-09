@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import numpy as np
 
+from common import num
 from utilities import approx
 
 
@@ -63,6 +66,13 @@ class Point(metaclass=PointProperties):
     def __iter__(self):
         yield self.x
         yield self.y
+
+    def set(self, x: num, y: Optional[num] = None):
+        if y is None:
+            y = x
+
+        self.x = float(x)
+        self.y = float(y)
 
     def get_global(self, matrix):
         [x, y, _] = matrix @ np.array([self.x, self.y, 1], dtype=np.float32)

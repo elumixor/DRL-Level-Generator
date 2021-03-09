@@ -55,7 +55,6 @@ class GameObject:
         return self.global_matrix @ np.array([0, 0, 1], dtype=np.float32)
 
     def render(self, parent_matrix):
-        print(self)
         local_matrix = parent_matrix @ self.transform.local_matrix
 
         # render self
