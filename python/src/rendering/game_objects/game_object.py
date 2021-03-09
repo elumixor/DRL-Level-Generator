@@ -10,9 +10,17 @@ from ..transform import Transform
 
 
 class GameObject:
-    def __init__(self, position: Point = Point.zero, scale: Point = Point.one, rotation: float = 0.0,
+    def __init__(self,
+                 position: Optional[Point] = None,
+                 scale: Optional[Point] = None,
+                 rotation: float = 0.0,
                  parent: Optional[GameObject] = None,
                  renderable: Optional[Renderable] = None):
+        if position is None:
+            position = Point.zero
+        if scale is None:
+            scale = Point.one
+
         self.transform = Transform(position, scale, rotation)
         self.children: List[GameObject] = []
         self.renderable = renderable
@@ -47,6 +55,7 @@ class GameObject:
         return self.global_matrix @ np.array([0, 0, 1], dtype=np.float32)
 
     def render(self, parent_matrix):
+        print(self)
         local_matrix = parent_matrix @ self.transform.local_matrix
 
         # render self
