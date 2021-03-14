@@ -1,21 +1,27 @@
+import inspect
+import os
+
 import yaml
 
 from .dot_dict import to_dot_dict
 
 
-class read_yaml:
-    def __init__(self, path: str):
-        self.path = path
+def read_yaml(path: str):
+    # We'll try all these paths in case some do not work
+    def paths():
+        yield path
+        yield f"{path}.yaml"
+        caller_path = os.path.join(os.path.dirname(os.path.abspath(inspect.stack()[2][1])), path)
+        yield caller_path
+        yield f"{caller_path}.yaml"
 
-    def __enter__(self):
+    for p in paths():
         try:
-            with open(self.path, "r") as stream:
+            with open(p, "r") as stream:
                 result = yaml.safe_load(stream)
-        except FileNotFoundError:
-            with open(f"{self.path}.yaml", "r") as stream:
-                result = yaml.safe_load(stream)
+                return to_dot_dict(result)
+        except FileNotFoundError as e:
+            ...
 
-        return to_dot_dict(result)
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        ...
+    # If no path worked, re-raise the last exception
+    raise e

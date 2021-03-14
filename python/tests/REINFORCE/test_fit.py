@@ -1,5 +1,5 @@
 import torch
-from torch.nn import Module, Linear, Softplus
+from torch.nn import Module, Linear, Softplus, LeakyReLU
 from torch.optim import Adam
 
 import wandb
@@ -12,10 +12,12 @@ class Generator(Module):
         self.base = Linear(1, 4)
         self.head_mean = Linear(4, 1)
         self.head_std = Linear(4, 1)
+        self.lrelu = LeakyReLU()
         self.softplus = Softplus()
 
     def forward(self, difficulty):
         hidden = self.base(difficulty)
+        # hidden = self.lrelu(hidden)
         mean = self.head_mean(hidden)
 
         std = self.head_std(hidden)
@@ -33,13 +35,8 @@ if __name__ == '__main__':
         generator = Generator()
         lr = 0.01
         optim = Adam(generator.parameters(), lr=lr)
-        # scheduler = LambdaLR(optim, lambda epoch: 0.999 ** epoch)
 
-        run = wandb.init(project="Heuristic", name="Dynamic fit", config={
-            "lr": lr,
-            # "scheduler": "lambda",
-            "factor": 0.999
-        })
+        run = wandb.init(project="Heuristic", name="Dynamic fit", config={"lr": lr, "relu": False})
 
         for epoch in range(2000):
             # Batch of inputs
@@ -51,7 +48,6 @@ if __name__ == '__main__':
 
                 sample = torch.distributions.Normal(mean, std).sample([num_samples])
                 distance = (sample - target) ** 2
-
                 difference = (distance - x) ** 2
 
             # Train

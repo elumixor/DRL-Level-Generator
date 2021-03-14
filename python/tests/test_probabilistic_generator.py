@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+import wandb
 from scipy.stats import truncnorm
 from torch.nn import Module, Linear, Softplus
 from torch.optim import Adam
 
-import wandb
 from common import Clamp
 from rendering import RenderingContext, Circle, Color
 
@@ -23,7 +23,6 @@ class Generator(Module):
     def forward(self, difficulty):
         hidden = self.base(difficulty)
         mean = self.head_mean(hidden)
-        mean = mean.sigmoid()
         mean = self.remap(mean)
 
         std = self.head_std(hidden)
