@@ -5,7 +5,19 @@ import torch
 from .state import PendulumState
 
 
-def transition(state: PendulumState, action: torch.tensor) -> Tuple[torch.tensor, float, bool]:
+def transition(state: PendulumState, action: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, bool]:
+    """
+    We need
+
+    d(s_{t+1})    d(r_t)
+    ----------    ------
+      d(s_t)      d(s_t)
+
+    :param state:
+    :param action:
+    :return:
+    """
+
     switch = action == 1
 
     # Interpret data
@@ -32,18 +44,13 @@ def transition(state: PendulumState, action: torch.tensor) -> Tuple[torch.tensor
 
     # Check collision
     bob_center_x = torch.sin(angle) * connector_length
-    bob_center_y = position - torch.cos(angle) * connector_length
-
-    reward = 1.0 if not switch else 0.9
-
-    distance = torch.sqrt((bob_center_x - enemy_x) ** 2 + (bob_center_y - enemy_y) ** 2)
 
     # Collision
-    if distance <= (bob_radius + enemy_radius):
-        done = True
-        reward = 0.0 if not switch else -0.1
-        return new_state, reward, done
+    collision = distance <= 0.0
 
-    # No collision
-    done = False
-    return new_state, reward, done
+    # base_reward = greater_zero(distance, torch.tensor(1.0), torch.tensor(0.0))
+    #
+    # reward = base_reward - (0.0 if not switch else 0.1)
+    reward = torch.tensor(1.0)
+
+    return new_state, reward, collision

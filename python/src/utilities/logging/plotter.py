@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 from utilities.buffer import Buffer
 from utilities.math_utilities import running_average
 
-plt.ion()
-
 
 def log(message):
     print(f"[P]: {message}")
@@ -31,6 +29,8 @@ class Plotter:
         self.max_total_rewards = Buffer(last_epochs_to_plot_count)
 
         self.epoch_mean_total_reward = 0
+
+        plt.ion()
 
     def update(self, epoch_training_data, **additional_data):
         self._update(epoch_training_data, **additional_data)

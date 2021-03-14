@@ -1,8 +1,7 @@
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 from torch.optim import Adam
 
 from common import MLP
@@ -12,17 +11,19 @@ from ..state import PendulumState
 
 
 class NNGenerator(PendulumGenerator):
-    """
-    Generates an enemy X position using NN
-    """
-
-    def __init__(self, hidden=None, lr=0.01, min_x=-0.5, max_x=0.5, beta=0.1,
-                 bob_radius=0.15, max_angle=np.deg2rad(30), connector_length=0.5):
+    def __init__(self, hidden=None, lr=0.01, speed=0.01, fast_speed=0.1, min_x=-0.5, max_x=0.5,
+                 min_y=-0.25, max_y=0.75, bob_radius=0.15, max_angle=np.deg2rad(30), angle=np.deg2rad(30),
+                 angular_speed=np.deg2rad(5), vertical_speed=0.02, connector_length=0.5):
         if hidden is None:
             hidden = [8, 8]
 
+        self.speed = speed
+        self.fast_speed = fast_speed
         self.min_x = min_x
         self.max_x = max_x
+
+        self.min_y = min_y
+        self.max_y = max_y
 
         self.enemy_radius = 0.1
         self.enemy_y = 0.25
@@ -30,25 +31,27 @@ class NNGenerator(PendulumGenerator):
         self.bob_radius = bob_radius
         self.max_angle = max_angle
         self.connector_length = connector_length
+        self.vertical_speed = vertical_speed
+        self.angle = angle
+        self.angular_speed = angular_speed
         self.lr = lr
-        self.beta = beta
 
         self.nn = MLP(1, 1, hidden)
         self.nn.add_module("remap", Remap(min_x, max_x))
         self.optim = Adam(self.nn.parameters(), lr=lr)
 
-    def generate(self, difficulty: Union[float, torch.Tensor], _: Optional[float] = None) -> PendulumState:
-        enemy_x = self.nn(difficulty)
-        return enemy_x
+    def generate(self, difficulty: float, _: Optional[float] = None) -> PendulumState:
+        position = 0
+        enemy_x = self.nn(torch.tensor([difficulty]))
 
-    def update(self, d_in: torch.Tensor, d_out: torch.Tensor, diversity: torch.Tensor):
-        loss_difficulty, loss_diversity = F.mse_loss(d_in, d_out), self.beta * diversity
+        return PendulumState(self.bob_radius, self.max_angle, self.connector_length, self.vertical_speed,
+                             enemy_x, self.enemy_y, self.enemy_radius,
+                             self.angle, position, self.angular_speed)
 
+    def update(self, loss: torch.Tensor):
         self.optim.zero_grad()
-        (loss_difficulty - loss_diversity).backward()
+        loss.backward()
         self.optim.step()
-
-        return loss_difficulty.item(), loss_diversity.item()
 
     @property
     def config(self):
@@ -60,6 +63,8 @@ class NNGenerator(PendulumGenerator):
             "Bob radius": self.bob_radius,
             "Max angle": self.max_angle,
             "Connector length": self.connector_length,
+            "Vertical speed": self.vertical_speed,
+            "angle": self.angle,
+            "Angular speed": self.angular_speed,
             "lr": self.lr,
-            "beta": self.beta
         }

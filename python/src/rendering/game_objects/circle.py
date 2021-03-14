@@ -14,7 +14,7 @@ class Circle(GameObject):
                  parent: Optional[GameObject] = None):
         if position is None:
             position = Point.zero
-        scale = radius * Point.one
+        scale = 2 * radius * Point.one
         circle = CircleRenderable(color, 0.5)
         super().__init__(position, scale, rotation, parent, circle)
 

@@ -14,7 +14,7 @@ class HeuristicsPlayer(Actor):
             action_distance = torch.tensor(0.1)
 
         self.action_distance = action_distance
-        self.randomness = 0
+        self.randomness = torch.tensor([0.0])
 
     def get_action(self, observation: PendulumState) -> torch.Tensor:
         if self.randomness > 0 and random.random() < self.randomness:

@@ -3,14 +3,13 @@ import numpy as np
 import torch
 import wandb
 
-from environments.pendulum.generators.nn import NNGenerator
+from environments.pendulum.generators import SimpleNNGenerator
 
 plt.ioff()
 
 if __name__ == '__main__':
     for a in np.linspace(5, 50, 5):
-        # print("\n\n NEW NEW NEW")
-        generator = NNGenerator(max_angle=np.deg2rad(a))
+        generator = SimpleNNGenerator(max_angle=np.deg2rad(a))
 
         x_max, x_min = generator.max_x, generator.min_x
         r_enemy = generator.enemy_radius

@@ -72,3 +72,19 @@ class GameObject:
     def remove_children(self):
         for child in self.children:
             child.parent = None
+
+    @property
+    def x(self):
+        return self.transform.local_position.x
+
+    @x.setter
+    def x(self, value):
+        self.transform.local_position.x = value
+
+    @property
+    def y(self):
+        return self.transform.local_position.y
+
+    @y.setter
+    def y(self, value):
+        self.transform.local_position.y = value
