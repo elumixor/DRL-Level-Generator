@@ -71,25 +71,11 @@ class SimpleProbabilisticNNGenerator(PendulumGenerator):
 
         difficulty_difference = (d_out - d_in) ** 2
 
-        # We compute the euclidean distance between each two generated levels
-        # This is done for the batch of shape [d_in_size * num_samples * level_size]
-        diversity = (x.unsqueeze(-2) - x.unsqueeze(-3)).abs().sum(dim=-1)
-        diversity_weight = (d_out.unsqueeze(-2) - d_out.unsqueeze(-3)).abs().squeeze()
-        weighted_diversity = diversity * diversity_weight
-
-        # Now we have a symmetric matrix of weighted differences
-        # We will average them for each sample over all other samples
-        weighted_diversity = weighted_diversity.mean(dim=-1, keepdim=True)
-
-        # print(weighted_diversity.shape)
-        # print(difficulty_difference.shape)
-
         wandb.log({
             "difficulty difference": difficulty_difference.mean(),
-            "diversity": weighted_diversity.mean()
         })
 
-        loss = ((difficulty_difference - self.beta * weighted_diversity) * log_probabilities).mean()
+        loss = ((difficulty_difference) * log_probabilities).mean()
 
         self.optim.zero_grad()
         loss.backward()
