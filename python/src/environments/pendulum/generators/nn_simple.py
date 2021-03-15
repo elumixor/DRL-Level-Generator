@@ -2,7 +2,6 @@ from typing import Optional, Union
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 from torch.optim import Adam
 
 from common import MLP
@@ -42,7 +41,7 @@ class SimpleNNGenerator(PendulumGenerator):
         return enemy_x
 
     def update(self, d_in: torch.Tensor, d_out: torch.Tensor, diversity: torch.Tensor):
-        loss_difficulty, loss_diversity = F.mse_loss(d_in, d_out), self.beta * diversity
+        loss_difficulty, loss_diversity = ((d_in - d_out) ** 2).mean(), self.beta * diversity
 
         self.optim.zero_grad()
         (loss_difficulty - loss_diversity).backward()

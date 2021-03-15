@@ -43,6 +43,7 @@ if __name__ == '__main__':
         run = wandb.init(project="Heuristic", name="Training Heuristic 1", tags=["Diversity"], config={
             "epochs": epochs,
             "batch size": batch_size,
+            "backpropagation": "direct",
             **generator.config
         })
         run.config.update({"Max angle": np.rad2deg(generator.max_angle)}, allow_val_change=True)
@@ -59,7 +60,7 @@ if __name__ == '__main__':
             loss_difficulty, loss_diversity = generator.update(d_in, d_out, diversity)
 
             wandb.log({
-                "loss difficulty": loss_difficulty,
+                "difficulty difference": loss_difficulty,
                 "diversity": loss_diversity,
                 "loss difficulty - diversity": loss_difficulty - loss_diversity
             })
