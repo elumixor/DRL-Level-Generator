@@ -1,0 +1,21 @@
+arguments:
+  enemy_x_min: -5
+  enemy_x_max: 5
+  enemy_radius: 0.1
+  bob_radius: 0.15
+  connector_length: 0.5
+
+name: "generator_training"
+
+description: "Experiment with different ways of fitting the generator to the required accuracy in the difficulty"
+experiments:
+  - name: "Direct gradient propagation"
+    description: "
+    The generator outputs the vector of parameters of the level directly
+    (e.g. enemy positions, various lengths and angles). The level is
+    evaluated by a differentiable difficulty evaluator. The error is calculated
+    as the difference between the input and the output difficulty.
+    "
+
+
+  - name: "REINFORCE"

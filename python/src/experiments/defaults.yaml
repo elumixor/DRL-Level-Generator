@@ -1,0 +1,10 @@
+# Default value for the config file name
+config: "config.yaml"
+
+# Default values for the experiments' configs
+file: "experiment.py"
+main: "main"
+clean: True
+
+username: "elumixor"
+project: "Level Generator"

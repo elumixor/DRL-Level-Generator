@@ -6,7 +6,7 @@ import yaml
 from .dot_dict import to_dot_dict
 
 
-def read_yaml(path: str):
+def read_yaml(path: str, dot_dict=True):
     # We'll try all these paths in case some do not work
     def paths():
         yield path
@@ -19,9 +19,12 @@ def read_yaml(path: str):
         try:
             with open(p, "r") as stream:
                 result = yaml.safe_load(stream)
-                return to_dot_dict(result)
+
+            if not dot_dict:
+                return result
+            return to_dot_dict(result)
         except FileNotFoundError as e:
             ...
 
     # If no path worked, re-raise the last exception
-    raise e
+    raise FileNotFoundError

@@ -1,0 +1,34 @@
+inherits: "../config.yaml"
+
+# Unique run name
+name: direct_evaluator
+
+# Name to be displayed in the WandB
+# If not specified will default to the value in the `name` field
+# with underscores changed to spaces and first letter capitalized
+display_name: "Direct level evaluation"
+
+# [console|wandb] or skip for silent run
+log: wandb
+
+# file name, defaults to "experiment.py"
+#file: "experiment.py"
+
+# function in an experiment file, defaults to "main"
+#main: "main"
+
+# Specify append if we don't want to remove the previous runs
+#append: True
+
+
+arguments:
+  max_angle:
+    linspace:
+      min: 5
+      max: 50
+      n: 10
+
+  enemy_x_min: -0.5
+  enemy_x_max: 0.5
+
+  subdivisions: 100

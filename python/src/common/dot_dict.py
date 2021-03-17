@@ -1,6 +1,9 @@
 class DotDict(dict):
     __getattr__, __setattr__ = dict.get, dict.__setitem__
 
+    def __delattr__(self, item):
+        self.__delitem__(item)
+
 
 def to_dot_dict(data):
     result = DotDict()
