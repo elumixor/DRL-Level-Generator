@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$/src" />
     <content url="file://$MODULE_DIR$/tests">
       <excludeFolder url="file://$MODULE_DIR$/tests/dqn_tests/wandb" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/heuristic/difficulty_estimation_via_trajectory_rewards/wandb" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/heuristic/training_generator/heuristic/wandb" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.7" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -5,7 +5,9 @@
       <w>overfitting</w>
       <w>renderable</w>
       <w>rollout</w>
+      <w>softplus</w>
       <w>tensored</w>
+      <w>unclamped</w>
     </words>
   </dictionary>
 </component>
