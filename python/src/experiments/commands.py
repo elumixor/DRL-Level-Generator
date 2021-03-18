@@ -54,7 +54,16 @@ def delete_runs_by_name(name):
     delete_runs(runs)
 
 
-def run_one(experiment_name, config_location, args):
+def run_one(config_location, args):
+    if args.console is None:
+        args.console = False
+
+    if args.wandb is None:
+        args.wandb = False
+
+    if args.silent is None:
+        args.silent = False
+
     if args.console + args.wandb + args.silent > 1:
         raise ValueError("Only one of --[console|wandb|silent] can be specified")
 
@@ -63,6 +72,7 @@ def run_one(experiment_name, config_location, args):
 
     # Read config
     config = read_yaml(config_location)
+    experiment_name = config.name
 
     experiment_file = config.file if "file" in config else defaults.file
     main_name = config.main if "main" in config else defaults.main

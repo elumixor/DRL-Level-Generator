@@ -68,7 +68,7 @@ def run_experiment(main, config, path, config_name):
 
             continue
 
-    if "append" not in config or not config["append"]:
+    if "wandb" in config and config["wandb"] and ("append" not in config or not config["append"]):
         runs = get_runs(config['username'], config['project'], config["name"])
 
         if len(runs) > 0:

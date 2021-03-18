@@ -1,5 +1,7 @@
 import numpy as np
 
+from experiments import run_current
+
 
 def main(context, max_angle, subdivisions, enemy_x_min, enemy_x_max, enemy_radius, bob_radius,
          connector_length):
@@ -16,3 +18,7 @@ def main(context, max_angle, subdivisions, enemy_x_min, enemy_x_max, enemy_radiu
 
     for d, x_l in zip(difficulties, np.linspace(enemy_x_min, enemy_x_max, subdivisions)):
         context.log({"x": x_l, "difficulty": d})
+
+
+if __name__ == '__main__':
+    run_current(wandb=True)

@@ -56,7 +56,7 @@ if __name__ == '__main__':
             exit()
 
         for experiment_name, config_path in all_experiments.items():
-            run_one(experiment_name, config_path, args)
+            run_one(config_path, args)
 
         exit()
 
@@ -71,5 +71,5 @@ if __name__ == '__main__':
 
             exit()
 
-        run_one(experiment_name, experiment_config_location, args)
+        run_one(experiment_config_location, args)
         exit()
