@@ -1,0 +1,20 @@
+inherits: "../config.yaml"
+
+name: REINFORCE
+
+arguments:
+  sample_size: 25  # number of the samples from the generated distribution
+  max_angle: 45  # let's now keep the maximum angle fixed
+
+  input_difficulty_sampling:
+    - random
+    - systematic
+
+  diversity:
+    - true
+    - false
+
+  constrain:
+    - null
+    - clamp
+    - remap

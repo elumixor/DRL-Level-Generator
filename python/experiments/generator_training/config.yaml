@@ -1,13 +1,21 @@
 arguments:
-  enemy_x_min: -5
-  enemy_x_max: 5
   enemy_radius: 0.1
   bob_radius: 0.15
   connector_length: 0.5
+  enemy_x_min: -0.5
+  enemy_x_max: 0.5
+  subdivisions: 100
+
+  epochs: 1000
+  batch_size: 100
+  diversity_weight: 0.5
+  constrain_weight: 0.5
 
   lr: 0.01
 
 name: "generator_training"
+
+log: console
 
 description: "Experiment with different ways of fitting the generator to the required accuracy in the difficulty"
 experiments:

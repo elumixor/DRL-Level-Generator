@@ -24,4 +24,3 @@ log: wandb
 arguments:
   enemy_x_min: -0.5
   enemy_x_max: 0.5
-  subdivisions: 100

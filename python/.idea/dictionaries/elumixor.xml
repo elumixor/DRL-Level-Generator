@@ -8,6 +8,7 @@
       <w>softplus</w>
       <w>tensored</w>
       <w>unclamped</w>
+      <w>wandb</w>
     </words>
   </dictionary>
 </component>

@@ -2,19 +2,15 @@ inherits: "../config.yaml"
 
 name: direct_generator
 
-log: console
-
 arguments:
+  enemy_x_min: -5
+  enemy_x_max: 5
+
   max_angle:
     linspace:
       min: 5
       max: 50
       n: 10
-
-  epochs: 1000
-  batch_size: 100
-  diversity_weight: 0.5
-  constrain_weight: 0.5
 
   input_difficulty_sampling:
     - random

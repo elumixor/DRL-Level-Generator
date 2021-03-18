@@ -1,5 +1,6 @@
 import inspect
 import os
+import shutil
 import time
 from pathlib import Path
 
@@ -111,6 +112,7 @@ def run_experiment(main, config, path, config_name, **args_overrides):
 
     elapsed = 0
 
+    # todo: parallelize!
     for i, config in enumerate(experiments_configurations):
         args = config["args"]
 
@@ -127,3 +129,8 @@ def run_experiment(main, config, path, config_name, **args_overrides):
             main(context, *args)
 
         elapsed += time.time() - start
+
+    # remove local wandb folder
+    path_to_wandb = os.path.join(os.path.dirname(path), "wandb")
+    if os.path.exists(path_to_wandb) and os.path.isdir(path_to_wandb):
+        shutil.rmtree(path_to_wandb)
