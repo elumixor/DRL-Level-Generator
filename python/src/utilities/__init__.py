@@ -1,5 +1,6 @@
 import functools
 import sys
+from datetime import timedelta
 
 from .buffer import Buffer
 from .event import Event
@@ -22,3 +23,7 @@ def log_call(func):
 
 def clamp(value, _min, _max):
     return max(_min, min(value, _max))
+
+
+def time_string(seconds):
+    return str(timedelta(seconds=round(seconds)))

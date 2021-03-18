@@ -5,6 +5,8 @@ arguments:
   bob_radius: 0.15
   connector_length: 0.5
 
+  lr: 0.01
+
 name: "generator_training"
 
 description: "Experiment with different ways of fitting the generator to the required accuracy in the difficulty"

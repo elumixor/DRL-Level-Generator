@@ -1,1 +1,30 @@
 inherits: "../config.yaml"
+
+name: direct_generator
+
+log: console
+
+arguments:
+  max_angle:
+    linspace:
+      min: 5
+      max: 50
+      n: 10
+
+  epochs: 1000
+  batch_size: 100
+  diversity_weight: 0.5
+  constrain_weight: 0.5
+
+  input_difficulty_sampling:
+    - random
+    - systematic
+
+  constrain:
+    - null
+    - clamp
+    - remap
+
+  diversity:
+    - true
+    - false

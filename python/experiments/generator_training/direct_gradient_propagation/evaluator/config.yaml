@@ -22,13 +22,6 @@ log: wandb
 
 
 arguments:
-  max_angle:
-    linspace:
-      min: 5
-      max: 50
-      n: 10
-
   enemy_x_min: -0.5
   enemy_x_max: 0.5
-
   subdivisions: 100

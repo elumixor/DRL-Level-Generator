@@ -1,5 +1,6 @@
 import inspect
 import os
+import time
 from pathlib import Path
 
 import numpy as np
@@ -70,6 +71,10 @@ def run_experiment(main, config, path, config_name, **args_overrides):
 
             continue
 
+        elif isinstance(arg, list):
+            iterate_on.append((arg_index, arg))
+            continue
+
     if config["log"] == "wandb" and ("append" not in config or not config["append"]):
         runs = get_runs(config['username'], config['project'], config["name"])
 
@@ -79,17 +84,20 @@ def run_experiment(main, config, path, config_name, **args_overrides):
         for run in runs:
             run.delete()
 
-    def run_experiments(iterables, selected):
+    experiments_configurations = []
+
+    def collect_configurations(iterables, selected):
         if len(iterables) == 0:
             for arg_index, value in selected:
                 args[arg_index] = value
 
-            with Context(project=config["project"],
-                         name=config["name"],
-                         display_name=config["display_name"],
-                         log=config["log"] if "log" in config else "none",
-                         arguments={name: value for name, value in zip(arg_names, args)}) as context:
-                main(context, *args)
+            experiments_configurations.append({
+                "project": config["project"],
+                "name": config["name"],
+                "display_name": config["display_name"],
+                "log": config["log"] if "log" in config else "none",
+                "args": args[:],
+            })
 
             return
 
@@ -97,6 +105,25 @@ def run_experiment(main, config, path, config_name, **args_overrides):
         arg_index, values = current
 
         for value in values:
-            run_experiments(remaining, selected + [(arg_index, value)])
+            collect_configurations(remaining, selected + [(arg_index, value)])
 
-    run_experiments(iterate_on, [])
+    collect_configurations(iterate_on, [])
+
+    elapsed = 0
+
+    for i, config in enumerate(experiments_configurations):
+        args = config["args"]
+
+        start = time.time()
+
+        with Context(project=config["project"],
+                     name=config["name"],
+                     display_name=config["display_name"],
+                     log=config["log"],
+                     arguments={name: value for name, value in zip(arg_names, args)},
+                     current=i,
+                     total=len(experiments_configurations),
+                     elapsed=elapsed) as context:
+            main(context, *args)
+
+        elapsed += time.time() - start
