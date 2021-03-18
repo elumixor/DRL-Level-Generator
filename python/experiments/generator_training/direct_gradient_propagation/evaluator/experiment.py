@@ -21,4 +21,6 @@ def main(context, max_angle, subdivisions, enemy_x_min, enemy_x_max, enemy_radiu
 
 
 if __name__ == '__main__':
-    run_current(wandb=True)
+    run_current(console=True, args={
+        "max_angle": 0.1
+    })

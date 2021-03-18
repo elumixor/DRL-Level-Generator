@@ -35,7 +35,7 @@ def get_runs(username, project, name=None):
     return list(runs)
 
 
-def run_experiment(main, config, path, config_name):
+def run_experiment(main, config, path, config_name, **args_overrides):
     # Collect all configs, with inherited
     configs = [config]
     current_path = os.path.dirname(path)
@@ -58,7 +58,9 @@ def run_experiment(main, config, path, config_name):
     # Context is an object to manage the experiments
     arg_names = list(inspect.signature(main).parameters)[1:]
 
-    args = [config["arguments"][arg_name] for arg_name in arg_names]
+    args = [args_overrides[arg_name] if arg_name in args_overrides else config["arguments"][arg_name]
+            for arg_name in arg_names]
+
     for arg_index, arg in enumerate(args):
         if isinstance(arg, dict):
             if "linspace" in arg:
