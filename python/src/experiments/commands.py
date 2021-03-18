@@ -104,8 +104,6 @@ def run_one(config_location, args):
     if "display_name" not in config:
         config.display_name = experiment_name.replace("_", " ").capitalize()
 
-    print(f"Running experiment {experiment_name}")
-
     args_overrides = args.args if "args" in args else dict()
 
     run_experiment(main, config, experiment_path, defaults.config, **args_overrides)
