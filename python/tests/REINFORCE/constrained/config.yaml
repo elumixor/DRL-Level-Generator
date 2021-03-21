@@ -1,8 +1,0 @@
-trials: 10
-lr: 0.01
-batch_size: 100
-num_samples: 100
-epochs: 2000
-penalty_weight: 0.5
-min: 0
-max: 2

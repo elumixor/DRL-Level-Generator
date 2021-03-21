@@ -2,12 +2,14 @@ import functools
 from typing import Optional
 from unittest import TestCase
 
+import matplotlib.pyplot as plt
+
 from utilities import approx
 
 
 class BaseTest(TestCase):
     @staticmethod
-    def confidence(min_ok: int, total: int):
+    def confidence(min_ok: int, total: int, early_stop=True):
         def decorator(func):
             @functools.wraps(func)
             def wrapper(self, *args, **kwargs):
@@ -22,7 +24,7 @@ class BaseTest(TestCase):
 
                         print(f"{i} ok: {succeeded}+{failed}/{total}")
 
-                        if succeeded >= min_ok:
+                        if early_stop and succeeded >= min_ok:
                             return
 
                     except AssertionError as e:
@@ -31,8 +33,11 @@ class BaseTest(TestCase):
                         print(f"{i} failed: {succeeded}+{failed}/{total}")
                         print(e)
 
-                        if failed > max_failed:
+                        if early_stop and failed > max_failed:
                             self.fail(f"Failed {failed}. Maximum allowed: {max_failed}/{total}")
+
+                if failed > max_failed:
+                    self.fail(f"Failed {failed}. Maximum allowed: {max_failed}/{total}")
 
             return wrapper
 
@@ -104,3 +109,7 @@ class BaseTest(TestCase):
                 self.fail(f"\"{key}\" does not decrease after step {self.steps[key]}. "
                           f"Was: {current_value}. "
                           f"Became {smoothed}")
+
+    def plot(self, values):
+        plt.plot(values)
+        plt.show()

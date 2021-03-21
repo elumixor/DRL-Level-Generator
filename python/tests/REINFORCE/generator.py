@@ -1,7 +1,7 @@
-from torch.nn import Module, Linear, Softplus
+from torch.nn import Linear, Module, Softplus
 
 
-class Simple(Module):
+class Generator(Module):
     def __init__(self):
         super().__init__()
 
@@ -12,9 +12,10 @@ class Simple(Module):
 
     def forward(self, difficulty):
         hidden = self.base(difficulty).relu()
+
         mean = self.head_mean(hidden)
 
         std = self.head_std(hidden)
-        std = self.softplus(std)
+        std = self.softplus(std) + 0.01
 
         return mean, std
