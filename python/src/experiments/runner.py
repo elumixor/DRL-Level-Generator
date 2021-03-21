@@ -97,6 +97,7 @@ def run_experiment(main, config, path, config_name, **args_overrides):
                 "name": config["name"],
                 "display_name": config["display_name"],
                 "log": config["log"] if "log" in config else "none",
+                "repeat": config["repeat"],
                 "args": args[:],
             })
 
@@ -118,15 +119,19 @@ def run_experiment(main, config, path, config_name, **args_overrides):
 
         start = time.time()
 
-        with Context(project=config["project"],
-                     name=config["name"],
-                     display_name=config["display_name"],
-                     log=config["log"],
-                     arguments={name: value for name, value in zip(arg_names, args)},
-                     current=i,
-                     total=len(experiments_configurations),
-                     elapsed=elapsed) as context:
-            main(context, *args)
+        repeat = config["repeat"] if "repeat" in config else 1
+        print("")
+
+        for _ in range(repeat):
+            with Context(project=config["project"],
+                         name=config["name"],
+                         display_name=config["display_name"],
+                         log=config["log"],
+                         arguments={name: value for name, value in zip(arg_names, args)},
+                         current=i,
+                         total=len(experiments_configurations),
+                         elapsed=elapsed) as context:
+                main(context, *args)
 
         elapsed += time.time() - start
 

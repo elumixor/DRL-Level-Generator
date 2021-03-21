@@ -39,7 +39,8 @@ def style(*values, r=255, g=255, b=255, bold=False, italic=False, type=None):
 set_style("bold", bold=True)
 set_style("reward", bold=True, r=100, g=255, b=100)
 set_style("path", bold=True, r=150, g=150, b=255)
-set_style("good", r=150, g=255, b=100)
+set_style("good", r=150, g=220, b=100)
+set_style("bad", r=220, g=100, b=100)
 
 
 @singleton
@@ -61,6 +62,9 @@ class Printer:
 
     def good(self, value: str):
         self(value, type="good")
+
+    def bad(self, value: str):
+        self(value, type="bad")
 
 
 log = Printer()

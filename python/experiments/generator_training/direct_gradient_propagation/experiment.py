@@ -6,6 +6,7 @@ from evaluators import DirectEvaluator
 from evaluators.utils import calculate_diversity
 from experiments import run_current
 from generators import DirectGenerator
+from generators.utils import get_input_difficulties
 
 
 def main(context, max_angle, enemy_x_min, enemy_x_max, connector_length, enemy_radius, bob_radius,
@@ -16,10 +17,7 @@ def main(context, max_angle, enemy_x_min, enemy_x_max, connector_length, enemy_r
     evaluator = DirectEvaluator(connector_length, np.deg2rad(max_angle), enemy_radius, bob_radius)
 
     for epoch in range(epochs):
-        if input_difficulty_sampling == "random":
-            d_in = torch.rand(batch_size, 1)
-        else:
-            d_in = torch.linspace(0, 1, batch_size).unsqueeze(1)
+        d_in = get_input_difficulties(batch_size, input_difficulty_sampling)
 
         x, unconstrained_x = generator.forward(d_in)
 
@@ -28,9 +26,9 @@ def main(context, max_angle, enemy_x_min, enemy_x_max, connector_length, enemy_r
         difficulty_difference = torch.linalg.norm(d_in - d_out, dim=-1).mean()
 
         if diversity:
-            diversity = calculate_diversity(x.unsqueeze(0), d_in.unsqueeze(0))
+            diversity_loss = calculate_diversity(x.unsqueeze(0), d_in.unsqueeze(0))
         else:
-            diversity = 0
+            diversity_loss = 0
 
         if not constrain:
             constrain_loss = 0
@@ -38,7 +36,7 @@ def main(context, max_angle, enemy_x_min, enemy_x_max, connector_length, enemy_r
             constrain_loss = torch.linalg.norm(x - unconstrained_x, dim=-1).mean()
 
         # ↓ difficulty difference  ↑ diversity  ↓ constrain penalty
-        loss = difficulty_difference - diversity_weight * diversity + constrain_weight * constrain_loss
+        loss = difficulty_difference - diversity_weight * diversity_loss + constrain_weight * constrain_loss
 
         optim.zero_grad()
         loss.backward()
@@ -46,7 +44,7 @@ def main(context, max_angle, enemy_x_min, enemy_x_max, connector_length, enemy_r
 
         context.log({
             "difficulty difference": difficulty_difference,
-            "diversity": diversity,
+            "diversity": diversity_loss,
             "constrain penalty": constrain_loss
         })
 
