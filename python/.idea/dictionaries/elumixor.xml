@@ -2,6 +2,7 @@
   <dictionary name="elumixor">
     <words>
       <w>coeff</w>
+      <w>linspace</w>
       <w>overfitting</w>
       <w>renderable</w>
       <w>rollout</w>

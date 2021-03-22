@@ -1,7 +1,7 @@
 class ConvergenceChecker:
-    def __init__(self, length=100, threshold=0.01, record_all=True):
+    def __init__(self, steps=100, threshold=0.01, record_all=True):
         self.threshold = threshold
-        self.length = length
+        self.length = steps
         self.values = []
 
         if record_all:

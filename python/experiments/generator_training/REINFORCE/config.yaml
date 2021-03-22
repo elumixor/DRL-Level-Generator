@@ -1,20 +1,47 @@
 inherits: "../config.yaml"
-
 name: REINFORCE
 
 arguments:
-  sample_size: 25  # number of the samples from the generated distribution
-  max_angle: 45  # let's now keep the maximum angle fixed
+  epochs: 2000
+  convergence:
+    steps: 100
+    threshold: 0.01
 
-  input_difficulty_sampling:
+  min_std:
+    - 0.01
+
+  std_constrain:
+    - softplus
+
+  sample_size:
+    - 50
+
+  enemy_x_min:
+    - 0
+    - -1
+  enemy_x_max: 2
+
+  constrain:
+    - false
+    - true
+
+  target:
+    # will be unwrapped
+    - linspace:
+        min: 0
+        max: 1
+        n: 10
+
+    # will not be unwrapped
+  #    - - random:
+  #          min: 0
+  #          max: 1
+  #          repeat: 10
+
+  d_in_sampling:
     - random
     - systematic
 
-  diversity:
-    - true
-    - false
-
-  constrain:
-    - null
-    - clamp
-    - remap
+skip:
+  - constrain: false
+    enemy_x_min: -1

@@ -6,11 +6,13 @@ class DotDict(dict):
 
 
 def to_dot_dict(data):
-    result = DotDict()
-    for key, value in data.items():
-        if isinstance(value, dict):
-            value = to_dot_dict(value)
+    if isinstance(data, dict):
+        result = DotDict()
+        for key, value in data.items():
+            result[key] = to_dot_dict(value)
+        return result
 
-        result.__setitem__(key, value)
+    elif isinstance(data, list):
+        return [to_dot_dict(item) for item in data]
 
-    return result
+    return data
