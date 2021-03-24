@@ -2,20 +2,12 @@ import math
 
 from matplotlib import pyplot as plt
 
+from utilities.recorder import Recorder
 
-class Plotter:
-    def __init__(self):
-        self.entries = dict()
 
+class Plotter(Recorder):
     def log(self, **kwargs):
-        for name, value in kwargs.items():
-            if name not in self.entries:
-                arr = []
-                self.entries[name] = arr
-            else:
-                arr = self.entries[name]
-
-            arr.append(value)
+        self.record(**kwargs)
 
     def show(self):
         num_plots = len(self.entries)

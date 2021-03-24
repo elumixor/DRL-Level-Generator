@@ -1,4 +1,3 @@
-import importlib.util as imp
 import os
 from pathlib import Path
 
@@ -25,6 +24,10 @@ def list_found(experiments):
 
 
 def delete_runs(runs):
+    if len(runs) < 1:
+        print("No runs to delete")
+        return
+
     if prompt(f"Delete {len(runs)} runs? (y|[n])"):
         for run in runs:
             run.delete()
@@ -85,11 +88,6 @@ def run_one(config_location, args):
 
     experiment_path = os.path.join(Path(os.path.dirname(config_location)).resolve(), experiment_file)
 
-    spec = imp.spec_from_file_location("module.name", experiment_path)
-    foo = imp.module_from_spec(spec)
-    spec.loader.exec_module(foo)
-    main = foo.__getattribute__(main_name)
-
     # Override stuff in config based on command line arguments
     if args.console:
         config.log = "console"
@@ -106,4 +104,4 @@ def run_one(config_location, args):
 
     args_overrides = args.args if "args" in args else dict()
 
-    run_experiment(main, config, experiment_path, defaults.config, **args_overrides)
+    run_experiment(main_name, config, experiment_path, defaults.config, **args_overrides)

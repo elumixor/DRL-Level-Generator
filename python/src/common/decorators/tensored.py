@@ -1,7 +1,7 @@
 import torch
 
 
-def tensored(_func=None, *, cuda=False):
+def tensored(_func=None):
     # noinspection PyPep8Naming
     class wrapper:
         def __init__(self, func):

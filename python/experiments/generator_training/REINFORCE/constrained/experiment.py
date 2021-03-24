@@ -2,7 +2,6 @@ import torch
 from torch.distributions import Normal
 from torch.optim import Adam
 
-from evaluators import DirectEvaluator
 from experiments import run_current
 from generators.probabilistic import ProbabilisticGenerator
 from test_utils import ConvergenceChecker
@@ -11,10 +10,11 @@ from test_utils import ConvergenceChecker
 # Generate actual levels, place the enemy and use heuristic evaluator
 
 def main(context, enemy_x_min, enemy_x_max, epochs, batch_size, sample_size, lr, constrain_weight, min_std,
-         std_constrain, convergence, max_angle, connector_length, enemy_radius, bob_radius, trial):
+         std_constrain, convergence, trial, target):
+    print(f"{trial=}")
+
     generator = ProbabilisticGenerator(min_std, std_constrain)
     optim = Adam(generator.parameters(), lr=lr)
-    evaluator = DirectEvaluator(connector_length, torch.deg2rad(max_angle).item(), enemy_radius, bob_radius)
 
     checker = ConvergenceChecker(convergence.steps, convergence.threshold, record_all=False)
 
@@ -41,7 +41,7 @@ def main(context, enemy_x_min, enemy_x_max, epochs, batch_size, sample_size, lr,
         # Compute basic loss of the clamped samples
         # d_out will just be the distance from the target
         # this is simply how we chose it to be for this case
-        d_out = evaluator.evaluate(x_constrained)
+        d_out = (x_constrained - target).abs()
 
         # Difference in the difficulties we will minimize
         # d_in shape [batch_size, 1] -> [batch_size, 1, 1] -> [batch_size, sample_size, 1]
@@ -56,20 +56,14 @@ def main(context, enemy_x_min, enemy_x_max, epochs, batch_size, sample_size, lr,
         loss = ((difference + constrain_weight * clamp_penalty) * log_prob).mean()
 
         # Total weighted loss
-        gradient = 0
         optim.zero_grad()
         loss.backward()
-
-        with torch.no_grad():
-            for p in generator.parameters():
-                gradient += p.grad.data.abs().sum()
-
         optim.step()
 
         # Validate using the clamped mean
         with torch.no_grad():
             clamped_mean = mean.clamp(enemy_x_min, enemy_x_max)  # [batch_size, 1]
-            d_out = evaluator.evaluate(clamped_mean)  # [batch_size, 1]
+            d_out = (clamped_mean - target).abs()  # [batch_size, 1]
             validation_difference = (d_out - d_in).abs().mean()
 
         # Log stuff
@@ -77,7 +71,6 @@ def main(context, enemy_x_min, enemy_x_max, epochs, batch_size, sample_size, lr,
             "difference": difference.mean(),
             "clamp penalty": clamp_penalty.mean(),
             "validation difference": validation_difference,
-            "gradient": gradient,
             "mean of the std": std.mean(),
         })
 

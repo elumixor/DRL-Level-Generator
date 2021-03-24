@@ -10,9 +10,9 @@ class ProbabilisticGenerator(Module):
 
     def __init__(self, min_std: float, std_constrain: Literal["clamp", "softplus"] = "softplus"):
         super().__init__()
-        self.l1 = Linear(1, 4)
-        self.mean = Linear(4, 1)
-        self.std = Linear(4, 1)
+        self.l1 = Linear(1, 2)
+        self.mean = Linear(2, 1)
+        self.std = Linear(2, 1)
 
         if std_constrain == "softplus":
             softplus = Softplus()

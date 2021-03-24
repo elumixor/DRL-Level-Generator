@@ -4,6 +4,9 @@ import torch
 
 
 class Actor(ABC):
+    def __init__(self, env):
+        self.env = env
+
     @abstractmethod
     def get_action(self, observation: torch.Tensor) -> torch.Tensor:
         """

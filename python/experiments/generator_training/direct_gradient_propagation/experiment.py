@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 from torch.optim import Adam
 
@@ -14,7 +13,7 @@ def main(context, max_angle, enemy_x_min, enemy_x_max, connector_length, enemy_r
          constrain_weight):
     generator = DirectGenerator(enemy_x_min, enemy_x_max, constrain)
     optim = Adam(generator.parameters(), lr=lr)
-    evaluator = DirectEvaluator(connector_length, np.deg2rad(max_angle), enemy_radius, bob_radius)
+    evaluator = DirectEvaluator(connector_length, torch.deg2rad(max_angle).item(), enemy_radius, bob_radius)
 
     for epoch in range(epochs):
         d_in = get_input_difficulties(batch_size, input_difficulty_sampling)
@@ -43,7 +42,7 @@ def main(context, max_angle, enemy_x_min, enemy_x_max, connector_length, enemy_r
         optim.step()
 
         context.log({
-            "difficulty difference": difficulty_difference,
+            "validation difference": difficulty_difference,
             "diversity": diversity_loss,
             "constrain penalty": constrain_loss
         })

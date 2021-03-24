@@ -1,0 +1,38 @@
+inherits: "../../../config.yaml"
+name: reinforce_constrained
+
+arguments:
+  epochs: 2000
+  constrain_weight:
+    - 0.5
+
+  convergence:
+    steps: 100
+    threshold: 0.01
+
+  min_std:
+    - 0.01
+
+  std_constrain:
+    - softplus
+
+  sample_size:
+    - 50
+
+  enemy_x_min: 0
+  enemy_x_max: 2
+
+  target:
+    # will be unwrapped
+    - linspace:
+        min: 0
+        max: 1
+        n: 10
+
+  d_in_sampling:
+    - random
+    - systematic
+
+  trial:
+    - linspace:
+        n: 10

@@ -1,0 +1,29 @@
+inherits: "../../../config.yaml"
+name: multiple_diffiuclties_logging
+
+arguments:
+  epochs: 2000
+
+  convergence:
+    steps: 100
+    threshold: 0.01
+
+  min_std:
+    - 0.01
+
+  std_constrain:
+    - softplus
+
+  sample_size:
+    - 50
+
+  enemy_x_min: 0
+  enemy_x_max: 2
+
+  target:
+    # will be unwrapped
+    - 0.77
+
+  trial:
+    - linspace:
+        n: 10

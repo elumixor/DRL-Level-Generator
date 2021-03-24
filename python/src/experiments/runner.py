@@ -1,13 +1,18 @@
+import gc
 import inspect
+import multiprocessing
 import os
 import shutil
-import time
+from importlib.util import spec_from_file_location, module_from_spec
+from multiprocessing.pool import ThreadPool
 from pathlib import Path
+from threading import Thread
 
 import torch
 import wandb
 
 from common import read_yaml, DotDict
+from common.dot_dict import from_dot_dict, to_dot_dict
 from .context import Context
 
 
@@ -30,9 +35,19 @@ def unwrap(args):
     if isinstance(args, DotDict):
         if "linspace" in args:
             linspace = args.linspace
-            _min, _max, n = linspace.min, linspace.max, linspace.n
+
+            _min = linspace.min if "min" in linspace else 0
+            n = linspace.n
+            _max = linspace.max if "max" in linspace else (n - 1)
+
             values = torch.linspace(_min, _max, n).unsqueeze(1)
             return list(values)
+
+        elif "random" in args:
+            random = args.random
+            _min, _max, repeat = random.min, random.max, random.repeat
+            shape = [1] if "shape" not in random else random.shape
+            return [torch.rand(shape) * (_max - _min) + _min for _ in range(repeat)]
 
         elif "random" in args:
             random = args.random
@@ -81,11 +96,14 @@ def get_runs(username, project, name=None):
     return list(runs)
 
 
-def execute_run(i, config, arg_names, total_len, main):
-    args = config.args
+def execute_run(i, config, arg_names, total_len, main_name, path):
+    spec = spec_from_file_location("module.name", path)
+    foo = module_from_spec(spec)
+    spec.loader.exec_module(foo)
+    main = foo.__getattribute__(main_name)
 
-    print("?")
-    # start = time.time()
+    config = to_dot_dict(config)
+    args = config.args
 
     with Context(project=config.project,
                  name=config.name,
@@ -95,12 +113,15 @@ def execute_run(i, config, arg_names, total_len, main):
                  current=i,
                  total=total_len,
                  elapsed=0) as context:
-        print("????")
         main(context, *args)
-        print("????111232")
 
 
-def run_experiment(main, config, path, config_name, **args_overrides):
+def run_experiment(main_name, config, path, config_name, **args_overrides):
+    spec = spec_from_file_location("module.name", path)
+    foo = module_from_spec(spec)
+    spec.loader.exec_module(foo)
+    main = foo.__getattribute__(main_name)
+
     # Collect all configs, with inherited
     configs = [config]
     current_path = os.path.dirname(path)
@@ -134,14 +155,18 @@ def run_experiment(main, config, path, config_name, **args_overrides):
             iterate_on.append((arg_index, arg))
             continue
 
-    if config.log == "wandb" and ("append" not in config or not config.append):
-        runs = get_runs(config.username, config.project, config.name)
+    def remove_runs():
+        if config.log == "wandb" and ("append" not in config or not config.append):
+            runs = get_runs(config.username, config.project, config.name)
 
-        if len(runs) > 0:
-            print(f"Removing previous runs ({len(runs)})")
+            if len(runs) > 0:
+                print(f"Removing previous runs ({len(runs)})")
 
-        for run in runs:
-            run.delete()
+            for run in runs:
+                run.delete()
+
+    remove_thread = Thread(target=remove_runs)
+    remove_thread.start()
 
     skip = config.skip if "skip" in config else DotDict()
 
@@ -193,25 +218,41 @@ def run_experiment(main, config, path, config_name, **args_overrides):
 
     elapsed = 0
 
-    # todo: parallelize! note that we cannot pickle torch stuff and `main` function
-    for i, config in enumerate(experiments_configurations):
-        args = config["args"]
+    # for multiprocessing we must convert DotDicts back into dict,
+    # as the __getitem__ and stuff will be used
+    experiments_configurations = from_dot_dict(experiments_configurations)
+    total = len(experiments_configurations)
 
-        start = time.time()
-
-        with Context(project=config["project"],
-                     name=config["name"],
-                     display_name=config["display_name"],
-                     log=config["log"],
-                     arguments={name: value for name, value in zip(arg_names, args)},
-                     current=i,
-                     total=len(experiments_configurations),
-                     elapsed=elapsed) as context:
-            main(context, *args)
-
-        elapsed += time.time() - start
+    gc.collect()
+    with MyPool(20) as pool:
+        pool.starmap(execute_run, [(i, config, arg_names, total, main_name, path)
+                                   for i, config in enumerate(experiments_configurations)])
 
     # remove local wandb folder
     path_to_wandb = os.path.join(os.path.dirname(path), "wandb")
     if os.path.exists(path_to_wandb) and os.path.isdir(path_to_wandb):
         shutil.rmtree(path_to_wandb)
+
+    remove_thread.join()
+
+
+class NoDaemonProcess(multiprocessing.Process):
+    @property
+    def daemon(self):
+        return False
+
+    @daemon.setter
+    def daemon(self, value):
+        pass
+
+
+class NoDaemonContext(type(multiprocessing.get_context())):
+    Process = NoDaemonProcess
+
+
+# We sub-class multiprocessing.pool.Pool instead of multiprocessing.Pool
+# because the latter is only a wrapper function, not a proper class.
+class MyPool(multiprocessing.pool.Pool):
+    def __init__(self, *args, **kwargs):
+        kwargs['context'] = NoDaemonContext()
+        super(MyPool, self).__init__(*args, **kwargs)
