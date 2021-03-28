@@ -3,6 +3,7 @@ import sys
 from datetime import timedelta
 
 import torch
+from numba import njit
 from scipy.stats import skewnorm
 
 from .buffer import Buffer
@@ -44,6 +45,7 @@ def get_total_gradient(nn):
     return total_grad / count
 
 
+@njit
 def get_trajectory_reward(env, agent, max_length):
     total_reward = 0
 
@@ -58,10 +60,23 @@ def get_trajectory_reward(env, agent, max_length):
     return total_reward
 
 
-def weight_skills(skills, mean, std, skew):
+def weight_skills(skills, mean, std, skew) -> np.ndarray:
     cdf_0 = skewnorm.cdf(0, skew, loc=mean, scale=std)
     cdf_1 = skewnorm.cdf(1, skew, loc=mean, scale=std)
     diff = cdf_1 - cdf_0
 
     weights = skewnorm.pdf(skills, skew, loc=mean, scale=std) / diff
     return weights / weights.sum()
+
+
+class time_section:
+    def __init__(self):
+        self.start_time: float
+
+    def __enter__(self):
+        self.start_time = datetime.now()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        end_time = datetime.now()
+        total = end_time - self.start_time
+        print(total)

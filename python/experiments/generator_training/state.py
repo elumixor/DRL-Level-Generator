@@ -1,25 +1,23 @@
-import torch
+import numpy as np
+from numba import njit
 
-from common import tensored
+
+@njit
+def create(bob_radius, max_angle, connector_length, vertical_speed, enemy_x, enemy_y, enemy_radius, current_angle,
+           position, angular_speed) -> np.ndarray:
+    return np.array([bob_radius, max_angle, connector_length, vertical_speed, enemy_x, enemy_y, enemy_radius,
+                     current_angle, position, angular_speed], dtype=np.float32)
 
 
-@tensored
-class State(torch.Tensor):
-    # Define init for static code checking
-    def __init__(self, bob_radius, max_angle, connector_length, vertical_speed,
-                 enemy_x, enemy_y, enemy_radius, current_angle, position, angular_speed):
-        ...
+bob_radius = 0
+max_angle = 1
+connector_length = 2
+vertical_speed = 3
 
-    # Define fields for access
-    bob_radius: torch.Tensor
-    max_angle: torch.Tensor
-    connector_length: torch.Tensor
-    vertical_speed: torch.Tensor
+enemy_x = 4
+enemy_y = 5
+enemy_radius = 6
 
-    enemy_x: torch.Tensor
-    enemy_y: torch.Tensor
-    enemy_radius: torch.Tensor
-
-    current_angle: torch.Tensor
-    position: torch.Tensor
-    angular_speed: torch.Tensor
+current_angle = 7
+position = 8
+angular_speed = 9

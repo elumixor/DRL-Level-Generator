@@ -35,8 +35,7 @@ def main(context, min_std, std_constrain, lr, skills, epochs, d_in_size, enemy_x
         level, log_prob, constrain_loss = generator.generate(d_in)
 
         # Evaluate the difficulty of the generated levels
-        d_out = evaluator.evaluate(level)
-        print(d_out.shape)
+        d_out = torch.from_numpy(evaluator.evaluate(level.numpy())).type(torch.float32)
 
         # Compute the difference with the input difficulty
         difference = (d_out - d_in.unsqueeze(1)).abs()
