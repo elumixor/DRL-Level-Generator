@@ -25,7 +25,8 @@ def main(context, min_std, std_constrain, lr, skills, epochs, d_in_size, enemy_x
     skill_weights = weight_skills(torch.tensor(skills), skill_weighting.mean, skill_weighting.std,
                                   skill_weighting.skew)
 
-    evaluator = TrajectoryRewardsEvaluator(Environment, Actor, torch.tensor(skills), skill_weights,
+    num_envs = d_in_size * sample_size * len(skills) * num_evaluations
+    evaluator = TrajectoryRewardsEvaluator(Environment, Actor, torch.tensor(skills), skill_weights, num_envs,
                                            num_evaluations, max_trajectory_length, env_args, actor_args)
 
     # generate input difficulties (systematically)

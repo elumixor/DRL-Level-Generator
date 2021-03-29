@@ -1,34 +1,39 @@
 import numpy as np
-from numba import njit, typed
+from numba import njit, typed, prange
 
 from utilities import get_trajectory_reward
 
 
-@njit
-def evaluate_levels(x, env, actors, num_evaluations, max_trajectory_length):
+@njit(parallel=True)
+def evaluate_levels(x, envs, actors, num_evaluations, max_trajectory_length):
     num_actors = len(actors)
     result = [0.0] * (len(x) * num_actors * num_evaluations)
 
-    for i in range(len(x)):
+    for i in prange(len(x)):
         level = x[i]
-        env.set_level(level)
         for e in range(num_actors):
             actor = actors[e]
-            for ev in range(num_evaluations):
-                result[i * num_actors * num_evaluations + e * num_evaluations + ev] = get_trajectory_reward(env, actor,
-                                                                                                            max_trajectory_length)
+            for ev in prange(num_evaluations):
+                index = i * num_actors * num_evaluations + e * num_evaluations + ev
+                env = envs[index]
+                env.set_level(level)
+                r_trajectory = get_trajectory_reward(env, actor, max_trajectory_length)
+                result[index] = r_trajectory
 
     return result
 
 
 class TrajectoryRewardsEvaluator:
-    def __init__(self, EnvClass, ActorClass, skills, skill_weights, num_evaluations, max_trajectory_length, env_args,
+    def __init__(self, EnvClass, ActorClass, skills, skill_weights, num_envs, num_evaluations, max_trajectory_length,
+                 env_args,
                  actor_args):
         self.actor_args = actor_args
         self.max_trajectory_length = max_trajectory_length
         self.num_evaluations = num_evaluations
         self.skill_weights = skill_weights
-        self.env = EnvClass(0.0, *env_args)
+        self.envs = typed.List()
+        for _ in range(num_envs):
+            self.envs.append(EnvClass(0.0, *env_args))
 
         self.skills_number = skills.shape[0]
         self.actors = typed.List()
@@ -53,7 +58,7 @@ class TrajectoryRewardsEvaluator:
         num_difficulties = x.shape[0]
         num_samples = x.shape[1]
 
-        r_trajectory = np.array(evaluate_levels(x.flatten(), self.env, self.actors, self.num_evaluations,
+        r_trajectory = np.array(evaluate_levels(x.flatten(), self.envs, self.actors, self.num_evaluations,
                                                 self.max_trajectory_length))
         r_trajectory = r_trajectory.reshape([num_difficulties, num_samples, self.skills_number, self.num_evaluations])
 
