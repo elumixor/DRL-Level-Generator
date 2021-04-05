@@ -6,6 +6,8 @@ arguments:
   constrain_weight:
     - 0.5
 
+  batch_size: 100
+
   max_angle:
     - linspace:
         min: 5
