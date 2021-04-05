@@ -31,7 +31,9 @@ def main(context, min_std, std_constrain, lr, skills, epochs, d_in_size, enemy_x
 
     # generate input difficulties (systematically)
     d_in = torch.linspace(0, 1, d_in_size).unsqueeze(1)
-    for _ in range(epochs):
+    for epoch in range(epochs):
+        print(epoch)
+
         # Generate the levels, get their log probabilities and constrain loss
         level, log_prob, constrain_loss = generator.generate(d_in)
 
@@ -54,4 +56,4 @@ def main(context, min_std, std_constrain, lr, skills, epochs, d_in_size, enemy_x
 
 
 if __name__ == '__main__':
-    run_current()
+    run_current(wandb=True, parallel=False)

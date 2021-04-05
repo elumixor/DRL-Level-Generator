@@ -116,7 +116,7 @@ def execute_run(i, config, arg_names, total_len, main_name, path):
         main(context, *args)
 
 
-def run_experiment(main_name, config, path, config_name, **args_overrides):
+def run_experiment(main_name, config, path, config_name, parallel=True, **args_overrides):
     spec = spec_from_file_location("module.name", path)
     foo = module_from_spec(spec)
     spec.loader.exec_module(foo)
@@ -223,10 +223,14 @@ def run_experiment(main_name, config, path, config_name, **args_overrides):
     experiments_configurations = from_dot_dict(experiments_configurations)
     total = len(experiments_configurations)
 
-    gc.collect()
-    with MyPool(20) as pool:
-        pool.starmap(execute_run, [(i, config, arg_names, total, main_name, path)
-                                   for i, config in enumerate(experiments_configurations)])
+    if parallel:
+        gc.collect()
+        with MyPool(20) as pool:
+            pool.starmap(execute_run, [(i, config, arg_names, total, main_name, path)
+                                       for i, config in enumerate(experiments_configurations)])
+    else:
+        for i, config in enumerate(experiments_configurations):
+            execute_run(i, config, arg_names, total, main_name, path)
 
     # remove local wandb folder
     path_to_wandb = os.path.join(os.path.dirname(path), "wandb")

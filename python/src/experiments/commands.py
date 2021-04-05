@@ -67,6 +67,9 @@ def run_one(config_location, args):
     if args.silent is None:
         args.silent = False
 
+    if args.parallel is None:
+        args.parallel = True
+
     if args.console + args.wandb + args.silent > 1:
         raise ValueError("Only one of --[console|wandb|silent] can be specified")
 
@@ -104,4 +107,4 @@ def run_one(config_location, args):
 
     args_overrides = args.args if "args" in args else dict()
 
-    run_experiment(main_name, config, experiment_path, defaults.config, **args_overrides)
+    run_experiment(main_name, config, experiment_path, defaults.config, parallel=args.parallel, **args_overrides)

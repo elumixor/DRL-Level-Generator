@@ -25,8 +25,19 @@ class Context:
                 self.run.log(values)
 
         elif self.console:
-            def log_function(values: Dict[str, Union[int, float, torch.Tensor]]):
-                print(values)
+            class LogFunction:
+                def __init__(self):
+                    self.epoch = 1
+
+                def __call__(self, values: Dict[str, Union[int, float, torch.Tensor]]):
+                    print(f"{self.epoch}", end=": ")
+                    for name, value in values.items():
+                        print(f"{name} {float(value):10.5f} ", end="\t\t")
+
+                    print()
+                    self.epoch += 1
+
+            log_function = LogFunction()
 
         else:
             def log_function(*args):

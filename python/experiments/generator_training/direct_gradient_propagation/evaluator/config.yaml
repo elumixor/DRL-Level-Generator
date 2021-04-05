@@ -22,5 +22,5 @@ log: wandb
 
 
 arguments:
-  enemy_x_min: -0.5
-  enemy_x_max: 0.5
+  enemy_x_min: -2.5
+  enemy_x_max: 2.5
