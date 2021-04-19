@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import glfw
 import numpy as np
 from OpenGL.GL import *
 from PIL import Image
 
-from utilities import eprint
+from utils import log, classproperty
 from .color import Color
 from .game_objects import GameObject
 
@@ -14,7 +16,7 @@ class RenderingContext:
         self.width = width
 
         if not glfw.init():
-            eprint("glfw.init() failed")
+            log.error("glfw.init() failed")
             return
 
         glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
@@ -24,7 +26,7 @@ class RenderingContext:
         self.window = glfw.create_window(width, height, title, None, None)
 
         if not self.window:
-            eprint("Could not create window")
+            log.error("Could not create window")
             glfw.terminate()
             return
 
@@ -67,11 +69,19 @@ class RenderingContext:
         # Set up rendering to the texture
         self.fb = glGenFramebuffers(1)
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __del__(self):
         glfw.terminate()
+
+    # noinspection PyMethodParameters
+    @classproperty
+    def instance(cls) -> RenderingContext:
+        try:
+            return cls.__static_instance
+        except AttributeError:
+            instance = RenderingContext(800, 600)
+            # noinspection PyAttributeOutsideInit
+            cls.__static_instance = instance
+            return instance
 
     @property
     def clear_color(self):

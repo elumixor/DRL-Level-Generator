@@ -4,8 +4,7 @@ from typing import Optional
 
 import numpy as np
 
-from common import num
-from utilities import approx
+from utils import num, approx
 
 
 class PointProperties(type):

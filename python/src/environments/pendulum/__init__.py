@@ -1,2 +1,1 @@
-from .environment import PendulumEnvironment
-from .state import PendulumState
+from .environment import PendulumEnv

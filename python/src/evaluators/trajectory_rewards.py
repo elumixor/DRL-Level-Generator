@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit, typed, prange
 
-from utilities import get_trajectory_reward
+from .utils import get_trajectory_reward
 
 
 @njit(parallel=True)
