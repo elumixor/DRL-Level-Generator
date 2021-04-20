@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require("webpack");
 
 module.exports = {
     entry: "./src/index.ts",
@@ -14,8 +15,17 @@ module.exports = {
             },
         ],
     },
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: 'Visualizer',
+        }),
+        new webpack.ProvidePlugin({
+            PIXI: "pixi.js",
+        }),
+    ],
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
+        modules: [path.resolve("./src"), "node_modules"],
     },
     output: {
         filename: "[name].bundle.js",
