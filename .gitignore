@@ -154,3 +154,5 @@ __pycache__/
 **/dqn_model.m
 
 wandb/
+visualizer/dist/
+**/node_modules/
