@@ -69,13 +69,28 @@ class RenderingContext:
         # Set up rendering to the texture
         self.fb = glGenFramebuffers(1)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.terminate()
+
     def __del__(self):
+        self.terminate()
+
+    def terminate(self):
         glfw.terminate()
+
+        RenderingContext.__static_instance = None
 
     # noinspection PyMethodParameters
     @classproperty
     def instance(cls) -> RenderingContext:
         try:
+            if cls.__static_instance is None:
+                instance = RenderingContext(800, 600)
+                cls.__static_instance = instance
+
             return cls.__static_instance
         except AttributeError:
             instance = RenderingContext(800, 600)
@@ -109,11 +124,11 @@ class RenderingContext:
 
         glfw.terminate()
 
-    def renderTexture(self, resolution=2):
+    def render_texture(self, resolution=1.0):
         glBindFramebuffer(GL_FRAMEBUFFER, self.fb)
 
-        width = self.width * resolution
-        height = self.height * resolution
+        width = round(self.width * resolution)
+        height = round(self.height * resolution)
 
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)

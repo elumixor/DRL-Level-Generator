@@ -1,9 +1,11 @@
 <component name="ProjectDictionaryState">
   <dictionary name="elumixor">
     <words>
+      <w>approximator</w>
       <w>coeff</w>
       <w>elumixor</w>
       <w>linspace</w>
+      <w>lrelu</w>
       <w>overfitting</w>
       <w>renderable</w>
       <w>rollout</w>

@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from typing import Union
 
@@ -6,7 +7,10 @@ import torch
 
 from .dot_dict import DotDict, to_dot_dict
 from .memory_buffer import MemoryBuffer
+from .mlp import MLP
 from .printing import log
+from .setter import setter
+from .train_until import TrainUntil
 from .yaml_reading import read_yaml
 
 num = Union[int, float]
@@ -15,6 +19,11 @@ vec = Union[np.ndarray, torch.tensor]
 
 def clamp(value, _min, _max):
     return max(_min, min(value, _max))
+
+
+def save(obj, path):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    obj.save(path)
 
 
 def running_average(arr, smoothing=0.8):

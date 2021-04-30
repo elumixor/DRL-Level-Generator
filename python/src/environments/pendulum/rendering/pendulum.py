@@ -32,6 +32,8 @@ class Pendulum(GameObject):
         self.bob.transform.local_scale = _bob_radius * Point.one
         self.bob.transform.local_position = connector_height * Point.down
 
+        self.update(state)
+
     def update(self, state: np.ndarray):
         self.transform.rotation = state[current_angle]
         self.line.transform.rotation = -state[current_angle]

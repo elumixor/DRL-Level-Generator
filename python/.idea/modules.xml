@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../.git/hooks/.idea/hooks.iml" filepath="$PROJECT_DIR$/../.git/hooks/.idea/hooks.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/python.iml" filepath="$PROJECT_DIR$/.idea/python.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../visualizer/.idea/visualizer.iml" filepath="$PROJECT_DIR$/../visualizer/.idea/visualizer.iml" />
     </modules>
   </component>
 </project>

@@ -5,8 +5,11 @@
       <sourceFolder url="file://$MODULE_DIR$/experiments" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/dummy" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (lgen)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="hooks" />
+    <orderEntry type="module" module-name="visualizer" />
   </component>
 </module>

@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from numba import njit
 from scipy.stats import skewnorm
+from torch import nn
 
 
 def calculate_diversity(batch_levels, batch_difficulties=None):
@@ -18,13 +19,12 @@ def calculate_diversity(batch_levels, batch_difficulties=None):
 
 
 @njit
-def get_trajectory_reward(env, agent, max_length):
+def get_trajectory_reward(env, agent, state, max_length):
     total_reward = 0
 
-    state = env.reset()
     for _ in range(max_length):
         action = agent.get_action(state)
-        state, reward, done = env.step(action)
+        state, reward, done = env.transition(state, action)
         total_reward += reward
         if done:
             break
@@ -39,3 +39,13 @@ def weight_skills(skills, mean, std, skew) -> np.ndarray:
 
     weights = skewnorm.pdf(skills, skew, loc=mean, scale=std) / diff
     return weights / weights.sum()
+
+
+def detach_nn(net: nn.Module):
+    for p in net.parameters():
+        p.requires_grad_(False)
+
+
+def attach_nn(net: nn.Module):
+    for p in net.parameters():
+        p.requires_grad_(True)

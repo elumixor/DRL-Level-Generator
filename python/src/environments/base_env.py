@@ -64,8 +64,8 @@ class BaseEnv(ABC, Generic[TState, TAction]):
     def instantiate(self) -> TEnvInstance:
         return self.instance_class(self)
 
-    def render(self, state: TState):
+    def render(self, state: TState, to_image=False, **kwargs):
         if not self.renderer:
             self.renderer = self.renderer_class()
 
-        self.renderer.render_state(state)
+        return self.renderer.render_state(state, to_image, **kwargs)

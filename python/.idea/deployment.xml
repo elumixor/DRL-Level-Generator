@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="yazykov@147.32.83.218:22" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="yazykov@147.32.83.218:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="lgen" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

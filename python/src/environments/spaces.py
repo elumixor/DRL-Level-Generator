@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+from numba import int32, float32
+from numba.experimental import jitclass
 
 from utils import vec
 
@@ -35,6 +37,41 @@ class BoxSpace(Space):
 
 
 class DiscreteSpace(Space):
+    def __init__(self, size: int):
+        self._size = size
+
+    @property
+    def size(self) -> int:
+        return self._size
+
+    def sample(self, n=1) -> vec:
+        return np.random.choice(self._size, n)
+
+
+@jitclass([
+    ("low", float32[:]),
+    ("high", float32[:]),
+    ("_size", int32),
+])
+class BoxSpaceJIT:
+    def __init__(self, low: vec, high: vec):
+        self.low = low
+        self.high = high
+        self._size = low.shape[0]
+
+    @property
+    def size(self) -> int:
+        return self._size
+
+    def sample(self, n=1) -> vec:
+        if n == 1:
+            return np.random.uniform(self.low, self.high).astype(np.float32)
+
+        return np.random.uniform(self.low, self.high, (n, self._size)).astype(np.float32)
+
+
+@jitclass([("_size", int32)])
+class DiscreteSpaceJIT:
     def __init__(self, size: int):
         self._size = size
 
