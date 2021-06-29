@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Tuple
+
 import glfw
 import numpy as np
 from OpenGL.GL import *
@@ -48,13 +50,13 @@ class RenderingContext:
         self._main_scene = GameObject()
 
         # Constant AR
-        aspect = width / height
-        self._projection_matrix = np.array([[1, 0, 0], [0, aspect, 0], [0, 0, 1]], dtype=np.float32)
+        self.aspect = width / height
+        self._projection_matrix = np.array([[1, 0, 0], [0, self.aspect, 0], [0, 0, 1]], dtype=np.float32)
 
         def resize_callback(window, width, height):
-            aspect = width / height
+            self.aspect = width / height
             glViewport(0, 0, width, height)
-            self._projection_matrix = np.array([[1, 0, 0], [0, aspect, 0], [0, 0, 1]], dtype=np.float32)
+            self._projection_matrix = np.array([[1, 0, 0], [0, self.aspect, 0], [0, 0, 1]], dtype=np.float32)
 
         glfw.set_framebuffer_size_callback(self.window, resize_callback)
 
@@ -110,6 +112,18 @@ class RenderingContext:
     @property
     def main_scene(self):
         return self._main_scene
+
+    @property
+    def camera_position(self) -> Tuple[float, float]:
+        dx = self._projection_matrix[0][-1]
+        dy = self._projection_matrix[1][-1]
+        return -dx, -dy / self.aspect
+
+    @camera_position.setter
+    def camera_position(self, position: Tuple[float, float]):
+        dx, dy = position
+        self._projection_matrix[0][-1] = -dx
+        self._projection_matrix[1][-1] = -dy * self.aspect
 
     def render_frame(self):
         self.keys_down = []

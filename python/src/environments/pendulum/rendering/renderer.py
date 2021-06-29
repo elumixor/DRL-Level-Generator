@@ -4,8 +4,9 @@ from rendering import RenderingContext, GameObject, Color, Circle, Point
 from utils import vec
 from .enemy import Enemy
 from .pendulum import Pendulum
+from ..state import enemy_radius as s_enemy_radius, size_fixed, position as s_position
 from ...renderer import Renderer, TState
-from ..state import enemy_radius as r_e, size_fixed
+
 
 class PendulumRenderer(Renderer[vec]):
     def render_state(self, state: TState, to_image=False, **kwargs):
@@ -16,6 +17,9 @@ class PendulumRenderer(Renderer[vec]):
         else:
             self.pendulum.update(state)
             self.enemy.update(state)
+
+        dx, _ = self.context.camera_position
+        self.context.camera_position = (dx, state[s_position])
 
         if to_image:
             return self.context.render_texture(resolution=kwargs.get("resolution", 1))
@@ -44,7 +48,7 @@ def render_variable(ctx, state, resolution=1.0):
 
     pendulum = Pendulum(state)
 
-    enemy_radius = state[r_e]
+    enemy_radius = state[s_enemy_radius]
     enemies = state[size_fixed:]
 
     game_object.add_child(pendulum)

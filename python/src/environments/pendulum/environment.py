@@ -6,7 +6,8 @@ from numba.experimental import jitclass
 
 from utils import vec
 from .rendering import PendulumRenderer
-from .state import create as State
+from .state import create as State, current_angle as s_current_angle, position as s_position, \
+    angular_speed as s_angular_speed
 from ..base_env import BaseEnv
 from ..spaces import DiscreteSpace, BoxSpace, DiscreteSpaceJIT, BoxSpaceJIT
 
@@ -34,9 +35,9 @@ def transition(state: np.ndarray, action: int):
 
     # Combine into the new observation
     new_state = state.copy()
-    new_state[5] = angle
-    new_state[6] = position
-    new_state[7] = angular_speed
+    new_state[s_current_angle] = angle
+    new_state[s_position] = position
+    new_state[s_angular_speed] = angular_speed
 
     # Check collision
     bob_center_x = np.sin(angle) * connector_length
