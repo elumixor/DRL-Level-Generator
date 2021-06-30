@@ -4,14 +4,16 @@ import glfw
 
 from environments import PendulumEnv
 from environments.pendulum import State
+from environments.pendulum.state import enemy_x as s_enemy_x
 from evaluators.direct_actor import NOP, SWITCH
 from rendering import RenderingContext
 from shared_parameters import bob_radius, max_angle, connector_length, vertical_speed, \
     current_angle, position, angular_speed, enemy_radius, enemy_x, enemy_y
 
 env = PendulumEnv()
+x = enemy_x
 start_state = State(bob_radius, max_angle, connector_length, vertical_speed,
-                    current_angle, position, angular_speed, enemy_radius, enemy_x, enemy_y)
+                    current_angle, position, angular_speed, enemy_radius, x, enemy_y)
 
 ctx = RenderingContext.instance
 
@@ -23,6 +25,16 @@ step = 0
 while not ctx.is_key_held(glfw.KEY_ESCAPE):
     env.render(state)
     step += 1
+
+    if ctx.is_key_pressed(glfw.KEY_LEFT):
+        x -= 0.1
+        state[s_enemy_x] = x
+        start_state[s_enemy_x] = x
+
+    if ctx.is_key_pressed(glfw.KEY_RIGHT):
+        x += 0.1
+        state[s_enemy_x] = x
+        start_state[s_enemy_x] = x
 
     if ctx.is_key_pressed(glfw.KEY_SPACE):
         state, reward, done = env.transition(state, SWITCH)

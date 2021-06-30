@@ -13,10 +13,10 @@ enemy_x = 0.1
 enemy_y = 0.25
 # endregion
 
-enemy_x_min = -1
-enemy_x_max = 1
-enemy_y_min = -1
-enemy_y_max = 1
+enemy_x_min = -0.5
+enemy_x_max = 0.5
+enemy_y_min = 0.15
+enemy_y_max = 0.8
 
 subdivisions = 100
 epochs = 100000

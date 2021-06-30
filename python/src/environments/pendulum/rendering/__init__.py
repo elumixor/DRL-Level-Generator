@@ -1,1 +1,1 @@
-from .renderer import PendulumRenderer
+from .renderer import PendulumRenderer, VariablePendulumRenderer

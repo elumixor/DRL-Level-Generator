@@ -1,1 +1,1 @@
-from .pendulum import PendulumEnv, PendulumEnvJIT, VariablePendulumJIT
+from .pendulum import PendulumEnv, VariablePendulumEnv, PendulumEnvJIT, VariablePendulumEnvJIT

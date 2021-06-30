@@ -2,7 +2,7 @@ from numba import njit, prange
 
 from environments import PendulumEnvJIT
 from environments.pendulum import State
-from environments.pendulum.state import enemy_x, size as state_size, size_fixed as state_size_fixed, create_variable
+from environments.pendulum.state import enemy_x as s_enemy_x, size as state_size, create_variable
 from evaluators import TrajectoryRewardsEvaluator, DirectEvaluator
 from evaluators.direct_actor import Actor
 from evaluators.utils import weight_skills
@@ -19,8 +19,8 @@ def create_actors(num_actors, actor_class=Actor):
 
 @njit
 def create_state(enemy_x):
-    return State(bob_radius, max_angle, connector_length, vertical_speed, enemy_x, enemy_y, enemy_radius, current_angle,
-                 position, angular_speed)
+    return State(bob_radius, max_angle, connector_length, vertical_speed, current_angle, position, angular_speed,
+                 enemy_radius, enemy_x, enemy_y)
 
 
 @njit
@@ -50,7 +50,7 @@ def states2x(x):
     x = x.reshape(-1, state_size)
     y = np.zeros((x.shape[0]), dtype=np.float32)
     for i in prange(x.shape[0]):
-        y[i] = x[i][enemy_x]
+        y[i] = x[i][s_enemy_x]
 
     return y.reshape(original_shape[:-1])
 
