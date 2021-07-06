@@ -8,6 +8,9 @@ class MLP(nn.Module):
                  activation: Union[Literal["relu"], Literal["lrelu"]] = "relu", **kwargs):
         super().__init__()
 
+        if hidden is None:
+            hidden = []
+
         for h in hidden:
             if h <= 0:
                 raise AttributeError(f"Hidden size should be greater than zero. Received: {hidden}")
