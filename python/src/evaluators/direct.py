@@ -7,6 +7,9 @@ class DirectEvaluator:
         self.enemy_radius = enemy_radius
         self.x_p_max = connector_length * np.sin(max_angle)
 
+    def __call__(self, x):
+        return self.evaluate(x)
+
     def evaluate(self, x):
         s_left = (x - self.enemy_radius - self.bob_radius + self.x_p_max).clip(0.0, 2 * self.x_p_max)
         s_right = (self.x_p_max - x - self.enemy_radius - self.bob_radius).clip(0.0, 2 * self.x_p_max)

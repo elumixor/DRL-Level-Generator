@@ -6,7 +6,8 @@ from IPython.display import clear_output
 
 
 class TrainUntil:
-    def __init__(self, threshold, num_items, max_iterations, print_frequency: Optional[int] = None, clear=False):
+    def __init__(self, threshold, num_items, max_iterations=float("inf"), print_frequency: Optional[int] = None,
+                 clear=False):
         self.threshold = threshold
         self.num_items = num_items
         self.max_iterations = max_iterations
