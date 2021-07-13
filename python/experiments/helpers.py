@@ -9,6 +9,13 @@ from evaluators.utils import weight_skills
 from shared_parameters import *
 
 
+def set_matplotlib_colors(matplotlib, text_color="black", other_color="white"):
+    for p in ['axes.labelcolor', 'xtick.color', 'ytick.color']:
+        matplotlib.rcParams[p] = other_color
+
+    matplotlib.rcParams['text.color'] = text_color
+
+
 def create_actors(num_actors, actor_class=Actor):
     skills = np.linspace(0, 1, num_actors, dtype=np.float32)
     actors = np.array([actor_class(skill) for skill in skills])

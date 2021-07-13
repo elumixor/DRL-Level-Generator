@@ -1,15 +1,17 @@
-from typing import Optional, List, Literal, Union
+from typing import Optional, List
 
 from torch import nn
 
 
 class MLP(nn.Module):
-    def __init__(self, in_size: int, out_size: int, hidden: Optional[List[int]] = None,
-                 activation: Union[Literal["relu"], Literal["lrelu"]] = "relu", **kwargs):
+    def __init__(self, in_size: int, out_size: int, hidden: Optional[List[int]] = None, activation: nn.Module = None):
         super().__init__()
 
         if hidden is None:
             hidden = []
+
+        if activation is None:
+            activation = nn.ReLU()
 
         for h in hidden:
             if h <= 0:
@@ -25,7 +27,7 @@ class MLP(nn.Module):
 
             layers.append(nn.Linear(hidden[-1], out_size))
 
-        self.activation = nn.ReLU() if activation == "relu" else nn.LeakyReLU(kwargs.get("negative_slope", 1e-2))
+        self.activation = activation
         self.layers = nn.ModuleList(layers)
 
     def forward(self, x):
