@@ -1,11 +1,11 @@
 import random
-from typing import Union, TypeVar, Generic, List
+from typing import TypeVar, Generic, List
 
 T = TypeVar('T')
 
 
 class MemoryBuffer(Generic[T]):
-    def __init__(self, capacity: Union[int, None] = None):
+    def __init__(self, capacity: int = 10000):
         self.data: List[T] = []
         self.capacity = capacity
         self.position = 0

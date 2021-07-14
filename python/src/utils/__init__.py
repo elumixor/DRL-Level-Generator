@@ -6,6 +6,7 @@ import numpy as np
 import torch
 
 from .dot_dict import DotDict, to_dot_dict
+from .epsilon_decay import EpsilonDecay
 from .memory_buffer import MemoryBuffer
 from .mlp import MLP
 from .printing import log

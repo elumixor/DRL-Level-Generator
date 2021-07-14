@@ -13,7 +13,7 @@ from ...spaces import DiscreteSpace, BoxSpace, DiscreteSpaceJIT, BoxSpaceJIT
 
 
 @njit
-def transition(state: np.ndarray, action: int):
+def transition(state: np.ndarray, action: int, step_reward: float, action_cost: float, death_cost: float):
     switch = action == 1
 
     # Interpret data
@@ -43,24 +43,25 @@ def transition(state: np.ndarray, action: int):
     bob_center_x = np.sin(angle) * connector_length
     bob_center_y = position - np.cos(angle) * connector_length
 
-    reward = 1.0 if not switch else 0.9
-
     distance = np.sqrt((bob_center_x - enemy_x) ** 2 + (bob_center_y - enemy_y) ** 2)
 
     # Collision
-    if distance <= (bob_radius + enemy_radius):
-        done = True
-        reward = 0.0 if not switch else -0.1
-        return new_state, reward, done
+    done = distance <= (bob_radius + enemy_radius)
+    reward = step_reward if not done else -death_cost
 
-    # No collision
-    done = False
+    if switch:
+        reward -= action_cost
+
     return new_state, reward, done
 
 
 class PendulumEnv(BaseEnv[vec, vec]):
-    def __init__(self):
+    def __init__(self, step_reward: float, action_cost: float, death_cost: float):
         super().__init__(PendulumRenderer)
+
+        self.step_reward = step_reward
+        self.action_cost = action_cost
+        self.death_cost = death_cost
 
         low = State(0.05, 0, 0.05, 0.1, -1, -1, 0.05, 0, 0, 0)
         high = State(1, 90, 1, 1, 1, 1, 1, 90, 1, 90)
@@ -77,7 +78,7 @@ class PendulumEnv(BaseEnv[vec, vec]):
         return self._action_space
 
     def transition(self, state: vec, action: vec) -> Tuple[vec, float, bool]:
-        return transition(state, action)
+        return transition(state, action, self.step_reward, self.action_cost, self.death_cost)
 
 
 @jitclass([
