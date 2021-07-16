@@ -27,8 +27,14 @@ class AbstractGenerator(abc.ABC):
     def __call__(self, *args, **kwargs):
         return self.generate(*args, **kwargs)
 
-    def remap(self, x):
+    def to_embedding(self, x):
+        """
+        Maps [0, 1] to the embeddings space
+        """
         return x * self.bounds_diff + self.bounds_min
 
-    def remap_inverse(self, x):
+    def from_embedding(self, x):
+        """
+        Maps embedding space back to the [0, 1] range
+        """
         return (x - self.bounds_min) / self.bounds_diff

@@ -14,7 +14,7 @@ state = State(P.bob_radius, P.max_angle, P.connector_length, P.vertical_speed, P
 
 def render_single_enemy(enemy_x, resolution=1.0) -> PIL.Image:
     state[enemy_x_index] = enemy_x
-    env = PendulumEnv()
+    env = PendulumEnv(0, 0, 0)
     img = env.render(state, to_image=True, resolution=resolution)
     RenderingContext.instance.terminate()
     return img

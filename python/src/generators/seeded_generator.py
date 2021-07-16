@@ -57,7 +57,7 @@ class SeededGenerator(AbstractGenerator):
         # todo: Check that seeds are within the bounds as well
 
         # Transform the seeds from the embedding space to the [0, 1] space
-        seeds = self.remap_inverse(seeds)
+        seeds = self.from_embedding(seeds)
 
         # Generate offsets from the inputs
         offsets = self.nn(inputs)
@@ -70,7 +70,7 @@ class SeededGenerator(AbstractGenerator):
         #       thus we may need to clamp them to the valid range
 
         # The generated offsets are in [0, 1] range. Thus, we need to remap them to the embedding space
-        offsets = self.remap(offsets)
+        offsets = self.to_embedding(offsets)
 
         # The generated levels are then the seeds + the offsets
         return seeds + offsets

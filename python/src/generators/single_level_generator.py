@@ -48,7 +48,7 @@ class SingleLevelGenerator(AbstractGenerator):
         #       thus we may need to clamp them to the valid range
 
         # The generated embeddings are generated in [0, 1] range. Thus, we need to remap to the embedding space
-        embeddings = self.remap(embeddings)
+        embeddings = self.to_embedding(embeddings)
 
         return embeddings
 
