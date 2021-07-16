@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Callable
 
 import torch
 from torch import Tensor
@@ -16,27 +16,35 @@ class SeededGenerator(AbstractGenerator):
     """
 
     def __init__(self, bounds: Tensor, hidden: Optional[List[int]] = None, activation: Optional[Module] = None,
-                 optimizer_class=None, lr=0.01):
+                 optimizer_class=None, lr=0.01, loss_function: Optional[Callable[[Tensor, Tensor], Tensor]] = None):
         super().__init__(bounds)
 
         if optimizer_class is None:
             optimizer_class = Adam
 
+        if loss_function is None:
+            loss_function = F.mse_loss
+
         # The actual network, which is a simple multi-layered perceptron
-        self.nn = MLP(in_size=1, out_size=self.embedding_size, hidden=hidden, activation=activation)
+        self.nn = MLP(in_size=1 + self.embedding_size, out_size=self.embedding_size, hidden=hidden,
+                      activation=activation)
 
         # todo: seed the network so it generates small offsets (or is that really necessary?)
 
         self.optim = optimizer_class(self.nn.parameters(), lr=lr)
+        self.loss_function = loss_function
 
         self.d_in: Optional[Tensor] = None
         self.offsets: Optional[Tensor] = None
 
-    def generate(self, inputs: Tensor):
+    def parameters(self):
+        return self.nn.parameters()
+
+    def generate(self, inputs: Tensor) -> Tensor:
         """
         Generates levels
         :param inputs: Batch of input difficulties and input seeds. Shape (batch_size, 1 + embedding_size)
-        :return: Generated levels. Shape (batch_size, embedding_size)
+        :return: Generated levels in the embedding space. Shape (batch_size, embedding_size)
         """
         if inputs.ndim != 2 or inputs.shape[1] != (1 + self.embedding_size):
             raise Exception(f"'d_in' should have shape (batch_size, {1 + self.embedding_size}), but was {inputs.shape}")
@@ -85,7 +93,7 @@ class SeededGenerator(AbstractGenerator):
                             f"{d_out.shape}")
 
         # Minimize the difference between the input and the output difficulties
-        difficulty_loss = F.mse_loss(self.d_in, d_out)
+        difficulty_loss = self.loss_function(self.d_in, d_out)
 
         # Also minimize generated offsets. This is crucial!
         offsets_loss = torch.norm(self.offsets, dim=-1).mean()

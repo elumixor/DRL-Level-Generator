@@ -25,7 +25,7 @@ class AbstractGenerator(abc.ABC):
         pass
 
     def __call__(self, *args, **kwargs):
-        self.generate(*args, **kwargs)
+        return self.generate(*args, **kwargs)
 
     def remap(self, x):
         return x * self.bounds_diff + self.bounds_min
