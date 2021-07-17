@@ -22,6 +22,11 @@ class AbstractGenerator(abc.ABC):
 
     @abc.abstractmethod
     def generate(self, d_in):
+        """
+        Generates levels of the given difficulties in embedding space
+        :param d_in: Difficulty, that the generated level should have
+        :return: Generated level
+        """
         pass
 
     def __call__(self, *args, **kwargs):

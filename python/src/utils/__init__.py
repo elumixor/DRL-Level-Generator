@@ -45,6 +45,10 @@ def approx(a: float, b: float, eps=1e-7):
     return abs(a - b) < eps
 
 
+def mean(iterable):
+    return sum(iterable) / len(iterable)
+
+
 class timed:
     def __init__(self):
         self.start_time: float

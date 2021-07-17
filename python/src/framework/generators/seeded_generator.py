@@ -2,11 +2,11 @@ from typing import Optional, List, Callable
 
 import torch
 from torch import Tensor
-from torch.nn import Module, functional as F
+from torch.nn import Module, functional as F, LeakyReLU
 from torch.optim import Adam
 
-from generators import AbstractGenerator
 from utils import MLP
+from .abstract_generator import AbstractGenerator
 
 
 class SeededGenerator(AbstractGenerator):
@@ -24,6 +24,9 @@ class SeededGenerator(AbstractGenerator):
 
         if loss_function is None:
             loss_function = F.mse_loss
+
+        if activation is None:
+            activation = LeakyReLU()
 
         # The actual network, which is a simple multi-layered perceptron
         self.nn = MLP(in_size=1 + self.embedding_size, out_size=self.embedding_size, hidden=hidden,

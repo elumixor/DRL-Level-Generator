@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from torch import Tensor
-from torch.nn import Module, functional as F
+from torch.nn import Module, functional as F, LeakyReLU
 from torch.optim import Adam
 
 from utils import MLP
@@ -19,6 +19,9 @@ class SingleLevelGenerator(AbstractGenerator):
 
         if optimizer_class is None:
             optimizer_class = Adam
+
+        if activation is None:
+            activation = LeakyReLU()
 
         # The actual network, which is a simple multi-layered perceptron
         self.nn = MLP(in_size=1, out_size=self.embedding_size, hidden=hidden, activation=activation)
