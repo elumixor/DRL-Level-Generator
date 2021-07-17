@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from random import random
 from typing import Optional, List, Callable
 
@@ -62,10 +63,11 @@ class DQNAgent(AbstractQAgent):
 
         return torch.argmax(q_values)
 
-    def get_q_values(self, state: Tensor) -> Tensor:
-        return self.nn(state)
+    def get_q_values(self, state: Tensor, with_grad=False) -> Tensor:
+        with torch.no_grad() if with_grad else nullcontext():
+            return self.nn(state)
 
-    def update(self, states: Tensor, actions: List[int], rewards: Tensor, next_states: Tensor, done: Tensor):
+    def update(self, states: Tensor, actions: List[int], rewards: Tensor, next_states: Tensor, done: Tensor) -> float:
         q = self.nn(states)
 
         # Select the Q-values, that were selected (by actions)
@@ -90,4 +92,4 @@ class DQNAgent(AbstractQAgent):
         # Decay the epsilon
         self.epsilon.decay()
 
-        return loss
+        return loss.item()

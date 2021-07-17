@@ -4,6 +4,7 @@ from typing import Union
 
 import numpy as np
 import torch
+from torch import Tensor
 
 from .dot_dict import DotDict, to_dot_dict
 from .epsilon_decay import EpsilonDecay
@@ -47,6 +48,16 @@ def approx(a: float, b: float, eps=1e-7):
 
 def mean(iterable):
     return sum(iterable) / len(iterable)
+
+
+def discounted_rewards(rewards: Tensor, discounting: float):
+    res = torch.zeros_like(rewards)
+    last = torch.zeros_like(rewards[0])
+
+    for i in reversed(range(rewards.shape[0])):
+        last = res[i] = rewards[i] + discounting * last
+
+    return res
 
 
 class timed:

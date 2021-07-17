@@ -34,7 +34,7 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
                 # an agent uses stochastic strategy, or environment is stochastic
                 for i_evaluation in range(self.num_evaluations):
                     # Evaluate the trajectory
-                    trajectory_difficulty, q_max, q_min = self.get_trajectory_q_values(state, agent)
+                    trajectory_difficulty, q_max, q_min = self.sample_trajectory(state, agent)
                     difficulties[i_state][i_agent][i_evaluation] = trajectory_difficulty
 
                     # Update bounds for normalization
@@ -52,7 +52,7 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
 
         return difficulties
 
-    def get_trajectory_q_values(self, state: Tensor, agent: AbstractQAgent):
+    def sample_trajectory(self, state: Tensor, agent: AbstractQAgent):
         """
         Evaluates a trajectory starting at the state by a particular agent, returns q-values of that trajectory
         :param state: Starting state of the trajectory
@@ -68,13 +68,14 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
             q_values = agent.get_q_values(state)
 
             # Calculate state difficulty
-            state_difficulty = q_values.max() - q_values.mean()
+            q_values_max = q_values.max()
+            state_difficulty = q_values_max - q_values.mean()
 
             # Update trajectory difficulty
             trajectory_difficulty += state_difficulty
 
             # Update bounds
-            q_max = max(q_max, q_values.max())
+            q_max = max(q_max, q_values_max)
             q_min = min(q_min, q_values.min())
 
             action = agent.get_action(state)
