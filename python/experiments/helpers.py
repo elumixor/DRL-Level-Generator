@@ -4,7 +4,7 @@ from environments import PendulumEnvJIT
 from environments.pendulum import State
 from environments.pendulum.state import enemy_x as s_enemy_x, size as state_size, create_variable
 from evaluators import TrajectoryRewardsEvaluator, DirectEvaluator
-from evaluators.direct_actor import Actor
+from evaluators.direct_actor import DirectActor
 from evaluators.utils import weight_skills
 from shared_parameters import *
 
@@ -16,7 +16,7 @@ def set_matplotlib_colors(matplotlib, text_color="black", other_color="white"):
     matplotlib.rcParams['text.color'] = text_color
 
 
-def create_actors(num_actors, actor_class=Actor):
+def create_actors(num_actors, actor_class=DirectActor):
     skills = np.linspace(0, 1, num_actors, dtype=np.float32)
     actors = np.array([actor_class(skill) for skill in skills])
     weights = weight_skills(skills, skill_weighting.mean, skill_weighting.std, skill_weighting.skew)
@@ -68,7 +68,7 @@ class SimpleTRE(TrajectoryRewardsEvaluator):
         env = PendulumEnvJIT()
 
         skills = np.linspace(0, 1, num_actors)
-        actors = [Actor(skill) for skill in skills]
+        actors = [DirectActor(skill) for skill in skills]
 
         # Also compute the weighting of each skill, w.r.t. the skewed normal distribution
         actors_weights = weight_skills(skills, skill_weighting.mean, skill_weighting.std, skill_weighting.skew)

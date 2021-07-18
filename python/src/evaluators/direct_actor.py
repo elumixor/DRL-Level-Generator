@@ -17,7 +17,7 @@ SWITCH = 1
     ("action_distance", float32),
     ("randomness", float32),
 ])
-class Actor:
+class DirectActor:
     def __init__(self, skill, action_distance: Optional[torch.Tensor] = None):
         if action_distance is None:
             action_distance = 0.1

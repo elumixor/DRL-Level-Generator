@@ -1,4 +1,4 @@
-import abc
+from abc import ABC
 from typing import Generic, List, TypeVar
 
 import torch
@@ -10,7 +10,7 @@ from utils import approx
 TAgent = TypeVar("TAgent")
 
 
-class AbstractWeightedEvaluator(abc.ABC, AbstractEvaluator, Generic[TAgent]):
+class AbstractWeightedEvaluator(AbstractEvaluator, Generic[TAgent], ABC):
     def __init__(self, environment: AbstractEnvironment, agents: List[TAgent], weights: List[float],
                  num_evaluations: int = 1, max_trajectory_length: int = 1):
         if len(agents) != len(weights):

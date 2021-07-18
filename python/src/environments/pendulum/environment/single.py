@@ -83,12 +83,19 @@ class PendulumEnv(BaseEnv[vec, vec]):
 
 @jitclass([
     ("_state_space", types.ListType(typeof(BoxSpaceJIT(np.zeros(2, dtype=np.float32), np.zeros(2, dtype=np.float32))))),
-    ("_action_space", types.ListType(typeof(DiscreteSpaceJIT(2))))
+    ("_action_space", types.ListType(typeof(DiscreteSpaceJIT(2)))),
+    ("step_reward", types.float32),
+    ("action_cost", types.float32),
+    ("death_cost", types.float32),
 ])
 class PendulumEnvJIT:
-    def __init__(self):
+    def __init__(self, step_reward: float, action_cost: float, death_cost: float):
         low = State(0.05, 0, 0.05, 0.1, -1, -1, 0.05, 0, 0, 0)
         high = State(1, 90, 1, 1, 1, 1, 1, 90, 1, 90)
+
+        self.step_reward = step_reward
+        self.action_cost = action_cost
+        self.death_cost = death_cost
 
         self._state_space = typed.List([BoxSpaceJIT(low, high)])
         self._action_space = typed.List([DiscreteSpaceJIT(2)])
@@ -102,4 +109,4 @@ class PendulumEnvJIT:
         return self._action_space[0]
 
     def transition(self, state: vec, action: vec) -> Tuple[vec, float, bool]:
-        return transition(state, action)
+        return transition(state, action, self.step_reward, self.action_cost, self.death_cost)
