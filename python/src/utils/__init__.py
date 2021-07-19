@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from random import random
 from typing import Union
 
 import numpy as np
@@ -48,6 +49,10 @@ def approx(a: float, b: float, eps=1e-7):
 
 def mean(iterable):
     return sum(iterable) / len(iterable)
+
+
+def sign(x):
+    return -x if random() < 0.5 else x
 
 
 def discounted_rewards(rewards: Tensor, discounting: float):

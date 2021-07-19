@@ -1,5 +1,7 @@
 from typing import Optional
 
+import numpy as np
+
 from rendering import RenderingContext, GameObject, Color, Circle, Point
 from utils import vec
 from .enemy import Enemy
@@ -9,7 +11,7 @@ from ...renderer import Renderer, TState
 
 
 class PendulumRenderer(Renderer[vec]):
-    def render_state(self, state: TState, to_image=False, **kwargs):
+    def render_state(self, state: np.ndarray, to_image=False, **kwargs):
         if not self.pendulum:
             self.pendulum = Pendulum(state)
             self.enemy = Enemy(state)
