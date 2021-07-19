@@ -10,7 +10,7 @@ from shared_parameters import *
 
 delta_time = 1
 env = PendulumEnvironment(bob_radius, max_angle, connector_length, vertical_speed, angular_speed, enemy_radius,
-                          enemy_x_min, enemy_x_max, enemy_y, delta_time=delta_time)
+                          enemy_x_min, enemy_x_max, enemy_y, time_scale=delta_time)
 renderer = PendulumRenderer(bob_radius, connector_length, enemy_radius, enemy_y)
 
 x = enemy_x
@@ -42,12 +42,12 @@ while not ctx.is_key_held(glfw.KEY_ESCAPE):
     # F - Faster
     if ctx.is_key_pressed(glfw.KEY_F):
         delta_time *= 2
-        env.delta_time = delta_time
+        env.time_scale = delta_time
 
     # S - Slower
     if ctx.is_key_pressed(glfw.KEY_S):
         delta_time /= 2
-        env.delta_time = delta_time
+        env.time_scale = delta_time
 
     if ctx.is_key_pressed(glfw.KEY_SPACE):
         state, reward, done = env.transition(state, torch.tensor(SWITCH))

@@ -40,9 +40,9 @@ class PendulumEnvironment(AbstractEnvironment):
 
     def __init__(self, bob_radius: float, max_angle: float, connector_length: float,
                  vertical_speed: float, angular_speed: float, enemy_radius: float, enemy_x_min: float,
-                 enemy_x_max: float, *enemies_y: float, delta_time: float = 1, step_reward: float = 0.0,
-                 action_cost: float = 0.0, death_cost: float = 0.0):
-        self.delta_time = delta_time
+                 enemy_x_max: float, *enemies_y: float, time_scale: float = 1, step_reward: float = 0.0,
+                 action_reward: float = 0.0, death_reward: float = 0.0):
+        self.time_scale = time_scale
 
         self.bob_radius = bob_radius
         self.max_angle = max_angle
@@ -59,8 +59,8 @@ class PendulumEnvironment(AbstractEnvironment):
         self.collision_distance = self.bob_radius + self.enemy_radius
 
         self.step_reward = step_reward
-        self.action_reward = action_cost
-        self.death_reward = death_cost
+        self.action_reward = action_reward
+        self.death_reward = death_reward
 
     def get_starting_state(self) -> PendulumState:
         """
@@ -91,14 +91,14 @@ class PendulumEnvironment(AbstractEnvironment):
         reward = self.action_reward if switch else 0.0
 
         # Add angular movement
-        current_angle = current_angle + angular_speed * self.delta_time
+        current_angle = current_angle + angular_speed * self.time_scale
 
         if current_angle.abs() > self.max_angle:
             current_angle = current_angle.sign() * (self.max_angle - (current_angle.abs() - self.max_angle))
             angular_speed *= -1
 
         # Add vertical movement
-        vertical_position = vertical_position + self.vertical_speed * self.delta_time
+        vertical_position = vertical_position + self.vertical_speed * self.time_scale
 
         # Combine into the new observation
         new_state = PendulumState.create(current_angle, angular_speed, vertical_position, *enemies_x)
