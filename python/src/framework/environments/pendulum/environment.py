@@ -91,14 +91,14 @@ class PendulumEnvironment(AbstractEnvironment):
         reward = self.action_reward if switch else 0.0
 
         # Add angular movement
-        current_angle = current_angle + angular_speed
+        current_angle = current_angle + angular_speed * self.delta_time
 
         if current_angle.abs() > self.max_angle:
             current_angle = current_angle.sign() * (self.max_angle - (current_angle.abs() - self.max_angle))
             angular_speed *= -1
 
         # Add vertical movement
-        vertical_position = vertical_position + self.vertical_speed
+        vertical_position = vertical_position + self.vertical_speed * self.delta_time
 
         # Combine into the new observation
         new_state = PendulumState.create(current_angle, angular_speed, vertical_position, *enemies_x)

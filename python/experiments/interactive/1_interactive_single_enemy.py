@@ -8,8 +8,9 @@ from framework.environments import PendulumEnvironment, PendulumRenderer
 from rendering import RenderingContext
 from shared_parameters import *
 
+delta_time = 1
 env = PendulumEnvironment(bob_radius, max_angle, connector_length, vertical_speed, angular_speed, enemy_radius,
-                          enemy_x_min, enemy_x_max, enemy_y)
+                          enemy_x_min, enemy_x_max, enemy_y, delta_time=delta_time)
 renderer = PendulumRenderer(bob_radius, connector_length, enemy_radius, enemy_y)
 
 x = enemy_x
@@ -38,16 +39,26 @@ while not ctx.is_key_held(glfw.KEY_ESCAPE):
         state.set_enemy_x(0, x)
         start_state.set_enemy_x(0, x)
 
+    # F - Faster
+    if ctx.is_key_pressed(glfw.KEY_F):
+        delta_time *= 2
+        env.delta_time = delta_time
+
+    # S - Slower
+    if ctx.is_key_pressed(glfw.KEY_S):
+        delta_time /= 2
+        env.delta_time = delta_time
+
     if ctx.is_key_pressed(glfw.KEY_SPACE):
         state, reward, done = env.transition(state, torch.tensor(SWITCH))
 
     else:
-        time.sleep(0.016)
+        time.sleep(0.016 * delta_time)
         state, reward, done = env.transition(state, torch.tensor(NOP))
 
     total_reward += reward
 
-    if step >= 100:
+    if step >= 100 / delta_time:
         done = True
 
     if done or ctx.is_key_pressed(glfw.KEY_R):
