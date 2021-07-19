@@ -52,16 +52,16 @@ class DQNAgent(AbstractQAgent):
         self.optim = optimizer_class(self.nn.parameters(), lr=lr)
         self.loss_function = loss_function
 
-    def get_action(self, state: Tensor) -> Tensor:
+    def get_action(self, state: Tensor) -> int:
         # With probability epsilon, select random action
         if random() < self.epsilon.value:
-            return torch.randint(0, self.action_size, [1])
+            return torch.randint(0, self.action_size, [1]).item()
 
         # Otherwise select the action with the highest Q-value
         with torch.no_grad():
             q_values = self.nn(state)
 
-        return torch.argmax(q_values)
+        return torch.argmax(q_values).item()
 
     def get_q_values(self, state: Tensor, with_grad=False) -> Tensor:
         with torch.no_grad() if with_grad else nullcontext():

@@ -81,9 +81,9 @@ class PendulumEnvironment(AbstractEnvironment):
 
         return PendulumState.create(current_angle, angular_speed, vertical_position, *enemies_x)
 
-    def transition(self, state: Tensor, action: Tensor) -> Tuple[PendulumState, float, bool]:
+    def transition(self, state: Tensor, action: int) -> Tuple[PendulumState, float, bool]:
         current_angle, angular_speed, vertical_position, *enemies_x = state
-        switch = action.item() == 1
+        switch = action == 1
 
         if switch:
             angular_speed = angular_speed * -1

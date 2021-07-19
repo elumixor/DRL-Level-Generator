@@ -35,11 +35,11 @@ class PGAgent(AbstractAgent):
         self.optim = optimizer_class(self.nn.parameters(), lr=lr)
         self.loss_function = loss_function
 
-    def get_action(self, state: Tensor) -> Tensor:
+    def get_action(self, state: Tensor) -> int:
         with torch.no_grad():
             logits = self.nn(state)
             distribution = Categorical(logits=logits)
-            return distribution.sample()
+            return distribution.sample().item()
 
     def get_state_difficulty(self, state: Tensor) -> Tensor:
         """

@@ -6,6 +6,10 @@ class PendulumState(Tensor):
     def create(cls, current_angle: float, angular_speed: float, vertical_position: float, *enemies_x: float):
         return PendulumState([current_angle, angular_speed, vertical_position, *enemies_x])
 
+    @classmethod
+    def get_size(cls, num_enemies: int = 1):
+        return 3 + num_enemies
+
     def get_enemy_x(self, enemy_index: int):
         return self[3 + enemy_index]
 
