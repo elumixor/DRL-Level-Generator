@@ -1,10 +1,11 @@
 from random import random
-from typing import Tuple, List
+from typing import Tuple
 
 import torch
 from torch import Tensor
 
 from utils import sign
+from .state import PendulumState
 from ..abstract_environment import AbstractEnvironment
 
 
@@ -37,9 +38,10 @@ class PendulumEnvironment(AbstractEnvironment):
 
     """
 
-    def __init__(self, delta_time: float, bob_radius: float, max_angle: float, connector_length: float,
+    def __init__(self, bob_radius: float, max_angle: float, connector_length: float,
                  vertical_speed: float, angular_speed: float, enemy_radius: float, enemy_x_min: float,
-                 enemy_x_max: float, enemies_y: List[float], step_reward: float, action_cost: float, death_cost: float):
+                 enemy_x_max: float, *enemies_y: float, delta_time: float = 1, step_reward: float = 0.0,
+                 action_cost: float = 0.0, death_cost: float = 0.0):
         self.delta_time = delta_time
 
         self.bob_radius = bob_radius
@@ -60,7 +62,7 @@ class PendulumEnvironment(AbstractEnvironment):
         self.action_reward = action_cost
         self.death_reward = death_cost
 
-    def get_starting_state(self) -> Tensor:
+    def get_starting_state(self) -> PendulumState:
         """
         Returns a randomized starting state
         :return: Tensor: [current_angle, angular_speed, vertical_position, enemy_0_x, enemy_1_x, ..., enemy_i_x]
@@ -77,9 +79,9 @@ class PendulumEnvironment(AbstractEnvironment):
         # Starting vertical position is going to always be zero
         vertical_position = 0.0
 
-        return torch.tensor([current_angle, angular_speed, vertical_position, *enemies_x])
+        return PendulumState.create(current_angle, angular_speed, vertical_position, *enemies_x)
 
-    def transition(self, state: Tensor, action: Tensor) -> Tuple[Tensor, float, bool]:
+    def transition(self, state: Tensor, action: Tensor) -> Tuple[PendulumState, float, bool]:
         current_angle, angular_speed, vertical_position, *enemies_x = state
         switch = action.item() == 1
 
@@ -99,7 +101,7 @@ class PendulumEnvironment(AbstractEnvironment):
         vertical_position = vertical_position + self.vertical_speed
 
         # Combine into the new observation
-        new_state = torch.tensor([current_angle, angular_speed, vertical_position, *enemies_x])
+        new_state = PendulumState.create(current_angle, angular_speed, vertical_position, *enemies_x)
 
         # Check collision
         bob_x = torch.sin(current_angle) * self.connector_length

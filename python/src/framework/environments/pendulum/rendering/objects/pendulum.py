@@ -29,3 +29,12 @@ class Pendulum(GameObject):
 
         self.bob.transform.local_scale = bob_radius * Point.one
         self.bob.transform.local_position = connector_length * Point.down
+
+    @property
+    def angle(self):
+        return self.transform.rotation
+
+    @angle.setter
+    def angle(self, value):
+        self.transform.rotation = value
+        self.line.transform.rotation = -value

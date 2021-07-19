@@ -8,7 +8,7 @@ from ....renderers import LazyRenderer
 
 
 class PendulumRenderer(LazyRenderer):
-    def __init__(self, bob_radius: float, connector_length: float, enemy_radius: float, enemies_y: List[float]):
+    def __init__(self, bob_radius: float, connector_length: float, enemy_radius: float, *enemies_y: float):
         super().__init__()
 
         self.bob_radius = bob_radius
@@ -28,11 +28,18 @@ class PendulumRenderer(LazyRenderer):
 
         current_angle, _, vertical_position, *enemies_x = state
 
-        self.pendulum.transform.rotation = current_angle
+        self.pendulum.angle = current_angle
         self.pendulum.y = vertical_position
 
         for enemy, x in zip(self.enemies, enemies_x):
             enemy.x = x
+
+        # Adjust camera position so that the pendulum is in the center
+        dx, _ = self.rendering_context.camera_position
+        self.rendering_context.camera_position = dx, vertical_position
+
+        # Render the scene
+        self.rendering_context.render_frame()
 
     def lazy_init(self, state: Tensor):
         # Get a rendering context

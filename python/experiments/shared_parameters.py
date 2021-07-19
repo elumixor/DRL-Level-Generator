@@ -2,7 +2,7 @@ import numpy as np
 
 # region Environment starting state
 bob_radius = 0.1
-max_angle = np.deg2rad(50)
+max_angle = float(np.deg2rad(50))
 connector_length = 0.3
 vertical_speed = 0.01
 current_angle = 0

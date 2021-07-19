@@ -1,47 +1,49 @@
 import time
 
 import glfw
+import torch
 
-from environments import PendulumEnv
-from environments.pendulum import State
-from environments.pendulum.state import enemy_x as s_enemy_x
 from evaluators.direct_actor import NOP, SWITCH
+from framework.environments import PendulumEnvironment, PendulumRenderer
 from rendering import RenderingContext
-from shared_parameters import bob_radius, max_angle, connector_length, vertical_speed, \
-    current_angle, position, angular_speed, enemy_radius, enemy_x, enemy_y
+from shared_parameters import *
 
-env = PendulumEnv()
+env = PendulumEnvironment(bob_radius, max_angle, connector_length, vertical_speed, angular_speed, enemy_radius,
+                          enemy_x_min, enemy_x_max, enemy_y)
+renderer = PendulumRenderer(bob_radius, connector_length, enemy_radius, enemy_y)
+
 x = enemy_x
-start_state = State(bob_radius, max_angle, connector_length, vertical_speed,
-                    current_angle, position, angular_speed, enemy_radius, x, enemy_y)
+start_state = env.get_starting_state()
 
 ctx = RenderingContext.instance
 
 done = False
 state = start_state
+
 total_reward = 0
 step = 0
 
 while not ctx.is_key_held(glfw.KEY_ESCAPE):
-    env.render(state)
+    renderer.render(state)
+
     step += 1
 
     if ctx.is_key_pressed(glfw.KEY_LEFT):
         x -= 0.1
-        state[s_enemy_x] = x
-        start_state[s_enemy_x] = x
+        state.set_enemy_x(0, x)
+        start_state.set_enemy_x(0, x)
 
     if ctx.is_key_pressed(glfw.KEY_RIGHT):
         x += 0.1
-        state[s_enemy_x] = x
-        start_state[s_enemy_x] = x
+        state.set_enemy_x(0, x)
+        start_state.set_enemy_x(0, x)
 
     if ctx.is_key_pressed(glfw.KEY_SPACE):
-        state, reward, done = env.transition(state, SWITCH)
+        state, reward, done = env.transition(state, torch.tensor(SWITCH))
 
     else:
         time.sleep(0.016)
-        state, reward, done = env.transition(state, NOP)
+        state, reward, done = env.transition(state, torch.tensor(NOP))
 
     total_reward += reward
 
