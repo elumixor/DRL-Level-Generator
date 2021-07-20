@@ -16,9 +16,14 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
         # The biggest, and smallest Q-values
         # Used for normalization to obtain difficulties in the [0, 1] range
         self.q_max = float("-inf")
-        self.q_min = float("-inf")
+        self.q_min = float("inf")
 
     def evaluate(self, states: Tensor) -> Tensor:
+        # Handle single state input
+        do_unsqueeze = states.ndim == 1
+        if do_unsqueeze:
+            states = states.reshape([1, -1])
+
         # First, let's collect trajectory rewards
         difficulties = torch.zeros((states.shape[0], len(self.agents), self.num_evaluations))
 
@@ -49,6 +54,10 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
 
         # Weight together the evaluations by all agents
         difficulties = (difficulties * self.weights).sum(dim=-1, keepdims=True)
+
+        # Handle single state input
+        if do_unsqueeze:
+            difficulties = difficulties.squeeze()
 
         return difficulties
 

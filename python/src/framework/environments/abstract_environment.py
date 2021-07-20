@@ -6,6 +6,13 @@ from torch import Tensor
 
 class AbstractEnvironment(abc.ABC):
     @abc.abstractmethod
+    def get_starting_state(self):
+        """
+        Returns a randomized starting state
+        """
+        pass
+
+    @abc.abstractmethod
     def transition(self, state: Tensor, action: int) -> Tuple[Tensor, float, bool]:
         """
         Applies an action in a state, and returns the next state, reward, and done flag

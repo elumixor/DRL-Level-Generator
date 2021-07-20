@@ -1,4 +1,3 @@
-import torch
 from torch import Tensor
 
 
@@ -60,10 +59,3 @@ class PendulumState(Tensor):
                    f"enemies: {', '.join([f'{x:.2f}' for x in self.enemy_x])})"
 
         return super().__str__()
-
-
-states = torch.vstack((PendulumState.create(1, 2, 3, 4, 5), PendulumState.create(1, 2, 3, 4, 5)))
-print(states)
-
-for i, s in enumerate(states):
-    print(i, type(s))
