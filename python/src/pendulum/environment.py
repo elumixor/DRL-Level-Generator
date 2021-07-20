@@ -4,9 +4,9 @@ from typing import Tuple
 import torch
 from torch import Tensor
 
+from framework import AbstractEnvironment
 from utils import sign
 from .state import PendulumState
-from ..abstract_environment import AbstractEnvironment
 
 
 class PendulumEnvironment(AbstractEnvironment):

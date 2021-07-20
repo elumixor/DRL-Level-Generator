@@ -1,10 +1,9 @@
 from typing import Optional, List
 
-from torch import Tensor
-
+from framework import LazyRenderer
 from rendering import RenderingContext, GameObject, Color
 from .objects import Enemy, Pendulum
-from ....renderers import LazyRenderer
+from ..state import PendulumState
 
 
 class PendulumRenderer(LazyRenderer):
@@ -23,7 +22,7 @@ class PendulumRenderer(LazyRenderer):
         self.enemies: Optional[List[Enemy]] = None
         self.rendering_context: Optional[RenderingContext] = None
 
-    def render(self, state: Tensor, to_image=False, resolution=1):
+    def render(self, state: PendulumState, to_image=False, resolution=1):
         super().render(state)
 
         current_angle, _, vertical_position, *enemies_x = state
@@ -44,7 +43,7 @@ class PendulumRenderer(LazyRenderer):
         # Render the scene
         self.rendering_context.render_frame()
 
-    def lazy_init(self, state: Tensor):
+    def lazy_init(self, state: PendulumState):
         # Get a rendering context
         self.rendering_context: RenderingContext = RenderingContext.instance
 
@@ -61,5 +60,5 @@ class PendulumRenderer(LazyRenderer):
         self.pendulum = Pendulum(self.bob_radius, self.connector_length, parent=self.scene)
 
         # Create enemies
-        enemies_x = state[3:]
+        enemies_x = state.enemy_x
         self.enemies = [Enemy(x, y, self.enemy_radius, parent=self.scene) for x, y in zip(enemies_x, self.enemies_y)]

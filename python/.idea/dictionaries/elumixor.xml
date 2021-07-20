@@ -11,9 +11,11 @@
       <w>polyak</w>
       <w>renderable</w>
       <w>rollout</w>
+      <w>skewnorm</w>
       <w>softplus</w>
       <w>tensored</w>
       <w>unclamped</w>
+      <w>unsqueeze</w>
       <w>wandb</w>
     </words>
   </dictionary>

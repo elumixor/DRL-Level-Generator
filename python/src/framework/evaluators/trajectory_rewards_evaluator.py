@@ -22,14 +22,20 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
         self.reward_max = float("-inf")
         self.reward_min = float("-inf")
 
-    def evaluate(self, states: Tensor) -> Tensor:
+    def evaluate(self, states: Tensor, verbose=False) -> Tensor:
         """
         1. In a specified environment, embeddings are translated into levels.
         2. Then trajectories are sampled using different agents with different skill levels.
         3. The individual difficulties are then weighted and summed using the skill weighting.
-        :param states: Level embeddings to evaluate
+        :param states: Level embeddings to evaluate, shape (num_states, embedding_size)
+        :param verbose: If True, will write differnet debug outputs
         :return: Difficulties, shape (num_embeddings, 1)
         """
+        # Handle single state input
+        do_unsqueeze = states.ndim == 1
+        if do_unsqueeze:
+            states = states.reshape([1, -1])
+
         # First, let's collect trajectory rewards
         trajectory_rewards = torch.zeros((states.shape[0], len(self.agents), self.num_evaluations))
 
@@ -48,18 +54,50 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
                     trajectory_reward = self.evaluate_trajectory(state, agent)
                     trajectory_rewards[i_state][i_agent][i_evaluation] = trajectory_reward
 
+        if verbose:
+            print("Trajectory rewards:")
+            print(trajectory_rewards)
+
         # Update the biggest and the smallest trajectory rewards
         self.reward_max = max(self.reward_max, trajectory_rewards.max())
         self.reward_min = max(self.reward_min, trajectory_rewards.min())
 
+        # When the maximum reward equals the minimum reward, we will return the zero difficulty,
+        # but strictly speaking, it's not defined
+        if self.reward_max == self.reward_min:
+            if verbose:
+                print(f"Maximum reward was equal to the minimum reward, returning zero difficulty.")
+
+            return torch.zeros(states.shape[:-1])
+
+        if verbose:
+            print(f"Maximum reward: {self.reward_max}")
+            print(f"Minimum reward: {self.reward_min}")
+
         # Calculate the difficulties
         difficulties = (self.reward_max - trajectory_rewards) / (self.reward_max - self.reward_min)
+
+        if verbose:
+            print("Difficulties")
+            print(difficulties)
 
         # Weight together the evaluations for the same agent
         difficulties = difficulties.mean(dim=-1)
 
+        if verbose:
+            print("Difficulties per agent:")
+            print(difficulties)
+
         # Weight together the evaluations by all agents
-        difficulties = (difficulties * self.weights).sum(dim=-1, keepdims=True)
+        difficulties = (difficulties * self.weights).sum(dim=-1)
+
+        if verbose:
+            print("Weighted:")
+            print(difficulties)
+
+        # Handle single state input
+        if do_unsqueeze:
+            difficulties = difficulties.squeeze()
 
         return difficulties
 

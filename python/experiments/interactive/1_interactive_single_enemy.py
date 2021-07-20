@@ -4,7 +4,7 @@ import glfw
 import torch
 
 from evaluators.direct_actor import NOP, SWITCH
-from framework.environments import PendulumEnvironment, PendulumRenderer
+from pendulum import PendulumEnvironment, PendulumRenderer
 from rendering import RenderingContext
 from shared_parameters import *
 
@@ -31,13 +31,13 @@ while not ctx.is_key_held(glfw.KEY_ESCAPE):
 
     if ctx.is_key_pressed(glfw.KEY_LEFT):
         x -= 0.1
-        state.set_enemy_x(0, x)
-        start_state.set_enemy_x(0, x)
+        state.set_enemy_x(x)
+        start_state.set_enemy_x(x)
 
     if ctx.is_key_pressed(glfw.KEY_RIGHT):
         x += 0.1
-        state.set_enemy_x(0, x)
-        start_state.set_enemy_x(0, x)
+        state.set_enemy_x(x)
+        start_state.set_enemy_x(x)
 
     # F - Faster
     if ctx.is_key_pressed(glfw.KEY_F):
