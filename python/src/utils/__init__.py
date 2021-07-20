@@ -22,7 +22,20 @@ vec = Union[np.ndarray, torch.tensor]
 
 def save(obj, path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    obj.save(path)
+    if issubclass(type(obj), torch.nn.Module):
+        torch.save(obj, path)
+        return
+
+    torch.save(obj, path)
+
+
+def load(path, none_on_error=False):
+    try:
+        return torch.load(path)
+    except FileNotFoundError as e:
+        if none_on_error:
+            return None
+        raise e
 
 
 def discounted_rewards(rewards: Tensor, discounting: float):

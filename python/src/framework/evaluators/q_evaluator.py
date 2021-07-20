@@ -55,11 +55,7 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
         # Weight together the evaluations by all agents
         difficulties = (difficulties * self.weights).sum(dim=-1, keepdims=True)
 
-        # Handle single state input
-        if do_unsqueeze:
-            difficulties = difficulties.squeeze()
-
-        return difficulties
+        return difficulties.squeeze()
 
     def sample_trajectory(self, state: Tensor, agent: AbstractQAgent):
         """

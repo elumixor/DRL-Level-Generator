@@ -71,11 +71,7 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
         # Weight together the evaluations by all agents
         difficulties = (difficulties * self.weights).sum(dim=-1)
 
-        # Handle single state input
-        if do_unsqueeze:
-            difficulties = difficulties.squeeze()
-
-        return difficulties
+        return difficulties.squeeze()
 
     def evaluate_trajectory(self, state: Tensor, agent: AbstractAgent):
         """
