@@ -60,6 +60,17 @@ class DQNAgent(AbstractQAgent):
         self.memory = MemoryBuffer(capacity=memory_capacity)
         self.training_sample_size = training_sample_size
 
+    @property
+    def eval(self):
+        return self.epsilon.value == 0.0
+
+    @eval.setter
+    def eval(self, value: bool):
+        if value:
+            self.epsilon.eval()
+        else:
+            self.epsilon.train()
+
     def __copy__(self):
         result = DQNAgent(self.state_size, self.action_size, self.hidden, self.activation, type(self.optim), self.lr,
                           self.loss_function, self.memory.capacity, self.training_sample_size, self.epsilon.initial,

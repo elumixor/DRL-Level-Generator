@@ -39,12 +39,12 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
                 # an agent uses stochastic strategy, or environment is stochastic
                 for i_evaluation in range(self.num_evaluations):
                     # Evaluate the trajectory
-                    trajectory_difficulty, q_max, q_min = self.sample_trajectory(state, agent)
+                    trajectory_difficulty, q_min, q_max = self.sample_trajectory(state, agent)
                     difficulties[i_state][i_agent][i_evaluation] = trajectory_difficulty
 
                     # Update bounds for normalization
                     self.q_max = max(self.q_max, q_max)
-                    self.q_min = max(self.q_min, q_min)
+                    self.q_min = min(self.q_min, q_min)
 
         # Normalize the difficulties using the maximum and minimum Q-values
         difficulties = self.normalize(difficulties)
@@ -99,4 +99,4 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
         return trajectory_difficulty, q_min, q_max
 
     def normalize(self, difficulties):
-        return (difficulties - self.q_min) / (self.q_max - self.q_min)
+        return difficulties / (self.q_max - self.q_min)
