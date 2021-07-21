@@ -1,19 +1,12 @@
-from numba import njit, prange
-
 from environments import PendulumEnvJIT
 from environments.pendulum import State
 from environments.pendulum.state import enemy_x as s_enemy_x, size as state_size, create_variable
+from evaluators.utils import weight_skills
+from numba import njit, prange
+
 from evaluators import TrajectoryRewardsEvaluator, DirectEvaluator
 from evaluators.direct_actor import DirectActor
-from evaluators.utils import weight_skills
 from shared_parameters import *
-
-
-def set_matplotlib_colors(matplotlib, text_color="black", other_color="white"):
-    for p in ['axes.labelcolor', 'xtick.color', 'ytick.color']:
-        matplotlib.rcParams[p] = other_color
-
-    matplotlib.rcParams['text.color'] = text_color
 
 
 def create_actors(num_actors, actor_class=DirectActor):

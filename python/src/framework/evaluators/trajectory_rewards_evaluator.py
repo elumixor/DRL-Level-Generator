@@ -20,7 +20,7 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
         # The biggest, and smallest trajectory rewards.
         # Used for normalization to obtain difficulties in the [0, 1] range
         self.reward_max = float("-inf")
-        self.reward_min = float("-inf")
+        self.reward_min = float("inf")
 
     def evaluate(self, states: Tensor) -> Tensor:
         """
@@ -55,7 +55,7 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
 
         # Update the biggest and the smallest trajectory rewards
         self.reward_max = max(self.reward_max, trajectory_rewards.max())
-        self.reward_min = max(self.reward_min, trajectory_rewards.min())
+        self.reward_min = min(self.reward_min, trajectory_rewards.min())
 
         # When the maximum reward equals the minimum reward, we will return the zero difficulty,
         # but strictly speaking, it's not defined

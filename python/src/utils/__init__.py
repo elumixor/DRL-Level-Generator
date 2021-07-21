@@ -48,6 +48,15 @@ def discounted_rewards(rewards: Tensor, discounting: float):
     return res
 
 
+def set_matplotlib_colors(matplotlib, text_color="black", other_color="white", label_color="white"):
+    matplotlib.rcParams["axes.labelcolor"] = label_color
+
+    for p in ['xtick.color', 'ytick.color']:
+        matplotlib.rcParams[p] = other_color
+
+    matplotlib.rcParams['text.color'] = text_color
+
+
 class timed:
     def __init__(self):
         self.start_time: float

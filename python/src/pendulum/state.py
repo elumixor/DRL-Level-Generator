@@ -52,10 +52,11 @@ class PendulumState(Tensor):
 
     def to_string(self):
         if self.ndim == 1:
-            return f"Pendulum(" \
-                   f"angle: {self.current_angle:.2f}, " \
-                   f"angular_speed: {self.angular_speed:.2f}, " \
-                   f"vertical_position: {self.vertical_position:.2f}, " \
-                   f"enemies: {', '.join([f'{x:.2f}' for x in self.enemy_x])})"
+            return f"PendulumState(\n  " \
+                   f"angle: {self.current_angle:.2f},\n  " \
+                   f"angular_speed: {self.angular_speed:.2f},\n  " \
+                   f"vertical_position: {self.vertical_position:.2f},\n  " \
+                   f"enemies: {', '.join([f'{x:.2f}' for x in self.enemy_x])}\n" \
+                   ")"
 
         return super().__str__()
