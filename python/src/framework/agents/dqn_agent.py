@@ -78,8 +78,8 @@ class DQNAgent(AbstractQAgent):
         # Copy NN parameters' data
         for p_source, p_result, p_result_target in zip(self.nn.parameters(), result.nn.parameters(),
                                                        result.target_nn.parameters()):
-            p_result.data = p_source.data
-            p_result_target.data = p_source.data
+            p_result.data = p_source.data.clone()
+            p_result_target.data = p_source.data.clone()
 
         return result
 

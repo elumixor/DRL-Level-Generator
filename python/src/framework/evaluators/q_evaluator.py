@@ -71,10 +71,11 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
         for trajectory_length in range(self.max_trajectory_length):
             # Get Q-values using the agent
             q_values = agent.get_q_values(state)
+            num_actions = q_values.shape[-1]
 
             # Calculate state difficulty
             q_values_max = q_values.max()
-            state_difficulty = q_values_max - q_values.mean()
+            state_difficulty = (q_values_max - q_values.mean()) * num_actions
 
             # Update trajectory difficulty
             trajectory_difficulty += state_difficulty
