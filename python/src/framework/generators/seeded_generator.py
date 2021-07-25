@@ -16,7 +16,8 @@ class SeededGenerator(AbstractGenerator):
     """
 
     def __init__(self, bounds: Tensor, hidden: Optional[List[int]] = None, activation: Optional[Module] = None,
-                 optimizer_class=None, lr=0.01, loss_function: Optional[Callable[[Tensor, Tensor], Tensor]] = None):
+                 optimizer_class=None, lr=0.01, loss_function: Optional[Callable[[Tensor, Tensor], Tensor]] = None,
+                 offsets_weight: float = 1.0):
         super().__init__(bounds)
 
         if optimizer_class is None:
@@ -39,6 +40,8 @@ class SeededGenerator(AbstractGenerator):
 
         self.d_in: Optional[Tensor] = None
         self.offsets: Optional[Tensor] = None
+
+        self.offsets_weight = offsets_weight
 
     def parameters(self):
         return self.nn.parameters()
@@ -101,7 +104,7 @@ class SeededGenerator(AbstractGenerator):
         # Also minimize generated offsets. This is crucial!
         offsets_loss = torch.norm(self.offsets, dim=-1).mean()
 
-        loss = difficulty_loss + offsets_loss
+        loss = difficulty_loss + self.offsets_weight * offsets_loss
 
         # Perform gradient step
         self.optim.zero_grad()
