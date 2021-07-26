@@ -11,6 +11,7 @@ angular_speed = 0.05
 enemy_radius = 0.1
 enemy_x = 0.1
 enemy_y = 0.25
+enemy_y_1 = 0.65
 # endregion
 
 enemy_x_min = -0.5
@@ -23,7 +24,8 @@ epochs = 100000
 
 num_actors = 50
 num_evaluations = 50
-max_trajectory_length = 75
+max_trajectory_length = 100
+max_trajectory_length_1 = 150
 
 
 class skill_weighting:

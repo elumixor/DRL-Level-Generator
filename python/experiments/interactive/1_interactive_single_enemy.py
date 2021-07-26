@@ -1,10 +1,9 @@
 import time
 
 import glfw
-import torch
 
-from evaluators.direct_actor import NOP, SWITCH
 from pendulum import PendulumEnvironment, PendulumRenderer
+from pendulum.actions import NOP, SWITCH
 from rendering import RenderingContext
 from shared_parameters import *
 
@@ -13,8 +12,8 @@ env = PendulumEnvironment(bob_radius, max_angle, connector_length, vertical_spee
                           enemy_x_min, enemy_x_max, enemy_y, time_scale=delta_time)
 renderer = PendulumRenderer(bob_radius, connector_length, enemy_radius, enemy_y)
 
-x = enemy_x
 start_state = env.get_starting_state()
+x = start_state.enemy_x
 
 ctx = RenderingContext.instance
 
@@ -31,13 +30,13 @@ while not ctx.is_key_held(glfw.KEY_ESCAPE):
 
     if ctx.is_key_pressed(glfw.KEY_LEFT):
         x -= 0.1
-        state.set_enemy_x(x)
-        start_state.set_enemy_x(x)
+        state.enemy_x = x
+        start_state.enemy_x = x
 
     if ctx.is_key_pressed(glfw.KEY_RIGHT):
         x += 0.1
-        state.set_enemy_x(x)
-        start_state.set_enemy_x(x)
+        state.enemy_x = x
+        start_state.enemy_x = x
 
     # F - Faster
     if ctx.is_key_pressed(glfw.KEY_F):
@@ -50,15 +49,15 @@ while not ctx.is_key_held(glfw.KEY_ESCAPE):
         env.time_scale = delta_time
 
     if ctx.is_key_pressed(glfw.KEY_SPACE):
-        state, reward, done = env.transition(state, torch.tensor(SWITCH))
+        state, reward, done = env.transition(state, SWITCH)
 
     else:
         time.sleep(0.016 * delta_time)
-        state, reward, done = env.transition(state, torch.tensor(NOP))
+        state, reward, done = env.transition(state, NOP)
 
     total_reward += reward
 
-    if step >= 100 / delta_time:
+    if step >= max_trajectory_length / delta_time:
         done = True
 
     if done or ctx.is_key_pressed(glfw.KEY_R):
