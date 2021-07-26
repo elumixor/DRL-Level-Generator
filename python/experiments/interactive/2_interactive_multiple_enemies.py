@@ -1,7 +1,6 @@
 import time
 
 import glfw
-import torch
 
 from pendulum import PendulumEnvironment, PendulumRenderer
 from pendulum.actions import NOP, SWITCH
@@ -10,11 +9,11 @@ from shared_parameters import *
 
 delta_time = 1
 env = PendulumEnvironment(bob_radius, max_angle, connector_length, vertical_speed, angular_speed, enemy_radius,
-                          enemy_x_min, enemy_x_max, enemy_y, enemy_y_1, time_scale=delta_time)
-renderer = PendulumRenderer(bob_radius, connector_length, enemy_radius, enemy_y, enemy_y_1)
+                          enemy_x_min, enemy_x_max, enemy_y, enemy_y_1, enemy_y_2, time_scale=delta_time)
+renderer = PendulumRenderer(bob_radius, connector_length, enemy_radius, enemy_y, enemy_y_1, enemy_y_2)
 
 start_state = env.get_starting_state()
-[x0, x1] = start_state.enemy_x
+enemy_x = start_state.enemy_x
 
 ctx = RenderingContext.instance
 
@@ -24,11 +23,17 @@ state = start_state
 total_reward = 0
 step = 0
 
+i = 0
+
+
+def update_selected(delta):
+    enemy_x[i] += delta
+
 
 def update_state():
     global state
-    state.enemy_x = torch.tensor([x0, x1])
-    start_state.enemy_x = torch.tensor([x0, x1])
+    state.enemy_x = enemy_x
+    start_state.enemy_x = enemy_x
 
 
 while not ctx.is_key_held(glfw.KEY_ESCAPE):
@@ -37,20 +42,20 @@ while not ctx.is_key_held(glfw.KEY_ESCAPE):
     step += 1
 
     if ctx.is_key_pressed(glfw.KEY_LEFT):
-        x0 -= 0.1
+        update_selected(-0.1)
         update_state()
 
     if ctx.is_key_pressed(glfw.KEY_RIGHT):
-        x0 += 0.1
+        update_selected(0.1)
         update_state()
 
     if ctx.is_key_pressed(glfw.KEY_UP):
-        x1 -= 0.1
-        update_state()
+        i += 1
+        i %= enemy_x.shape[0]
 
     if ctx.is_key_pressed(glfw.KEY_DOWN):
-        x1 += 0.1
-        update_state()
+        i -= 1
+        i %= enemy_x.shape[0]
 
     # F - Faster
     if ctx.is_key_pressed(glfw.KEY_F):
@@ -71,7 +76,7 @@ while not ctx.is_key_held(glfw.KEY_ESCAPE):
 
     total_reward += reward
 
-    if step >= max_trajectory_length_1 / delta_time:
+    if step >= max_trajectory_length_2 / delta_time:
         done = True
 
     if done or ctx.is_key_pressed(glfw.KEY_R):
