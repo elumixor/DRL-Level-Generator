@@ -7,7 +7,7 @@ from pendulum.actions import NOP, SWITCH
 from rendering import RenderingContext
 from shared_parameters import *
 
-delta_time = 1
+delta_time = 5
 env = PendulumEnvironment(bob_radius, max_angle, connector_length, vertical_speed, angular_speed, enemy_radius,
                           enemy_x_min, enemy_x_max, enemy_y, enemy_y_1, enemy_y_2, time_scale=delta_time)
 renderer = PendulumRenderer(bob_radius, connector_length, enemy_radius, enemy_y, enemy_y_1, enemy_y_2)

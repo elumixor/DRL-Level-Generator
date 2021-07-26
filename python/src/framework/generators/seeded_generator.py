@@ -46,6 +46,21 @@ class SeededGenerator(AbstractGenerator):
     def parameters(self):
         return self.nn.parameters()
 
+    def cuda(self):
+        return self.device("cuda")
+
+    def cpu(self):
+        return self.device("cpu")
+
+    def device(self, device):
+        self.nn.to(device=device)
+
+        self.bounds = self.bounds.to(device)
+        self.bounds_min = self.bounds_min.to(device)
+        self.bounds_diff = self.bounds_diff.to(device)
+
+        return self
+
     def generate(self, inputs: Tensor) -> Tensor:
         """
         Generates levels

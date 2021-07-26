@@ -57,6 +57,15 @@ def set_matplotlib_colors(matplotlib, text_color="black", other_color="white", l
     matplotlib.rcParams['text.color'] = text_color
 
 
+def sample_from(dataset: Tensor, size: int, indices=False):
+    i = torch.randperm(dataset.shape[0])[:size]
+
+    if not indices:
+        return dataset[i]
+    else:
+        return dataset[i], i
+
+
 class timed:
     def __init__(self):
         self.start_time: float

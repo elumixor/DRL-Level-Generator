@@ -22,11 +22,12 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
         self.reward_max = float("-inf")
         self.reward_min = float("inf")
 
-    def evaluate(self, states: Tensor) -> Tensor:
+    def evaluate(self, states: Tensor, *args, verbose=False) -> Tensor:
         """
         1. In a specified environment, embeddings are translated into levels.
         2. Then trajectories are sampled using different agents with different skill levels.
         3. The individual difficulties are then weighted and summed using the skill weighting.
+        :param verbose: If True, will print the current evaluation state - how many states are evaluated
         :param states: Level embeddings to evaluate, shape (num_states, embedding_size)
         :return: Difficulties, shape (num_embeddings, 1)
         """
@@ -42,6 +43,8 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
 
         # Find the difficulty of each state
         for i_state, state in enumerate(states):
+            if verbose and i_state % 10 == 0:
+                print(f"Evaluating {i_state}/{states.shape[0]}...")
 
             # Evaluate state by each agent
             for i_agent, (agent, weight) in enumerate(zip(self.agents, self.weights)):
@@ -52,6 +55,9 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
                     # Evaluate the trajectory
                     trajectory_reward = self.evaluate_trajectory(state, agent)
                     trajectory_rewards[i_state][i_agent][i_evaluation] = trajectory_reward
+
+        if verbose:
+            print("Done.")
 
         # Update the biggest and the smallest trajectory rewards
         self.reward_max = max(self.reward_max, trajectory_rewards.max())
@@ -69,9 +75,9 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
         difficulties = difficulties.mean(dim=-1)
 
         # Weight together the evaluations by all agents
-        difficulties = (difficulties * self.weights).sum(dim=-1)
+        difficulties = (difficulties * self.weights).sum(dim=-1, keepdims=True)
 
-        return difficulties.squeeze()
+        return difficulties
 
     def evaluate_trajectory(self, state: Tensor, agent: AbstractAgent):
         """

@@ -5,7 +5,7 @@ from torch import Tensor
 
 class AbstractEvaluator(abc.ABC):
     @abc.abstractmethod
-    def evaluate(self, embeddings: Tensor) -> Tensor:
+    def evaluate(self, embeddings: Tensor, *args, **kwargs) -> Tensor:
         """
         Evaluates levels as embeddings
         :param embeddings: Levels in embedding space, shape (num_levels, embedding_size)
@@ -13,5 +13,5 @@ class AbstractEvaluator(abc.ABC):
         """
         pass
 
-    def __call__(self, levels: Tensor) -> Tensor:
-        return self.evaluate(levels)
+    def __call__(self, levels: Tensor, *args, **kwargs) -> Tensor:
+        return self.evaluate(levels, *args, **kwargs)
