@@ -85,6 +85,13 @@ class RenderingContext:
 
         RenderingContext.__static_instance = None
 
+    def resize(self, width: float, height: float):
+        self.width = width
+        self.height = height
+        self.aspect = width / height
+        glViewport(0, 0, width, height)
+        self._projection_matrix = np.array([[1, 0, 0], [0, self.aspect, 0], [0, 0, 1]], dtype=np.float32)
+
     # noinspection PyMethodParameters
     @classproperty
     def instance(cls) -> RenderingContext:
@@ -138,11 +145,17 @@ class RenderingContext:
 
         glfw.terminate()
 
-    def render_texture(self, resolution=1.0):
+    def render_texture(self, width=None, height=None, resolution=1.0):
         glBindFramebuffer(GL_FRAMEBUFFER, self.fb)
 
-        width = round(self.width * resolution)
-        height = round(self.height * resolution)
+        if width is None:
+            width = self.width
+
+        if height is None:
+            height = self.height
+
+        width = round(width * resolution)
+        height = round(height * resolution)
 
         texture = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texture)

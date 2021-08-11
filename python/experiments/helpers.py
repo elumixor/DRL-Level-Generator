@@ -1,11 +1,8 @@
-from environments import PendulumEnvJIT
-from environments.pendulum import State
-from environments.pendulum.state import enemy_x as s_enemy_x, size as state_size, create_variable
+from evaluators import TrajectoryRewardsEvaluator, DirectEvaluator
+from evaluators.direct_actor import DirectActor
 from evaluators.utils import weight_skills
 from numba import njit, prange
 
-from evaluators import TrajectoryRewardsEvaluator, DirectEvaluator
-from evaluators.direct_actor import DirectActor
 from shared_parameters import *
 
 

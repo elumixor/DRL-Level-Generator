@@ -22,7 +22,7 @@ class PendulumRenderer(LazyRenderer):
         self.enemies: Optional[List[Enemy]] = None
         self.rendering_context: Optional[RenderingContext] = None
 
-    def render(self, state: PendulumState, to_image=False, resolution=1):
+    def render(self, state: PendulumState, to_image=False, resolution=1, width=None, height=None):
         super().render(state)
 
         current_angle, _, vertical_position, *enemies_x = state
@@ -38,7 +38,7 @@ class PendulumRenderer(LazyRenderer):
         self.rendering_context.camera_position = dx, vertical_position
 
         if to_image:
-            return self.rendering_context.render_texture(resolution=resolution)
+            return self.rendering_context.render_texture(resolution=resolution, width=width, height=height)
 
         # Render the scene
         self.rendering_context.render_frame()

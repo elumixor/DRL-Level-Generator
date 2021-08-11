@@ -1,7 +1,7 @@
-from torch import Tensor
+from framework import State
 
 
-class PendulumState(Tensor):
+class PendulumState(State):
     @classmethod
     def create(cls, current_angle: float, angular_speed: float, vertical_position: float, *enemies_x: float):
         return PendulumState([current_angle, angular_speed, vertical_position, *enemies_x])
@@ -9,6 +9,14 @@ class PendulumState(Tensor):
     @classmethod
     def get_size(cls, num_enemies: int = 1):
         return 3 + num_enemies
+
+    @property
+    def embedding(self):
+        return self.enemy_x
+
+    @embedding.setter
+    def embedding(self, value):
+        self.enemy_x = value
 
     @property
     def current_angle(self):

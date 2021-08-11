@@ -3,10 +3,12 @@ from typing import Tuple
 
 from torch import Tensor
 
+from ..state import State
+
 
 class AbstractEnvironment(abc.ABC):
     @abc.abstractmethod
-    def get_starting_state(self):
+    def get_starting_state(self) -> State:
         """
         Returns a randomized starting state
         """

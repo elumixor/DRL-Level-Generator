@@ -22,7 +22,14 @@ class TrajectoryRewardsEvaluator(AbstractWeightedEvaluator[AbstractAgent]):
         self.reward_max = float("-inf")
         self.reward_min = float("inf")
 
-    def evaluate(self, states: Tensor, *args, verbose=False) -> Tensor:
+    def __call__(self, *args, verbose=False, **kwargs):
+        return self.evaluate(*args, verbose=verbose, **kwargs)
+
+    def evaluate(self, embeddings: Tensor, *args, verbose=False, **kwargs) -> Tensor:
+        states = torch.vstack([self.environment.get_starting_state() for _ in embeddings])
+        return self.evaluate_states(states, *args, verbose=verbose, **kwargs)
+
+    def evaluate_states(self, states: Tensor, *args, verbose=False, **kwargs) -> Tensor:
         """
         1. In a specified environment, embeddings are translated into levels.
         2. Then trajectories are sampled using different agents with different skill levels.

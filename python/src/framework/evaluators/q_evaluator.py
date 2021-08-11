@@ -39,15 +39,10 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
                 # an agent uses stochastic strategy, or environment is stochastic
                 for i_evaluation in range(self.num_evaluations):
                     # Evaluate the trajectory
-                    trajectory_difficulty, q_min, q_max = self.sample_trajectory(state, agent)
-                    difficulties[i_state][i_agent][i_evaluation] = trajectory_difficulty
-
-                    # Update bounds for normalization
-                    self.q_max = max(self.q_max, q_max)
-                    self.q_min = min(self.q_min, q_min)
+                    difficulties[i_state, i_agent, i_evaluation] = self.sample_trajectory(state, agent)
 
         # Normalize the difficulties using the maximum and minimum Q-values
-        difficulties = self.normalize(difficulties)
+        difficulties = difficulties / (self.q_max - self.q_min)
 
         # Weight together the evaluations for the same agent
         difficulties = difficulties.mean(dim=-1)
@@ -65,8 +60,6 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
         :return: The difficulty of the trajectory, minimum Q-value, maximum Q-value
         """
         trajectory_difficulty = 0.0
-        q_max = float("-inf")
-        q_min = float("inf")
 
         for trajectory_length in range(self.max_trajectory_length):
             # Get Q-values using the agent
@@ -75,14 +68,19 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
 
             # Calculate state difficulty
             q_values_max = q_values.max()
+            q_values_min = q_values.min()
+
             state_difficulty = (q_values_max - q_values.mean()) * num_actions
 
             # Update trajectory difficulty
             trajectory_difficulty += state_difficulty
 
             # Update bounds
-            q_max = max(q_max, q_values_max)
-            q_min = min(q_min, q_values.min())
+            if q_values_max > self.q_max:
+                self.q_max = q_values_max
+
+            if q_values_min < self.q_min:
+                self.q_min = q_values_min
 
             action = agent.get_action(state)
             state, reward, done = self.environment.transition(state, action)
@@ -93,7 +91,4 @@ class QEvaluator(AbstractWeightedEvaluator[AbstractQAgent]):
         # Average the individual states' difficulties
         trajectory_difficulty /= (trajectory_length + 1)
 
-        return trajectory_difficulty, q_min, q_max
-
-    def normalize(self, difficulties):
-        return difficulties / (self.q_max - self.q_min)
+        return trajectory_difficulty
